@@ -1,0 +1,86 @@
+/** ***************************************************************************
+ *  \file    state_machine.h
+ *  \author  Hugo Gimbert - Olivier Ly
+ *  \date    2010-12
+ *
+ *  \brief   State machine infrastructure.
+ *****************************************************************************/
+#ifndef STATE_MACHINE_H
+#define STATE_MACHINE_H
+#include <stdlib.h>
+
+class State {
+	int wait_n_tick;
+public:
+	State() : wait_n_tick(0) {};
+	bool is_sleeping() { if (wait_n_tick == 0) return false; else wait_n_tick--; return true; }
+	void sleep_tick(int tick_nb) { wait_n_tick = (tick_nb > 0)? tick_nb : 0; }
+	bool ready() { return (wait_n_tick == 0); }
+
+	virtual bool terminal() = 0;
+	virtual void entry() = 0;
+	virtual void activity() = 0;
+	virtual void quit() = 0;
+	virtual State * transition() = 0;
+};
+
+class StateMachine {
+public:
+	State * init_state;
+	State * active_state;
+	StateMachine();
+
+	/*! \brief this is an action done at every tic at every state */
+	virtual void activity() = 0;
+
+	/*! \brief user defined initialisation procedure. The requested point
+	 *  is that it must define the init_state. */
+	virtual void init() = 0;
+
+	/*! \brief start the machine. The init_state must have been defined. Note
+	 *  that this function is called by the constructor.
+	 *  \return 1 if ok, 0 otherwise. */
+	int reset();
+
+	/*! \brief the general scheduling function of the machine.
+	 *  \return 0 if the machine reached a terminal state. 1 if the machine
+	 *  is still running (RAS). -1 if active_state==NULL. */
+	int tic();
+};
+
+
+/*****************************************************************************/
+
+#define DECLARE_STATE(StateName)            \
+class StateName : public State {            \
+  static State * singleton;                 \
+public:                                     \
+  static State * get_instance() {           \
+    if (singleton==NULL)                    \
+	  singleton = new StateName();          \
+	  return singleton;                     \
+    }                                       \
+  bool terminal();                          \
+  void entry();                             \
+  void activity();                          \
+  void quit();                              \
+  State * transition();                     \
+};                                          \
+State * StateName::singleton = NULL;
+
+#define TRANSITION(cond, target)                    \
+  if (cond) { return target::get_instance(); }
+
+#define JUMP(target)                                \
+  return target::get_instance();
+
+
+#define DECLARE_MACHINE(MachineName, InitState)                   \
+class MachineName : public StateMachine {                         \
+	void init() { init_state = InitState::get_instance(); }       \
+	void activity();                                              \
+};
+
+#endif /* STATE_MACHINE_H */
+/*****************************************************************************/
+/*****************************************************************************/

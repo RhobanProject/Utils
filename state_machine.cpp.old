@@ -1,0 +1,48 @@
+/** ***************************************************************************
+ *  \file    state_machine.cpp
+ *  \author  Hugo Gimbert - Olivier Ly
+ *  \date    2010-12
+ *
+ *  \brief   State machine infrastructure.
+ *****************************************************************************/
+#include "state_machine.h"
+#include <list>
+
+using namespace std;
+
+/*****************************************************************************/
+
+int StateMachine::reset() {
+	init();
+	if (init_state == NULL) return 0;
+	active_state = init_state;
+	init_state->entry();
+	return 1;
+}
+
+int StateMachine::tic() {
+
+	// checks preconditions
+	if (active_state==NULL) return -1;
+
+	if (!(active_state->is_sleeping())) {
+		active_state->activity();
+		this->activity();
+	};
+
+	// check transition
+	State * new_state = active_state->transition();
+	if (new_state != NULL) { // there is a transition
+		active_state->quit();
+		active_state = new_state;
+		active_state->entry();
+	}
+
+	if (active_state->terminal()) return 0;
+	else return 1;
+}
+
+StateMachine::StateMachine() : init_state(NULL), active_state(NULL) {}
+
+
+/*****************************************************************************/

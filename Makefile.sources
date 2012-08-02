@@ -1,0 +1,13 @@
+UTILS_SRC = file_mngt.cpp \
+ fifo.cpp                 \
+ state_machine.cpp        \
+ command.cpp              \
+ ticks.cpp                \
+ util.cpp                 \
+ chrono.cpp               \
+ anyoption.cpp            \
+ config_file.cpp
+
+SOURCES := $(UTILS_SRC)
+
+UTILS_SUBDIRS = test xml timing threading
