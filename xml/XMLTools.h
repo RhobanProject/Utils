@@ -17,12 +17,15 @@
 #include <fstream>
 #include <vector>
 
+#ifndef NO_ALGEBRA
+#include "linear_algebra.h"
+#endif
+
 #include "TinyXml/tinystr.h"
 #include "TinyXml/tinyxml.h"
 
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
-
 
 #define xml_parse_error(str...)   { throw string(str); }
 #define interpretor_error(str...) { throw string(str); }
