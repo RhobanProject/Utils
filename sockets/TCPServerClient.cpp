@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <iostream>
 
-#include <sockets/TCPServerClient.h>
+#include "TCPServerClient.h"
 
 using namespace std;
 

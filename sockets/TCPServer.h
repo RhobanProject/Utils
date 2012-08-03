@@ -21,8 +21,8 @@
 #include <string>
 
 #include <vector>
-#include <sockets/common.h>
-#include <sockets/TCPServerClient.h>
+#include "common.h"
+#include "TCPServerClient.h"
 
 using namespace std;
 

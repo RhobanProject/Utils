@@ -12,8 +12,8 @@
 
 #include <pthread.h>
 
-#include <sockets/common.h>
-#include <sockets/TCPClientBase.h>
+#include "common.h"
+#include "TCPClientBase.h"
 
 namespace Rhoban 
 {

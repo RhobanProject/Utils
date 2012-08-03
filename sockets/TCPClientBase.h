@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include <sockets/common.h>
+#include "common.h"
 
 using namespace std;
 

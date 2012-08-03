@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-#include <sockets/TCPClient.h>
+#include "TCPClient.h"
 
 using namespace std;
 

@@ -25,11 +25,6 @@
 #include <windows.h>
 #endif
 
-
-
-//following file should contain MAX_TICKS_FREQUENCY
-//and DEFAULT_TICKS_FREQUENCY
-#include "config.h"
 #include "ticks.h"
 #include "util.h"
 

@@ -24,9 +24,8 @@
 #include <vector>
 #include <list>
 #include <string>
-#include "types.h"
-#include "Thread.h"
-#include "Mutex.h"
+#include <threading/Thread.h>
+#include <threading/Mutex.h>
 #ifdef _WIN32
 #include <windows.h>
 #endif

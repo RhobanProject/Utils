@@ -16,6 +16,7 @@
 
 #include "XMLTools.h"
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 
 using namespace std;
@@ -137,6 +138,7 @@ string XMLTools::serialize_double_array(vector<double> data)
 	return result.str();
 }
 
+#ifndef NO_ALGEBRA
 Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 	if(!node) throw string("XMLTools extractdoublearray null node");
 	TiXmlNode* the_values = node->FirstChild( array_id );
@@ -161,6 +163,7 @@ Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 		xml_parse_error(string("Xml parsing: Could not find (double array) node with label  ") +array_id + " in node " + string(node->Value()));
 	}
 }
+#endif
 
 vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id)
 {

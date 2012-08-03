@@ -21,7 +21,7 @@
 #include <string>
 #include <sstream>
 
-#include <sockets/TCPClientBase.h>
+#include "TCPClientBase.h"
 
 using namespace std;
 

@@ -10,8 +10,8 @@
 #ifndef _TCPCLIENT_H
 #define _TCPCLIENT_H
 
-#include <sockets/common.h>
-#include <sockets/TCPClientBase.h>
+#include "common.h"
+#include "TCPClientBase.h"
 
 namespace Rhoban
 {

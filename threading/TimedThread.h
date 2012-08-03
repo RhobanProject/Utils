@@ -17,8 +17,8 @@
 #ifndef TIMED_THREAD_HPP_
 #define TIMED_THREAD_HPP_
 
-#include "TickMachine.h"
-#include "Player.h"
+#include <timing/TickMachine.h>
+#include <timing/Player.h>
 
 #include "Thread.h"
 #include "Mutex.h"

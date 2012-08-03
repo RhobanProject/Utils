@@ -14,10 +14,11 @@
  *      Author: hugo
  */
 
-#include "tinystr.h"
-#include "tinyxml.h"
-#include "linear_algebra.h"
 #include <fstream>
+#include <vector>
+
+#include "TinyXml/tinystr.h"
+#include "TinyXml/tinyxml.h"
 
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
@@ -56,7 +57,9 @@ bool get_bool_element(TiXmlNode * node, const char * id);
 
 float * get_float_array_with_3_element(TiXmlNode * node, const char * id);
 
+#ifndef NO_ALGEBRA
 Matrix extract_double_array(TiXmlNode* node, const char * array_id);
+#endif
 
 string serialize_double_array(vector<double> data);
 
