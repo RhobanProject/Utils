@@ -11,9 +11,9 @@ LIBFILES += $(RHOBAN_LIB_FILE)
 ALL_OBJECTS_IN_LIBS = 1
 
 ifeq ($(PLATFORM),win32)
-LIBS +=	$(LIB_RHOBAN) -lrt -lpthread -lws2_32  
+LIBS +=	$(LIB_RHOBAN) -lpthread -lws2_32  
 else
-LIBS +=	$(LIB_RHOBAN) -lrt -pthread
+LIBS +=	$(LIB_RHOBAN) -pthread
 endif
 
 IS_TESTSDIR := 1
