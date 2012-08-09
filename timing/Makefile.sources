@@ -1,6 +1,4 @@
   
 UTILS_TIMING_SRC = TickTimer.cpp TickMachine.cpp Player.cpp Playable.cpp
 
-SOURCES = $(UTILS_TIMING_SRC)
-
 UTILS_TIMING_EXE = tests/test_tick_machine

@@ -3,5 +3,3 @@ TINYXML_SRC =   \
   tinyxml.cpp \
   tinyxmlerror.cpp \
   tinyxmlparser.cpp
- 
-SOURCES := $(TINYXML_SRC)

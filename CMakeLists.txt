@@ -29,8 +29,11 @@ set(THREADING_SOURCES threading/Condition.cpp  threading/Mutex.cpp
 include_directories ("${PROJECT_SOURCE_DIR}/xml")
 set(XML_SOURCES xml/XMLTools.cpp)
 
+include_directories ("${PROJECT_SOURCE_DIR}/sockets")
+set(SOCKETS_SOURCES sockets/TCPClientBase.cpp  sockets/TCPClient.cpp  sockets/TCPServerClient.cpp)
+
 set(ALL_SOURCES ${SOURCES} ${TESTS_SOURCES} ${TIMING_SOURCES}
-    ${THREADING_SOURCES} ${XML_SOURCES})
+    ${THREADING_SOURCES} ${XML_SOURCES} ${SOCKETS_SOURCES})
 
 # Adding TinyXml
 add_subdirectory(xml/TinyXml)
