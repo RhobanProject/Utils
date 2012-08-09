@@ -1,7 +1,6 @@
 UTILS_SRC = file_mngt.cpp \
  fifo.cpp                 \
  state_machine.cpp        \
- command.cpp              \
  ticks.cpp                \
  util.cpp                 \
  chrono.cpp               \
