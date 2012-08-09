@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include <utils/ticks.h>
+#include "ticks.h"
 #include "TimedThread.h"
 
 using namespace std;
