@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
+find_package(Threads)
 
 # Options
 option(RHOBANMATH
@@ -8,6 +9,10 @@ option(RHOBANMATH
 if(NOT RHOBANMATH)
     add_definitions(-DNO_RHOBANMATH)
 endif(NOT RHOBANMATH)
+
+if(CMAKE_BUILD_TYPE EQUAL "Release")
+    add_definitions(-DNDEBUG)
+endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 # Source files
 include_directories ("${PROJECT_SOURCE_DIR}")
@@ -37,7 +42,7 @@ set(ALL_SOURCES ${SOURCES} ${TESTS_SOURCES} ${TIMING_SOURCES}
 
 # Adding TinyXml
 add_subdirectory(xml/TinyXml)
-set(EXTRA_LIBS ${EXTRA_LIBS} TinyXml)
+set(EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
 
 # Adding library and dependecy
 add_library(RhobanUtils ${ALL_SOURCES})
