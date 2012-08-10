@@ -1,8 +1,10 @@
 #ifndef UTILS_LOG_H
 #define UTILS_LOG_H
 
+#include <sstream>
+#include <cstdio>
+#include <string>
 #include <string.h>
-#include <stdio.h>
 #include <time.h>
 
 #ifdef NDEBUG
@@ -10,6 +12,11 @@
 #else
 #define LOG_DEBUG 0
 #endif
+
+#define LOG_CPP(condition, component, message) \
+    ostringstream oss__; \
+    oss__ << message; \
+    LOG(condition, component, "%s", oss__.str().c_str())
 
 #define LOG(condition, component, ...) \
     if (condition) { \

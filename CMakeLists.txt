@@ -47,3 +47,6 @@ set(EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
 # Adding library and dependecy
 add_library(RhobanUtils ${ALL_SOURCES})
 target_link_libraries(RhobanUtils ${EXTRA_LIBS})
+
+add_executable(TestLog ${ALL_SOURCES} exes/test_log.cpp)
+target_link_libraries(TestLog ${EXTRA_LIBS})
