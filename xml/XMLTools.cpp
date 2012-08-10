@@ -138,7 +138,7 @@ string XMLTools::serialize_double_array(vector<double> data)
 	return result.str();
 }
 
-#ifndef NO_ALGEBRA
+#ifndef NO_RHOBANMATH
 Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 	if(!node) throw string("XMLTools extractdoublearray null node");
 	TiXmlNode* the_values = node->FirstChild( array_id );

@@ -17,7 +17,7 @@
 #include <fstream>
 #include <vector>
 
-#ifndef NO_ALGEBRA
+#ifndef NO_RHOBANMATH
 #include "linear_algebra.h"
 #endif
 
@@ -60,7 +60,7 @@ bool get_bool_element(TiXmlNode * node, const char * id);
 
 float * get_float_array_with_3_element(TiXmlNode * node, const char * id);
 
-#ifndef NO_ALGEBRA
+#ifndef NO_RHOBANMATH
 Matrix extract_double_array(TiXmlNode* node, const char * array_id);
 #endif
 
