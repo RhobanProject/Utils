@@ -27,7 +27,7 @@ set(DIRECTORIES
 
 foreach (DIRECTORY ${DIRECTORIES})
     message("* Adding ${DIRECTORY}/")
-    include_directories("${CMAKE_SOURCE_DIR}/${DIRECTORY}")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
     include (${DIRECTORY}/Sources.cmake)
 
     set (PREFIXED_SOURCES)
@@ -45,6 +45,3 @@ set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
 # Adding library and dependecy
 add_library (RhobanUtils ${ALL_SOURCES})
 target_link_libraries (RhobanUtils ${EXTRA_LIBS})
-
-add_executable (TestLog ${ALL_SOURCES} exes/test_log.cpp)
-target_link_libraries (TestLog ${EXTRA_LIBS})

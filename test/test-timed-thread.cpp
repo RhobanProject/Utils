@@ -11,9 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "TimedThread.hpp"
-#include "ticks.h"
-#include "TickMachine.hpp"
+#include <ticks.h>
+#include <threading/TimedThread.h>
+#include <timing/TickMachine.h>
 
 #define OUTPUT(msg...) printf(msg); fflush(stdout);
 
