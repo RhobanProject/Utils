@@ -12,6 +12,7 @@
 #ifndef WIN32
 #include <fcntl.h>
 #endif
+#include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,7 +38,7 @@ namespace Rhoban
         }
 
 #ifdef WIN32
-		if (n < 0 && errno != EAGAIN && errno != WSAEWOULDBLOCK ) {
+	if (n < 0 && errno != EAGAIN && errno != WSAEWOULDBLOCK ) {
 #else 
         if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
 #endif
