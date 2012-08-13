@@ -6,39 +6,36 @@ find_package(Threads)
 option(RHOBANMATH
     "Enables RhobanMath support" OFF)
 
-if(NOT RHOBANMATH)
+if (NOT RHOBANMATH)
     add_definitions(-DNO_RHOBANMATH)
-endif(NOT RHOBANMATH)
+endif (NOT RHOBANMATH)
 
 if(CMAKE_BUILD_TYPE EQUAL "Release")
     add_definitions(-DNDEBUG)
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
-# Source files
-include_directories ("${PROJECT_SOURCE_DIR}")
-set(SOURCES anyoption.cpp chrono.cpp config_file.cpp
-    fifo.cpp  file_mngt.cpp  state_machine.cpp
-    ticks.cpp  util.cpp)
+# Sources
+set(DIRECTORIES
+    .
+    tests
+    timing
+    threading
+    xml
+    sockets
+    )
 
-include_directories ("${PROJECT_SOURCE_DIR}/tests")
-set(TESTS_SOURCES tests/TestCase.cpp)
+foreach (DIRECTORY ${DIRECTORIES})
+    message("* Adding ${DIRECTORY}/")
+    include_directories("${CMAKE_SOURCE_DIR}/${DIRECTORY}")
+    include (${DIRECTORY}/Sources.cmake)
 
-include_directories ("${PROJECT_SOURCE_DIR}/timing")
-set(TIMING_SOURCES timing/Playable.cpp  timing/Player.cpp
-    timing/TickMachine.cpp  timing/TickTimer.cpp)
+    set (PREFIXED_SOURCES)
+    foreach (SOURCE ${SOURCES})
+        set (PREFIXED_SOURCES ${PREFIXED_SOURCES} ${DIRECTORY}/${SOURCE})
+    endforeach (SOURCE)
 
-include_directories ("${PROJECT_SOURCE_DIR}/threading")
-set(THREADING_SOURCES threading/Condition.cpp  threading/Mutex.cpp 
-    threading/Thread.cpp  threading/TimedThread.cpp)
-
-include_directories ("${PROJECT_SOURCE_DIR}/xml")
-set(XML_SOURCES xml/XMLTools.cpp)
-
-include_directories ("${PROJECT_SOURCE_DIR}/sockets")
-set(SOCKETS_SOURCES sockets/TCPClientBase.cpp  sockets/TCPClient.cpp  sockets/TCPServerClient.cpp)
-
-set(ALL_SOURCES ${SOURCES} ${TESTS_SOURCES} ${TIMING_SOURCES}
-    ${THREADING_SOURCES} ${XML_SOURCES} ${SOCKETS_SOURCES})
+    set (ALL_SOURCES ${ALL_SOURCES} ${PREFIXED_SOURCES})
+endforeach (DIRECTORY)
 
 # Adding TinyXml
 add_subdirectory(xml/TinyXml)
