@@ -12,6 +12,7 @@
 #ifndef WIN32
 #include <fcntl.h>
 #endif
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
