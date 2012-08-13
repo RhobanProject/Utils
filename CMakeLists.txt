@@ -21,6 +21,7 @@ set(DIRECTORIES
     timing
     threading
     xml
+    serial
     sockets
     )
 
