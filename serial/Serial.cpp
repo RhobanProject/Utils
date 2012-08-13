@@ -252,8 +252,7 @@ void Serial::setSpeed(int baudrate)
  */
 size_t Serial::receive(char *destination, size_t size)
 {
-    char dummy[128];
-    int n;
+    int n = 0;
 
 #ifdef WIN32
     DWORD dwToRead, dwRead;
@@ -275,9 +274,9 @@ size_t Serial::receive(char *destination, size_t size)
 #else
         n = read(fd, destination, size);
 #endif
-
-        return n;
     }
+
+    return n;
 }
 
 /**
@@ -287,6 +286,7 @@ void Serial::flush()
 {
 #ifdef WIN32
     FlushFileBuffers(handle);
+    PurgeComm(handle, PURGE_RXABORT|PURGE_RXCLEAR);
 #endif
 }
 
