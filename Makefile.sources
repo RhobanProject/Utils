@@ -7,4 +7,4 @@ UTILS_SRC = file_mngt.cpp \
  anyoption.cpp            \
  config_file.cpp
 
-UTILS_SUBDIRS = test xml timing threading
+UTILS_SUBDIRS = test xml timing threading serial
