@@ -50,8 +50,8 @@ namespace Rhoban
 
         try {
             client->loop();
-        } catch (string exception) {
-            cout << "Closing client (" << exception << ")" << endl;
+        } catch (string exception_) {
+            cout << "Closing client (" << exception_ << ")" << endl;
         }
 
         client->stop();
