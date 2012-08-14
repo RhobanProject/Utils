@@ -10,6 +10,14 @@ if (NOT RHOBANMATH)
     add_definitions(-DNO_RHOBANMATH)
 endif (NOT RHOBANMATH)
 
+if (RHOBANMATH)
+    set(RHOBAN_MATH_DIRECTORY "${BASE}/Math"
+        CACHE STRING "RhobanMath directory")
+
+    include_directories ("${RHOBAN_MATH_DIRECTORY}")
+    set (EXTRA_LIBS ${EXTRA_LIBS} RhobanMath)
+endif (RHOBANMATH)
+
 if(CMAKE_BUILD_TYPE EQUAL "Release")
     add_definitions(-DNDEBUG)
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
@@ -26,7 +34,7 @@ set(DIRECTORIES
     )
 
 foreach (DIRECTORY ${DIRECTORIES})
-    message("* Adding ${DIRECTORY}/")
+    message("-- Utils: Adding ${DIRECTORY}/")
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
     include (${DIRECTORY}/Sources.cmake)
 
