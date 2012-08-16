@@ -22,6 +22,11 @@ if(CMAKE_BUILD_TYPE EQUAL "Release")
     add_definitions(-DNDEBUG)
 endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
+# Adding sockets for Win32
+if (WIN32)
+    set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
+endif (WIN32)
+
 # Sources
 set(DIRECTORIES
     .
