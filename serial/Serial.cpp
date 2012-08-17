@@ -24,6 +24,8 @@
 #include <sys/time.h>
 #endif
 
+#include <logging/log.h>
+
 #include "Serial.h"
 
 using namespace std;
@@ -70,7 +72,6 @@ int Serial::connect()
     DCB Dcb;
     COMMTIMEOUTS Timeouts;
     DWORD dwError;
-    HANDLE handle;
 
     // Open serial device
     handle = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
@@ -312,7 +313,8 @@ size_t Serial::send(char *data, size_t size)
     dwToWrite = (DWORD)size;
     dwWritten = 0;
 
-    got = WriteFile(handle, data, dwToWrite, &dwWritten, NULL);
+    WriteFile(handle, data, dwToWrite, &dwWritten, NULL);
+	got = dwWritten;
     FlushFileBuffers(handle);
 #else
 #ifdef ROBOARD
