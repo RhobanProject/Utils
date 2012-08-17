@@ -27,6 +27,13 @@ if (WIN32)
     set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif (WIN32)
 
+# Adding YAML support
+option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
+add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
+set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include")
+include_directories ("${YAML_HEADERS}")
+set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
+
 # Sources
 set(DIRECTORIES
     .
