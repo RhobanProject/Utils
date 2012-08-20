@@ -42,92 +42,97 @@
 using namespace std;
 /*****************************************************************************/
 /*
- */
+*/
 namespace XMLTools
 {
-string get_string_element(TiXmlNode * node, const char * id);
-vector<string> get_string_array(TiXmlNode * node, const char * id);
+    string get_string_element(TiXmlNode * node, const char * id);
 
-vector<int> get_int_array(TiXmlNode * node, const char * id);
+    vector<string> get_string_array(TiXmlNode * node, const char * id);
 
-double get_double_element(TiXmlNode * node, const char * id);
+    bool has_child(TiXmlNode *node, const char *name);
 
-float get_float_element(TiXmlNode * node, const char * id);
+    TiXmlNode *get_child(TiXmlNode *node, const char *name);
 
-int get_int_element(TiXmlNode * node, const char * id);
+    vector<int> get_int_array(TiXmlNode * node, const char * id);
 
-bool get_bool_element(TiXmlNode * node, const char * id);
+    double get_double_element(TiXmlNode * node, const char * id);
 
-float * get_float_array_with_3_element(TiXmlNode * node, const char * id);
+    float get_float_element(TiXmlNode * node, const char * id);
+
+    int get_int_element(TiXmlNode * node, const char * id);
+
+    bool get_bool_element(TiXmlNode * node, const char * id);
+
+    float * get_float_array_with_3_element(TiXmlNode * node, const char * id);
 
 #ifndef NO_RHOBANMATH
-Matrix extract_double_array(TiXmlNode* node, const char * array_id);
+    Matrix extract_double_array(TiXmlNode* node, const char * array_id);
 #endif
 
-string serialize_double_array(vector<double> data);
+    string serialize_double_array(vector<double> data);
 
-/*!
- * @param stream
- * @return a non null node on the second sibling of the stream
- * and throw an exception if no such node
- */
-TiXmlDocument * stream_to_node(const string stream);
+    /*!
+     * @param stream
+     * @return a non null node on the second sibling of the stream
+     * and throw an exception if no such node
+     */
+    TiXmlDocument * stream_to_node(const string stream);
 
-TiXmlDocument * file_to_node(string filename);
+    TiXmlDocument * file_to_node(string filename);
 
-/*!
- * The xml stream is checked then wrote to a file
- */
-void stream_to_file(string filename, const string  stream);
+    /*!
+     * The xml stream is checked then wrote to a file
+     */
+    void stream_to_file(string filename, const string  stream);
 
-void node_to_file(string filename, TiXmlDocument * node);
+    void node_to_file(string filename, TiXmlDocument * node);
 
 
 }
 
 class Serializable
 {
-public:
-	virtual string class_name() const = 0;
+    public:
+        virtual string class_name() const = 0;
 
-	//loads the object from the default file
-	//the default filename is the name of the class + .xml
-	virtual void load_file();
+        //loads the object from the default file
+        //the default filename is the name of the class + .xml
+        virtual void load_file();
 
-	//loads the object from a given file
-	void load_file(string filename);
+        //loads the object from a given file
+        void load_file(string filename);
 
-	//serializes and saves to a file using default filename
-	void save_file();
+        //serializes and saves to a file using default filename
+        void save_file();
 
-	//serializes and saves to a file using given filename
-	void save_file(string filename);
+        //serializes and saves to a file using given filename
+        void save_file(string filename);
 
-	//current default filename
-	string filename;
+        //current default filename
+        string filename;
 
-	//deserializes from an xml stream
-	virtual void from_xml(string xml_stream);
+        //deserializes from an xml stream
+        virtual void from_xml(string xml_stream);
 
-	//deserializes from an xml node
-	virtual void from_xml(TiXmlNode *node) { throw string("from_xml not implemented");};
+        //deserializes from an xml node
+        virtual void from_xml(TiXmlNode *node) { throw string("from_xml not implemented");};
 
-	//serializes to an xml strem excluding class name
-	virtual string to_xml() const { throw string("to_xml not implemented");};
+        //serializes to an xml strem excluding class name
+        virtual string to_xml() const { throw string("to_xml not implemented");};
 
 
-	//serializes to an xml strem including class name
-	string to_xml_stream() const;
+        //serializes to an xml strem including class name
+        string to_xml_stream() const;
 
-	/*! pretty print */
-	void pretty_print() const;
+        /*! pretty print */
+        void pretty_print() const;
 
-	/*! not so pretty print */
-	friend ostream & operator<< (ostream & stream, Serializable & obj);
+        /*! not so pretty print */
+        friend ostream & operator<< (ostream & stream, Serializable & obj);
 
-protected:
-	Serializable();
-	virtual ~Serializable();
+    protected:
+        Serializable();
+        virtual ~Serializable();
 
 };
 
