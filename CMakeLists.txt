@@ -30,7 +30,8 @@ endif (WIN32)
 # Adding YAML support
 option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
 add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
-set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include")
+set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
+    CACHE STRING "")
 include_directories ("${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 
