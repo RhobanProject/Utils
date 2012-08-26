@@ -16,8 +16,6 @@
 #include <string.h>
 #include <time.h>
 
-#define HAVE_COLORS
-
 #ifdef HAVE_COLORS
 #define TEST_HAVE_COLORS 1
 #else
