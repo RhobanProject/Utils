@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
-find_package(Threads)
+find_package (Threads)
 
 # Options
-option(RHOBANMATH
+option (RHOBANMATH
     "Enables RhobanMath support" OFF)
 
 if (NOT RHOBANMATH)
@@ -17,10 +17,6 @@ if (RHOBANMATH)
     include_directories ("${RHOBAN_MATH_DIRECTORY}")
     set (EXTRA_LIBS ${EXTRA_LIBS} RhobanMath)
 endif (RHOBANMATH)
-
-if(CMAKE_BUILD_TYPE EQUAL "Release")
-    add_definitions(-DNDEBUG)
-endif(CMAKE_BUILD_TYPE EQUAL "Release")
 
 # Adding sockets for Win32
 if (WIN32)
