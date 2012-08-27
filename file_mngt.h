@@ -11,11 +11,14 @@
 #ifndef FILE_MNGT_H
 #define FILE_MNGT_H
 
+#include <string>
 #include "util.h"
 
 int store_in_file(char * name, ui8 * src, int size);
 
 int read_file(char * name, ui8 * dest, int size);
+
+string file_to_string(string path);
 
 
 #endif /* FILE_MNGT_H */

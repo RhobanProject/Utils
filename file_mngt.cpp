@@ -10,6 +10,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <fstream>
+#include <iterator>
 
 #include "file_mngt.h"
 #include "util.h"
@@ -48,4 +50,14 @@ int read_file(char * name, ui8 * dest, int size) {
   fclose(f);
   return 1;
   
+}
+
+string file_to_string(string path)
+{
+  ifstream in_file(path.c_str());
+  string contents(istreambuf_iterator<char>(in_file), 
+		  (istreambuf_iterator<char>()) );
+  in_file.close();
+
+  return contents;
 }
