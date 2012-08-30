@@ -17,8 +17,11 @@ typedef unsigned int uint;
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 using namespace std;
+
+bool is_in_vector_string(vector<string> vector, string testval);
 
 inline string my_itoa(int i)
 {

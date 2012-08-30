@@ -9,12 +9,23 @@
  *************************************************/
 
 
-#include <string.h>
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 #include "util.h"
 
 using namespace std;
+
+bool is_in_vector_string(vector<string> vector, string testval)
+{
+  for(int i=0; i<vector.size(); ++i)
+    {
+      if(vector[i].compare(testval) == 0)
+	return 1;
+    }
+  return 0;
+}
 
 int char_to_int(char c){
 	if ((int) c >= (int) 'a') return ((int) c - (int)'a' + 10);
