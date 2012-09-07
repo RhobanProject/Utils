@@ -37,9 +37,9 @@ class Parameter(object):
         code = '';
         # Command line
         if self.typing == 'bool':
-            code += "if (options.findFlag(\"%s\")) {\n"
+            code += "if (options.getFlag(\"%s\")) {\n" % (self.name)
             code += "obj->%s = true;\n" % (self.propertyName)
-            code += "} else if (options.findFlag(\"no-%s\")) {\n"
+            code += "} else if (options.getFlag(\"no-%s\")) {\n" % (self.name)
             code += "obj->%s = false;\n" % (self.propertyName)
         else:
             code += "if (char *value = options.getValue(\"%s\")) {\n" % (self.name)
@@ -69,6 +69,11 @@ class Parameter(object):
         else:
             init += "options.setOption(\"%s\");" % (self.name)
         return init
+
+    def generateUsage(self):
+        usage = ''
+        usage += "cout << \"\t%-6s %s: \" << %s << \" (default: \" << %s << \")\" << endl;\n" % (self.typing, self.name, self.description, self.default)
+        return usage
 
 class Generator(object):
     def __init__(self, entry, directory, className):
@@ -122,4 +127,11 @@ class Generator(object):
             init += property.generateInit()
 
         cppTemplate.appendVariable('INIT', init)
+
+        # Usage
+        usage = 'cout << endl << "%s:" << endl;\n' % (self.entry)
+        for property in self.properties:
+            usage += property.generateUsage()
+
+        cppTemplate.appendVariable('USAGE', usage)
 

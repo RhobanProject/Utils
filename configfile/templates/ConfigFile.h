@@ -13,6 +13,7 @@ class %NAME%
     public:
         %NAME%(string filename);
         void processCommandArgs(int argc, char **argv);
+        void usage();
 
         %PROTOTYPES%
 

@@ -13,10 +13,25 @@ using namespace std;
     YAML::Parser parser(fin);
     parser.GetNextDocument(doc);
 
+    options.setFlag("help");
+    options.setFlag("?");
+
     %INIT%
+}
+
+void %NAME%::usage()
+{
+    cout << "Parameters:\n";
+    %USAGE%
+
+    exit(1);
 }
         
 void %NAME%::processCommandArgs(int argc, char **argv)
 {
     options.processCommandArgs(argc, argv);
+
+    if (options.getFlag("help") || options.getFlag("?")) {
+        usage();
+    }
 }

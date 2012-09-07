@@ -25,7 +25,7 @@ class Something
         float floatParam;
 
         /**
-         * Parameter(my-bool, true, "A boolean")
+         * Parameter(my-bool, false, "A boolean")
          */
         bool boolParam;
 };
