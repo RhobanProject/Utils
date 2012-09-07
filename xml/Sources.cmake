@@ -1,0 +1,4 @@
+
+set (SOURCES
+    XMLTools.cpp
+    )
