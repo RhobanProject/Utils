@@ -8,6 +8,7 @@ using namespace std;
 class Something
 {
     public:
+        void print();
 
         /**
          * Parameter(my-int, 1, "An int parameter")

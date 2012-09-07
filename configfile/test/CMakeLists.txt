@@ -15,6 +15,7 @@ config_file (ConfigFile "Something.h")
 
 # Sources
 set (ALL_SOURCES ${ALL_SOURCES}
+    Something.cpp
     main.cpp
     )
 
