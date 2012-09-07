@@ -1,3 +1,8 @@
 
-something: something/Something
-something2: something/Something
+something:
+    class: Something
+    header: something/Something.h
+
+something2:
+    class: Something
+    header: something/Something.h

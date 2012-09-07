@@ -26,9 +26,9 @@ endName = name.split('/')[-1]
 headerTemplate.setVariable('NAME', endName)
 cppTemplate.setVariable('NAME', endName)
 
-for entry, className in config.items():
-    headerTemplate.appendVariable('INCLUDES', "#include \"%s.h\"\n"%className)
-    generator = Generator(entry, directory, className)
+for entry, config in config.items():
+    headerTemplate.appendVariable('INCLUDES', "#include \"%s\"\n"%config['header'])
+    generator = Generator(entry, directory, config['class'], config['header'])
     generator.generate(outputDirectory, headerTemplate, cppTemplate, endName)
 
 headerTemplate.render(os.path.join(outputDirectory, name+'.h'))
