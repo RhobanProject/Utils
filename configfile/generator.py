@@ -26,7 +26,8 @@ class Template(object):
         self.variables[variable] = self.variables.get(variable, '') + value
 
 class Parameter(object):
-    def __init__(self, name, propertyName, typing, default, description):
+    def __init__(self, entry, name, propertyName, typing, default, description):
+        self.entry = entry
         self.name = name
         self.propertyName = propertyName
         self.typing = typing
@@ -37,18 +38,23 @@ class Parameter(object):
         code = '';
         # Command line
         if self.typing == 'bool':
-            code += "if (options.getFlag(\"%s\")) {\n" % (self.name)
+            code += "if (options.getFlag(\"%s\") || options.getFlag(\"%s.%s\")) {\n" % (self.name, self.entry, self.name)
             code += "obj->%s = true;\n" % (self.propertyName)
-            code += "} else if (options.getFlag(\"no-%s\")) {\n" % (self.name)
+            code += "} else if (options.getFlag(\"no-%s\") || options.getFlag(\"%s.no-%s\")) {\n" % (self.name, self.entry, self.name)
             code += "obj->%s = false;\n" % (self.propertyName)
         else:
-            code += "if (char *value = options.getValue(\"%s\")) {\n" % (self.name)
+            load = ''
             if self.typing == 'string':
-                code += 'obj->%s = string(value);\n' % (self.propertyName)
+                load += 'obj->%s = string(value);\n' % (self.propertyName)
             if self.typing == 'float' or self.typing == 'double':
-                code += 'obj->%s = atof(value);\n' % (self.propertyName)
+                load += 'obj->%s = atof(value);\n' % (self.propertyName)
             if self.typing == 'int':
-                code += 'obj->%s = atoi(value);\n' % (self.propertyName)
+                load += 'obj->%s = atoi(value);\n' % (self.propertyName)
+
+            code += "if (char *value = options.getValue(\"%s\")) {\n" % (self.name)
+            code += load
+            code += "} else if (char *value = options.getValue(\"%s.%s\")) {\n" % (self.entry, self.name)
+            code += load
 
         code += "} else {\n"
         # Yaml
@@ -66,13 +72,16 @@ class Parameter(object):
         if self.typing == 'bool':
             init += "options.setFlag(\"%s\");" % (self.name)
             init += "options.setFlag(\"no-%s\");" % (self.name)
+            init += "options.setFlag(\"%s.%s\");" % (self.entry, self.name)
+            init += "options.setFlag(\"%s.no-%s\");" % (self.entry, self.name)
         else:
             init += "options.setOption(\"%s\");" % (self.name)
+            init += "options.setOption(\"%s.%s\");" % (self.entry, self.name)
         return init
 
     def generateUsage(self):
         usage = ''
-        usage += "cout << \"\t%-6s %s: \" << %s << \" (default: \" << %s << \")\" << endl;\n" % (self.typing, self.name, self.description, self.default)
+        usage += "cout << \"    %s: \" << %s << \" (%s, default: \" << %s << \")\" << endl;\n" % (self.name, self.description, self.typing, self.default)
         return usage
 
 class Generator(object):
@@ -90,7 +99,7 @@ class Generator(object):
             if matches != None:
                 data = matches.groups()[2].split(',')
                 data = map(lambda x: x.strip(), data)
-                self.properties += [Parameter(data[0], property['name'], property['type'], data[1], data[2])]
+                self.properties += [Parameter(self.entry, data[0], property['name'], property['type'], data[1], data[2])]
 
     def generate(self, outputDirectory, headerTemplate, cppTemplate, configClass):
         header = CppHeaderParser.CppHeader(os.path.join(self.directory, self.className + '.h'))
@@ -104,10 +113,10 @@ class Generator(object):
             self.process(property)
 
         # Header
-        headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (self.className, self.className))
+        headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (self.entry.capitalize(), self.className))
 
         # Code
-        code = "void %s::load%s(%s *obj) {\n" % (configClass, self.className, self.className)
+        code = "void %s::load%s(%s *obj) {\n" % (configClass, self.entry.capitalize(), self.className)
         code += "const YAML::Node *yaml = NULL;\n"
         code += "const YAML::Node *node;\n"
         code += "bool yamlOk;"

@@ -1,3 +1,8 @@
+/**
+ * /!\
+ * Ce fichier a été généré automatiquement
+ * Toute modification pourra être perdue
+ */
 #include <iostream>
 #include <fstream>
 #include <string>

@@ -1,3 +1,8 @@
+/**
+ * /!\
+ * Ce fichier a été généré automatiquement
+ * Toute modification pourra être perdue
+ */
 #ifndef _CONFIGFILE_%NAME%_H
 #define _CONFIGFILE_%NAME%_H
 
