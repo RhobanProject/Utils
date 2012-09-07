@@ -12,21 +12,24 @@ if len(sys.argv) != 4:
 (directory, name, outputDirectory) = sys.argv[1:]
 configFile = os.path.join(directory, name + '.yml')
 
-if not os.path.exists(outputDirectory):
-    os.mkdir(outputDirectory)
+targetDirectory = os.path.dirname(os.path.join(outputDirectory, name))
+
+if not os.path.exists(targetDirectory):
+    os.makedirs(targetDirectory)
 
 config = yaml.load(file(configFile, 'r').read())
 
 headerTemplate = Template('ConfigFile.h')
 cppTemplate = Template('ConfigFile.cpp')
 
-headerTemplate.setVariable('NAME', name)
-cppTemplate.setVariable('NAME', name)
+endName = name.split('/')[-1]
+headerTemplate.setVariable('NAME', endName)
+cppTemplate.setVariable('NAME', endName)
 
 for entry, className in config.items():
     headerTemplate.appendVariable('INCLUDES', "#include \"%s.h\"\n"%className)
     generator = Generator(entry, directory, className)
-    generator.generate(outputDirectory, headerTemplate, cppTemplate, name)
+    generator.generate(outputDirectory, headerTemplate, cppTemplate, endName)
 
 headerTemplate.render(os.path.join(outputDirectory, name+'.h'))
 cppTemplate.render(os.path.join(outputDirectory, name+'.cpp'))

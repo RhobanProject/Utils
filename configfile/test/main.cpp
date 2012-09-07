@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
-#include "Something.h"
-#include "ConfigFile.h"
+#include "config/ConfigFile.h"
+#include "something/Something.h"
 
 int main(int argc, char **argv)
 {

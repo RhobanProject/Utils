@@ -103,20 +103,21 @@ class Generator(object):
 
     def generate(self, outputDirectory, headerTemplate, cppTemplate, configClass):
         header = CppHeaderParser.CppHeader(os.path.join(self.directory, self.className + '.h'))
+        justClass = self.className.split('/')[-1]
 
-        if self.className not in header.classes:
-            raise Exception('Class '+self.className+' not found in header file')
+        if justClass not in header.classes:
+            raise Exception('Class '+justClass+' not found in header file')
         
-        classHeader = header.classes[self.className]
+        classHeader = header.classes[justClass]
 
         for property in classHeader['properties']['public']:
             self.process(property)
 
         # Header
-        headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (self.entry.capitalize(), self.className))
+        headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (self.entry.capitalize(), justClass))
 
         # Code
-        code = "void %s::load%s(%s *obj) {\n" % (configClass, self.entry.capitalize(), self.className)
+        code = "void %s::load%s(%s *obj) {\n" % (configClass, self.entry.capitalize(), justClass)
         code += "const YAML::Node *yaml = NULL;\n"
         code += "const YAML::Node *node;\n"
         code += "bool yamlOk;"

@@ -11,11 +11,11 @@ include_directories ("${RHOBAN_UTILS_DIR}")
 
 # Config file
 include ("${RHOBAN_UTILS_DIR}/configfile/ConfigFile.cmake")
-config_file (ConfigFile "Something.h")
+config_file (config/ConfigFile "something/Something.h")
 
 # Sources
 set (ALL_SOURCES ${ALL_SOURCES}
-    Something.cpp
+    something/Something.cpp
     main.cpp
     )
 
