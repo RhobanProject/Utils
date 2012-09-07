@@ -35,12 +35,40 @@ class Parameter(object):
 
     def generateCode(self):
         code = '';
+        # Command line
+        if self.typing == 'bool':
+            code += "if (options.findFlag(\"%s\")) {\n"
+            code += "obj->%s = true;\n" % (self.propertyName)
+            code += "} else if (options.findFlag(\"no-%s\")) {\n"
+            code += "obj->%s = false;\n" % (self.propertyName)
+        else:
+            code += "if (char *value = options.getValue(\"%s\")) {\n" % (self.name)
+            if self.typing == 'string':
+                code += 'obj->%s = string(value);\n' % (self.propertyName)
+            if self.typing == 'float' or self.typing == 'double':
+                code += 'obj->%s = atof(value);\n' % (self.propertyName)
+            if self.typing == 'int':
+                code += 'obj->%s = atoi(value);\n' % (self.propertyName)
+
+        code += "} else {\n"
+        # Yaml
         code += "if (yamlOk && (node = yaml->FindValue(\"%s\"))) {\n" % (self.name)
         code += "*node >> obj->%s;\n" % (self.propertyName)
         code += "} else {\n"
+        # Default value
         code += "obj->%s = %s;\n" % (self.propertyName, self.default)
         code += "}\n"
+        code += "}\n"
         return code
+
+    def generateInit(self):
+        init = ''
+        if self.typing == 'bool':
+            init += "options.setFlag(\"%s\");" % (self.name)
+            init += "options.setFlag(\"no-%s\");" % (self.name)
+        else:
+            init += "options.setOption(\"%s\");" % (self.name)
+        return init
 
 class Generator(object):
     def __init__(self, entry, directory, className):
@@ -70,8 +98,10 @@ class Generator(object):
         for property in classHeader['properties']['public']:
             self.process(property)
 
+        # Header
         headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (self.className, self.className))
 
+        # Code
         code = "void %s::load%s(%s *obj) {\n" % (configClass, self.className, self.className)
         code += "const YAML::Node *yaml = NULL;\n"
         code += "const YAML::Node *node;\n"
@@ -85,4 +115,11 @@ class Generator(object):
         code += "}\n"
 
         cppTemplate.appendVariable('METHODS', code)
+
+        # Init
+        init = ''
+        for property in self.properties:
+            init += property.generateInit()
+
+        cppTemplate.appendVariable('INIT', init)
 

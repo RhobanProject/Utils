@@ -7,6 +7,7 @@ set (RHOBAN_UTILS_DIR
 
 add_subdirectory ("${RHOBAN_UTILS_DIR}" utils)
 set (EXTRA_LIBS RhobanUtils)
+include_directories ("${RHOBAN_UTILS_DIR}")
 
 # Config file
 include ("${RHOBAN_UTILS_DIR}/configfile/ConfigFile.cmake")

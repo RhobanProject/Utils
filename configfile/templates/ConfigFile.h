@@ -3,6 +3,7 @@
 
 #include <string>
 #include <yaml-cpp/yaml.h>
+#include <anyoption.h>
 %INCLUDES%
 
 using namespace std;
@@ -11,10 +12,12 @@ class %NAME%
 {
     public:
         %NAME%(string filename);
+        void processCommandArgs(int argc, char **argv);
 
         %PROTOTYPES%
 
     protected:
+        AnyOption options;
         YAML::Node doc;
 };
 

@@ -1,4 +1,0 @@
-
-set (SOURCES
-    XMLTools.cpp
-    )

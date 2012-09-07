@@ -11,6 +11,12 @@ using namespace std;
 {
     ifstream fin(filename.c_str());
     YAML::Parser parser(fin);
-
     parser.GetNextDocument(doc);
+
+    %INIT%
+}
+        
+void %NAME%::processCommandArgs(int argc, char **argv)
+{
+    options.processCommandArgs(argc, argv);
 }
