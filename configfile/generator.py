@@ -95,7 +95,7 @@ class Generator(object):
     def process(self, property):
         if 'doxygen' in property:
             comment = property['doxygen']
-            matches = re.match(r"(.*)(Parameter\()(.+?)(\))(.*)", comment, re.MULTILINE|re.DOTALL)
+            matches = re.match(r"(.*)(Parameter\()(.+)(\)\w*\n)(.*)", comment, re.MULTILINE|re.DOTALL)
 
             if matches != None:
                 data = matches.groups()[2].split(',', 2)
