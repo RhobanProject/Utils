@@ -6,6 +6,8 @@ find_package (Threads)
 option (RHOBANMATH
     "Enables RhobanMath support" OFF)
 
+set (RHOBAN_UTILS_DIRECTORY "${PROJECT_SOURCE_DIR}")
+
 if (NOT RHOBANMATH)
     add_definitions(-DNO_RHOBANMATH)
 endif (NOT RHOBANMATH)

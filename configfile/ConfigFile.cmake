@@ -1,4 +1,4 @@
-set (CONFIG_FILE_GENERATOR "${RHOBAN_UTILS_DIR}/configfile/generate.py")
+set (CONFIG_FILE_GENERATOR "${RHOBAN_UTILS_DIRECTORY}/configfile/generate.py")
 
 macro (config_file NAME DEPENDS)
     set (OUTPUT_DIR "${PROJECT_BINARY_DIR}/configs/")
