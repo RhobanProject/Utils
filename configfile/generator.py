@@ -114,10 +114,11 @@ class Generator(object):
             self.process(property)
 
         # Header
-        headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (self.entry.capitalize(), self.className))
+        methodName = self.entry[0].capitalize() + self.entry[1:]
+        headerTemplate.appendVariable('PROTOTYPES', "void load%s(%s *obj);\n" % (methodName, self.className))
 
         # Code
-        code = "void %s::load%s(%s *obj) {\n" % (configClass, self.entry.capitalize(), self.className)
+        code = "void %s::load%s(%s *obj) {\n" % (configClass, methodName, self.className)
         code += "const YAML::Node *yaml = NULL;\n"
         code += "const YAML::Node *node;\n"
         code += "bool yamlOk;"
