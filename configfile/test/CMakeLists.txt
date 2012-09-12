@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project (ConfigTest)
 
 # Rhoban utils
-set (RHOBAN_UTILS_DIR
+set (RHOBAN_UTILS_DIRECTORY
     "${PROJECT_SOURCE_DIR}/../../" CACHE STRING "")
 
 add_subdirectory ("${RHOBAN_UTILS_DIR}" utils)
