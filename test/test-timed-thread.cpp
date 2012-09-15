@@ -31,7 +31,7 @@ int main(int argc, char * argv[]) {
   //  TickMachine::init_tick_machine();
 
   MyThread my_thread;
-  my_thread.init(10.0, true);
+  my_thread.init(10.0);
   OUTPUT("Started !\n");
   syst_wait_ms(2000);
   
