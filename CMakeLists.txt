@@ -57,6 +57,7 @@ set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 # Sources
 set(DIRECTORIES
     .
+    logging
     tests
     timing
     threading
