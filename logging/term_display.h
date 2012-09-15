@@ -28,7 +28,7 @@
 #define TERM_COLOR(c) printf("\033[%sm", c);
 
 void term_separator();
-void print_nth(int n, char c);
+void print_n_times(int n, char c);
 
 #endif /* TERM_DISPLAY_H */
 

@@ -39,28 +39,26 @@ class MyThread : public TimedThread
 
 class MyThread2 : public TimedThread
 {
-    public:
-        MyThread2() : count(0)
-        {
-        }
-        
-        int count;
+public:
+	int count;
+	MyThread2(string name):count(0){this->name = name;}
 
-    protected:
-        void step()
-        {
-            cout << "TimedThread " << (long) this;
 
-            if (count <FREQ)
-                cout << " step " << count ++ << " at "<< real_time << endl;
-            else
-            {
-                cout << " killing myself... ";
-                kill_and_delete_me();
-                cout << "... my last blow." << endl;
-            }
+protected:
+	string name;
+	void step()
+	{
+		cout <<  name;
+		if(count < FREQ)
+			cout << " step " << count ++ << " at "<< real_time << " and frequency "<< frequency << endl;
+		else
+		{
+			cout << " killing myself... ";
+			kill_and_delete_me();
+			cout << "... my last blow." << endl;
+		}
 
-        }
+	}
 };
 
 class TimedThreadTest : public TestCase
@@ -82,29 +80,35 @@ class TimedThreadTest : public TestCase
         void testTimedThread2()
         {
             cout << "Creating thread" << endl;
-            MyThread2 * thread = new MyThread2();
+            MyThread2 * thread = new MyThread2("Thread1");
             cout << "Initializing thread" << endl;
             thread->init(FREQ);
-            cout << "Waiting..." << endl;
-            syst_wait_ms(1500);
+            //thread2->init(20,true);
+            //cout << "Waiting 2 secs..." << endl;
+            //syst_wait_ms(2000);
 
+            syst_wait_ms(10000);
 
             cout << "Creating thread2" << endl;
-            MyThread2 * thread2 = new MyThread2();
+            MyThread2 * thread2 = new MyThread2("Thread2");
             cout << "Initializing thread2" << endl;
-            thread2->init(FREQ);
+            thread2->init(FREQ * 2);
+
+            syst_wait_ms(10000);
 
             cout << "Creating thread3" << endl;
-            MyThread2 * thread3 = new MyThread2();
+            MyThread2 * thread3 = new MyThread2("Thread3");
             cout << "Initializing thread3" << endl;
-            thread3->init_suspended(FREQ);
+            thread3->init_suspended(FREQ/2);
             cout << "Waiting 300 ms before starting thread 3..." << endl;
-            syst_wait_ms(300);
+            //syst_wait_ms(2000);
             cout << "Resuming thread 3" << endl;
             thread3->resume();
 
 
-            syst_wait_ms(1500);
+            syst_wait_ms(10000);
+
+
             cout << "... bye!" << endl;
         }
 

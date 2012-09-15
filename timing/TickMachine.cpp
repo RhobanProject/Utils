@@ -105,7 +105,6 @@ void TickMachine::internal_register_timer(TickTimer * timer)
     safe.unlock();
     gettimeofday(&timer->start_time,0);
 
-
     timer->tick();
 
     /*

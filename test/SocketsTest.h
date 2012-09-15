@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 
+#include <timing/sleep.h>
 #include <logging/log.h>
 
 #include <tests/TestCase.h>
@@ -65,7 +66,7 @@ class SocketsTest : public TestCase
 
             TEST_LOG("Running server...");
             pthread_create(&serverThread, NULL, run_server, NULL);
-            sleep(1);
+            ms_sleep(1000);
 
             TEST_LOG("Connecting client...");
             client.connectTo("localhost", 9696);
