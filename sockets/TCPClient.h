@@ -24,7 +24,7 @@ namespace Rhoban
             /**
              * Try to connect to address:port
              */
-            void connectTo(const char *address, int port);
+            virtual void connectTo(const char *address, int port);
 
             /**
              * Is the connection established ?

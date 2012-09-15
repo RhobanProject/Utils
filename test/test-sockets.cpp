@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Rhoban;
 
-#define TEST_LOG(...) LOG(1, "test", __VA_ARGS__)
+#define TEST_LOG(...) LOG(1, 1, "test", __VA_ARGS__)
 
 class EchoClient : public TCPServerClient
 {
