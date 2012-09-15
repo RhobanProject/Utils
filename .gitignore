@@ -7,3 +7,7 @@ bin/
 */*.pyc
 */*/*.pyc
 */*/*/*.pyc
+/.project
+/C:/Users/Hugo/Documents/utils/.externalToolBuilders
+/C:/Users/Hugo/Documents/utils/.settings
+/.cproject

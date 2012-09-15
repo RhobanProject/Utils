@@ -216,11 +216,12 @@ void TickMachine::update_timer()
 void TickMachine::wait_next_tick()
 {
 #ifdef WIN32
-    Sleep(granularity.tv_sec*1000+granularity.tv_usec/1000);
+    Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
 #else
     wait_signal(SIGALRM);
 #endif
 }
+
 
 /*!
  * main loop of the tick machine
@@ -256,7 +257,6 @@ void TickMachine::execute()
 
 void TickMachine::tick_players()
 {
-
     TM_DEBUG_MSG(players.size()<<" players to tick");
     for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
     {
@@ -270,8 +270,16 @@ void TickMachine::tick_players()
         }
         else
         {
+#ifndef WIN32
             if(--(timer->tick_counter) <= 0)
                 timer->tick();
+#else
+        	timeval now;
+        	gettimeofday(&now,0);
+        	decrease(now, timer->start_time);
+        	if( to_secs(now ) * timer->frequency - timer->ticks_elapsed >= 0)
+        		timer->tick();
+#endif
         }
     }
 
