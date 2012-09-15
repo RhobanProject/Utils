@@ -182,6 +182,7 @@ Playable::Playable()
     gettimeofday(&last_step_time,0);
     real_time = 0;
     play_state = playing;
+    suspend_time = 0;
 }
 
 void Playable::prepare_play(bool forever_, timeval duration_)

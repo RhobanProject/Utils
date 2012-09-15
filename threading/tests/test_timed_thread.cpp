@@ -7,16 +7,7 @@
  * Licence Creative Commons *CC BY-NC-SA
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
-/*
- * test_timed_thread.cpp
- *
- *  Created on: 29 nov. 2011
- *      Author: Hugo
- */
-
-
-
-
+/*****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
@@ -28,7 +19,9 @@
 #include <windows.h>
 #endif
 
-#include "TimedThread.h"
+#include <ticks.h>
+#include <threading/TimedThread.h>
+#include <timing/TickMachine.h>
 
 using namespace std;
 
@@ -36,57 +29,72 @@ int freq = 50;
 
 class TestTimedThread : public TimedThread
 {
-    public:
-        int count;
-        TestTimedThread():count(0){}
+public:
+	int count;
+	TestTimedThread(string name):count(0){this->name = name;}
 
 
-    protected:
-        void step()
-        {
-            cout << "TimedThread " << (long) this;
+protected:
+	string name;
+	void step()
+	{
+		cout <<  name;
+		if(count < freq)
+			cout << " step " << count ++ << " at "<< real_time << " and frequency "<< frequency << endl;
+		else
+		{
+			cout << " killing myself... ";
+			kill_and_delete_me();
+			cout << "... my last blow." << endl;
+		}
 
-            if(count <freq)
-                cout << " step " << count ++ << " at "<< real_time << endl;
-            else
-            {
-                cout << " killing myself... ";
-                kill_and_delete_me();
-                cout << "... my last blow." << endl;
-            }
-
-        }
+	}
 };
 
 int main(int argc, char **argv)
 {
 
-    cout << "Creating thread" << endl;
-    TestTimedThread * thread = new TestTimedThread();
-    cout << "Initializing thread" << endl;
-    thread->init(freq,false);
-    //thread2->init(20,true);
-    cout << "Waiting..." << endl;
-    syst_wait_ms(1500);
+	cout << "Creating thread" << endl;
+	TestTimedThread * thread = new TestTimedThread("Thread1");
+	cout << "Initializing thread" << endl;
+	thread->init(freq);
+	//thread2->init(20,true);
+	//cout << "Waiting 2 secs..." << endl;
+	//syst_wait_ms(2000);
+
+	syst_wait_ms(10000);
+
+	return 0;
+
+	cout << "Creating thread2" << endl;
+	TestTimedThread * thread2 = new TestTimedThread("Thread2");
+	cout << "Initializing thread2" << endl;
+	thread2->init(freq * 2);
 
 
-    cout << "Creating thread2" << endl;
-    TestTimedThread * thread2 = new TestTimedThread();
-    cout << "Initializing thread2" << endl;
-    thread2->init(freq,true);
+	syst_wait_ms(10000);
 
-    cout << "Creating thread3" << endl;
-    TestTimedThread * thread3 = new TestTimedThread();
-    cout << "Initializing thread3" << endl;
-    thread3->init_suspended(freq,false);
-    cout << "Waiting 300 ms before starting thread 3..." << endl;
-    syst_wait_ms(300);
-    cout << "Resuming thread 3" << endl;
-    thread3->resume();
+	cout << "Creating thread3" << endl;
+	TestTimedThread * thread3 = new TestTimedThread("Thread3");
+	cout << "Initializing thread3" << endl;
+	thread3->init_suspended(freq/2);
+	cout << "Waiting 300 ms before starting thread 3..." << endl;
+	//syst_wait_ms(2000);
+	cout << "Resuming thread 3" << endl;
+	thread3->resume();
 
 
-    syst_wait_ms(1500);
-    cout << "... bye!" << endl;
-    return 0;
+	syst_wait_ms(10000);
+
+
+	cout << "... bye!" << endl;
+	return 0;
 
 }
+
+// TODO est-ce qu'un thread peut dire qu'il est mort:
+// par exemple step pourrait retourner un booleen
+
+// Est-ce que ticks.h est toujours utilis� ?
+
+/*****************************************************************************/
