@@ -15,13 +15,24 @@
 
 #ifdef WIN32
 #include <windows.h>
-#else
+#endif
+
+#ifdef LINUX
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#endif
+
+#ifdef MACOSX
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <serial.h>
 #endif
 
 #include <logging/log.h>
@@ -69,6 +80,7 @@ void Serial::fdClose()
 int Serial::connect()
 {
 #ifdef WIN32
+
     DCB Dcb;
     COMMTIMEOUTS Timeouts;
     DWORD dwError;
@@ -147,7 +159,7 @@ int Serial::connect()
 
 USART_INIT_ERROR:
     return -1;
-#else
+#elif LINUX
     struct termios newtio;
     struct serial_struct serinfo;
 
@@ -234,7 +246,7 @@ void Serial::setSpeed(int baudrate)
 {
 #ifdef WIN32
     fprintf(stderr, "usart_set_channel_speed not implemented for WIN32\n");
-#else
+#elif LINUX
     struct serial_struct serinfo;
 
     if (fd == -1) {
