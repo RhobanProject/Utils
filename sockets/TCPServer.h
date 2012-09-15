@@ -66,8 +66,9 @@ namespace Rhoban
 #ifdef WIN32
                     WSADATA wsa;
                     WSAStartup(MAKEWORD(2,0), &wsa);
-#endif
+#else
                     signal(SIGPIPE, SIG_IGN);
+#endif
 
                     // Initializing the sinserv
                     memset(&sinserv, 0, sizeof(sinserv));

@@ -15,6 +15,7 @@
 #include <threading/TimedThread.h>
 #include <timing/TickMachine.h>
 
+
 #define OUTPUT(msg...) printf(msg); fflush(stdout);
 
 int n = 0;
@@ -30,7 +31,7 @@ int main(int argc, char * argv[]) {
   //  TickMachine::init_tick_machine();
 
   MyThread my_thread;
-  my_thread.init(10.0, true);
+  my_thread.init(10.0);
   OUTPUT("Started !\n");
   syst_wait_ms(2000);
   
@@ -40,6 +41,6 @@ int main(int argc, char * argv[]) {
 // TODO est-ce qu'un thread peut dire qu'il est mort:
 // par exemple step pourrait retourner un booleen
 
-// Est-ce que ticks.h est toujours utilisé ?
+// Est-ce que ticks.h est toujours utilisï¿½ ?
 
 /*****************************************************************************/

@@ -2,7 +2,7 @@
 
 void Poller::startPolling(int frequency)
 {
-    init(frequency, true);
+    init(frequency);
 }
 
 void Poller::add(Pollable *pollable)

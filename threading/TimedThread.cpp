@@ -42,33 +42,20 @@ void TimedThread::suspend()
     suspend_thread();
 }
 
-void TimedThread::init(double hertz, bool threaded)
+void TimedThread::init(double hertz)
 {
-    Player::init(hertz,!threaded);
+    Player::init(hertz,true);
     play_state = playing;
     forever = true;
-    if(threaded)
-    {
-        start(0);
-        wait_started();
-    }
-    else
-    {
-        thread_state = Running;
-    }
+    thread_state = Running;
 }
 
-void TimedThread::init_suspended(double hertz, bool threaded)
+void TimedThread::init_suspended(double hertz)
 {
     pause_mutex.lock();
-    Player::init(hertz,!threaded);
+    Player::init(hertz,true);
     forever = true;
 
-    if(threaded)
-    {
-        start(0);
-        wait_started();
-    }
     thread_state = Suspended;
     play_state = suspended;
 }

@@ -2,6 +2,27 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
 
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   # Mac OS X specific code
+   SET(SYSTEM_OS "MACOSX")
+   add_definitions(-DMACOSX)
+   MESSAGE ("-- Running on Mac OS X platform")
+ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    # Linux specific code
+   SET(SYSTEM_OS "LINUX")
+   add_definitions(-DLINUX)
+   MESSAGE ("-- Running on Linux platform")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+IF(DEFINED WIN32)
+    # Windows specific code
+    SET(SYSTEM_OS "WINDOWS")
+    add_definitions(-DWINDOWS)
+    MESSAGE ("-- Running on Windows platform")
+ENDIF(DEFINED WIN32)
+
 # Options
 option (RHOBANMATH
     "Enables RhobanMath support" OFF)
