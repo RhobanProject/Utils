@@ -6,13 +6,5 @@ include_directories (..)
 set (EXTRA_LIBS RhobanUtils)
 
 # Test logging
-add_executable (TestLogging test-logging.cpp)
-target_link_libraries (TestLogging ${EXTRA_LIBS})
-
-# Test timed thread
-add_executable (TestTimedThread test-timed-thread.cpp)
-target_link_libraries (TestTimedThread ${EXTRA_LIBS})
-
-# Test sockets
-add_executable (TestSockets test-sockets.cpp)
-target_link_libraries (TestSockets ${EXTRA_LIBS})
+add_executable (Tests main.cpp)
+target_link_libraries (Tests ${EXTRA_LIBS})

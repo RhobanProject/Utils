@@ -31,6 +31,7 @@
 #define COLOR_NONE 0
 
 #define T_COLOR_RED "\e[0;31m"
+#define T_COLOR_GREEN "\e[0;32m"
 #define T_COLOR_BLUE "\e[0;34m"
 #define T_COLOR_RESET "\e[0m"
 

@@ -2,6 +2,13 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
 
+option (HAVE_COLORS 
+    "Have terminal colors" ON)
+
+if (HAVE_COLORS)
+    add_definitions (-DHAVE_COLORS)
+endif (HAVE_COLORS)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    SET(SYSTEM_OS "MACOSX")
