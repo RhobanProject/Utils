@@ -21,7 +21,6 @@
 #include <timing/Player.h>
 
 #include "Thread.h"
-#include "Mutex.h"
 
 class TimedThread : public Thread, public Player
 {
@@ -40,9 +39,13 @@ class TimedThread : public Thread, public Player
          * @param frequency_
          * this sets the tick frequency and creates and starts the timed thread
          *
-         *the tick machine will animate the TimedThread
-         *the running time of the call to step() should be quite small,
-         *because in the meantime other timedthreads animated by the tick machine are waiting
+         * The TimedThread will be automatically animated and the step() method will be called at the given frequency
+         *
+         * The running time of the call to step() should be quite small,
+         * because in the meantime other TimedThreads are waiting
+         *
+         * If the running time of the call to step() is large, create a thread
+         * and use a TickTimer instead
          *
          * @return
          */

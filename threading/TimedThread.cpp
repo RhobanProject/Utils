@@ -54,6 +54,7 @@ void TimedThread::init_suspended(double hertz)
 {
     pause_mutex.lock();
     Player::init(hertz,true);
+    gettimeofday( &suspend_start , 0);
     forever = true;
 
     thread_state = Suspended;
