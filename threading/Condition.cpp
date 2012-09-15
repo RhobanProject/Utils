@@ -37,12 +37,12 @@ int Condition::wait(Mutex *mutex, unsigned int timeout = 0)
 {
     int ret;
     struct timespec time;
-	struct timeval tv;
+    struct timeval tv;
 
-	gettimeofday(&tv, NULL);
+    gettimeofday(&tv, NULL);
 
     time.tv_sec = tv.tv_sec + (timeout/1000);
-    time.tv_nsec += (tv.tv_usec*1000) + ((timeout%1000) * 1000000);
+    time.tv_nsec = (tv.tv_usec*1000) + ((timeout%1000) * 1000000);
 
     if (time.tv_nsec >= 1000000000L) {
         time.tv_sec++;
@@ -59,7 +59,7 @@ int Condition::wait(Mutex *mutex, unsigned int timeout = 0)
         return 0;
     }
 
-    if (ret != 0) {
+    if (ret < 0) {
         throw string("Failed to wait condition");
     }
 
