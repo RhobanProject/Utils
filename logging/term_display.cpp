@@ -6,7 +6,7 @@ void term_separator() {
   printf("-------------------------------------------------------------------------------\n");
 }
 
-void print_nth(int n, char c) {
+void print_n_times(int n, char c) {
   char str[1024];
   int k;
   for (k=0; k<n; k++) str[k] = c;
