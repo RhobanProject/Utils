@@ -38,19 +38,16 @@ class TimedThread : public Thread, public Player
 
         /*!
          * @param frequency_
-         * this sets the tick frequency and creates and starts the thread
+         * this sets the tick frequency and creates and starts the timed thread
          *
-         * depending on the boolean
-         * this will create or not a new thread
-         *
-         *in case a thread is not created, the tick machine will animate the TimedThread
-         *in this case the running time of the call to step() should be very small,
-         *because in the meantime other threads animated by the tick machine are waiting
+         *the tick machine will animate the TimedThread
+         *the running time of the call to step() should be quite small,
+         *because in the meantime other timedthreads animated by the tick machine are waiting
          *
          * @return
          */
-        void init(double hertz, bool threaded);
-        void init_suspended(double hertz, bool threaded);
+        void init(double hertz);
+        void init_suspended(double hertz);
 
         /*!
          * frequency can be changed using set_frequency() inherited from TickTimer
