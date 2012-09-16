@@ -38,7 +38,7 @@ int string_to_int(char * argv);
 #define my_trunc(x,a,b) { if ((x) < (a)) x=a; if ((x) > (b)) x=b; }
 
 // Truncate the value x and return the new value
-#define interval_trunc(x,a,b) (({ if ((x) < (a)) x=a; }), ({ if ((x) > (b)) x=b; }), (x))
+#define interval_trunc(x,a,b) ( ((x)<(a)) ? x=a : ( ((x)>(b))? x=b : x ) )
 #define abs_value(x) (((x)>=0)?(x):-(x))
 
 /*****************************************************************************/

@@ -29,6 +29,8 @@
 
 void term_separator();
 void print_n_times(int n, char c);
+void term_title(char * title);
+void term_subtitle(char * title);
 
 #endif /* TERM_DISPLAY_H */
 
