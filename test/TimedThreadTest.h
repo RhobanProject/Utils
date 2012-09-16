@@ -8,113 +8,104 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 /*****************************************************************************/
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <iostream>
+#include <time.h>
+#include "util.h"
+#include "ticks.h"
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include <ticks.h>
 #include <threading/TimedThread.h>
 #include <timing/TickMachine.h>
-
 #include <tests/TestCase.h>
 
-#define OUTPUT(msg...) printf(msg); fflush(stdout);
+using namespace std;
 
-#define FREQ 50
+int freq = 50;
+double accuracy = 0.01;
 
-int n = 0;
-
-class MyThread : public TimedThread
-{
-    public:
-        MyThread() : counter(0)
-    {
-    }
-
-        void step() {
-            counter++;
-        };
-
-        int counter ;
-};
-
-class MyThread2 : public TimedThread
-{
-public:
-	int count;
-	MyThread2(string name):count(0){this->name = name;}
-
-
-protected:
-	string name;
-	void step()
-	{
-		cout <<  name;
-		if(count < FREQ)
-			cout << " step " << count ++ << " at "<< real_time << " and frequency "<< frequency << endl;
-		else
-		{
-			cout << " killing myself... ";
-			kill_and_delete_me();
-			cout << "... my last blow." << endl;
-		}
-
-	}
-};
 
 class TimedThreadTest : public TestCase
 {
-    public:
-        void testTimedThread()
-        {
-            MyThread my_thread;
-            my_thread.init(10.0);
-            OUTPUT("Running a 10Hz TimedThread for 1.9s\n");
-            syst_wait_ms(1900);
-            my_thread.kill();
-            assertEquals(my_thread.counter, 20);
-        }
+	class MyTimedThread : 	public TimedThread
+	{
+	public:
+		int count;
+		MyTimedThread(string name):count(0){this->name = name;}
 
-        /**
-         * TODO: Use assertions!
-         */
-        void testTimedThread2()
-        {
-            cout << "Creating thread" << endl;
-            MyThread2 * thread = new MyThread2("Thread1");
-            cout << "Initializing thread" << endl;
-            thread->init(FREQ);
-            //thread2->init(20,true);
-            //cout << "Waiting 2 secs..." << endl;
-            //syst_wait_ms(2000);
+		bool accurate()
+		{
+			return real_time - count*1.0/frequency <= accuracy;
+		}
 
-            syst_wait_ms(10000);
+	protected:
+		string name;
+		void step()
+		{
+			//		if(count < 3*freq)
+			if(count++ % 10 == 0)
+			{
+				cout <<  name;
+				cout << " step " << count << " at "<< real_time << " and frequency "<< frequency << endl;
+			}
 
-            cout << "Creating thread2" << endl;
-            MyThread2 * thread2 = new MyThread2("Thread2");
-            cout << "Initializing thread2" << endl;
-            thread2->init(FREQ * 2);
+			//		else
+			//		{
+			//			cout << " killing myself... ";
+			//			kill_and_delete_me();
+			//			cout << "... my last blow." << endl;
+			//		}
 
-            syst_wait_ms(10000);
-
-            cout << "Creating thread3" << endl;
-            MyThread2 * thread3 = new MyThread2("Thread3");
-            cout << "Initializing thread3" << endl;
-            thread3->init_suspended(FREQ/2);
-            cout << "Waiting 300 ms before starting thread 3..." << endl;
-            //syst_wait_ms(2000);
-            cout << "Resuming thread 3" << endl;
-            thread3->resume();
+		}
+	};
 
 
-            syst_wait_ms(10000);
+	public:
+
+	void testAccuracy()
+	{
+		cout << "Creating thread" << endl;
+		MyTimedThread thread1("Thread1");
+		cout << "Initializing thread" << endl;
+		thread1.init(freq*2);
+		//thread2->init(20,true);
+		//cout << "Waiting 2 secs..." << endl;
+		syst_wait_ms(2000);
 
 
-            cout << "... bye!" << endl;
-        }
+		cout << "Creating thread2" << endl;
+		MyTimedThread thread2("Thread2");
+		cout << "Initializing thread2" << endl;
+		thread2.init(freq);
 
-    protected:
-        void _run() {
-            testTimedThread();
-            testTimedThread2();
-        }
+		cout << "Creating thread3" << endl;
+		MyTimedThread thread3("Thread3");
+		cout << "Initializing thread3" << endl;
+		thread3.init_suspended(freq/2);
+		cout << "Waiting 300 ms before starting thread 3..." << endl;
+		//syst_wait_ms(2000);
+		cout << "Resuming thread 3" << endl;
+		thread3.resume();
+
+
+		syst_wait_ms(2000);
+
+		assertTrue(thread1.accurate());
+		assertTrue(thread2.accurate());
+		assertTrue(thread3.accurate());
+
+	}
+
+	protected:
+	void _run()
+	{
+		testAccuracy();
+	}
 };
+
+/*****************************************************************************/
