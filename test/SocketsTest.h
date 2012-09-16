@@ -14,7 +14,6 @@
 #include <logging/log.h>
 
 #include <tests/TestCase.h>
-#include <tests/runTests.h>
 
 #include <sockets/TCPClient.h>
 #include <sockets/TCPServer.h>
@@ -55,7 +54,7 @@ void *run_server(void *data)
     }
 };
 
-class TestSockets : public TestCase
+class SocketsTest : public TestCase
 {
     public:
         void testClientServer()
@@ -93,12 +92,3 @@ class TestSockets : public TestCase
             testClientServer();
         }
 };
-
-int main(void)
-{
-    try {
-        runTests<TestSockets>("Sockets testing");
-    } catch (string error) {
-        TEST_LOG("Error: %s", error.c_str())
-    }
-}

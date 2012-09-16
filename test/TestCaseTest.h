@@ -9,7 +9,6 @@
  *************************************************/
 #include <cstdlib>
 #include <iostream>
-#include <main/Command.h>
 #include <tests/TestCase.h>
 
 using namespace std;
@@ -35,10 +34,3 @@ class TestCaseTest : public TestCase
             testTest();
         }
 };
-
-COMMAND_DEFINE(tests_tests, "Tests the testing methods")
-{
-    TestCaseTest test;
-
-    test.run();
-}

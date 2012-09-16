@@ -10,10 +10,20 @@
 #include <iostream>
 #include <logging/log.h>
 
+#include <tests/TestCase.h>
+
 using namespace std;
 
-int main(void)
+class LoggingTest : public TestCase
 {
-    LOG(1, 1, "main", "C-style log [%d]", 12);
-    LOG_CPP(1, 1, "main", "C++-style log [" << 12 << "]");
-}
+    public:
+        void testLogging() {
+            LOG(1, 1, "main", "C-style log [%d]", 12);
+            LOG_CPP(1, 1, "main", "C++-style log [" << 12 << "]");
+        }
+
+    protected:
+        void _run() {
+            testLogging();
+        }
+};

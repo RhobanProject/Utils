@@ -12,6 +12,7 @@
 #include <sstream>
 #include <cmath>
 #include <string.h>
+#include <logging/log.h>
 #include "TestCase.h"
 
 using namespace std;
@@ -29,7 +30,18 @@ void TestCase::run()
 
     cout << endl;
     cout << "-------------------------------" << endl;
+#ifdef HAVE_COLORS
+    if (assertionsPassed == assertions) {
+        cout << T_COLOR_GREEN;
+    } else {
+        cout << T_COLOR_RED;
+    }
+#endif
     cout << "Ended, " << assertionsPassed << "/" << assertions << " assertions passed" << endl << endl;
+
+#ifdef HAVE_COLORS
+    cout << T_COLOR_RESET;
+#endif
 }
 
 void TestCase::setPlace(string file, int line, string function)
