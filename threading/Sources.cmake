@@ -4,5 +4,4 @@ set (SOURCES
     Mutex.cpp 
     Thread.cpp
     TimedThread.cpp
-    Poller.cpp
     )
