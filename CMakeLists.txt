@@ -9,6 +9,13 @@ if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)
 
+option (HAVE_ZMQ
+    "Have ZMQ" OFF)
+
+if (HAVE_ZMQ)
+    add_definitions (-DHAVE_ZMQ)
+endif (HAVE_ZMQ)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    SET(SYSTEM_OS "MACOSX")

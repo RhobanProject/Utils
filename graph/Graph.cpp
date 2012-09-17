@@ -4,12 +4,12 @@ using namespace std;
 
 Graph::Graph()
 {
-    gettimeofday(&start, NULL);
+    gettimeofday(&startTime, NULL);
 }
 
 Curve *Graph::addCurve(string name)
 {
-    Curve *curve = new Curve(name, &start);
+    Curve *curve = new Curve(name, &startTime);
     curves.push_back(curve);
 
     return curve;

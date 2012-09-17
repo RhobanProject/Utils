@@ -15,7 +15,7 @@ class Graph
 
     protected:
         vector<Curve*> curves;
-        struct timeval start;
+        struct timeval startTime;
 };
 
 #endif // _GRAPH_H
