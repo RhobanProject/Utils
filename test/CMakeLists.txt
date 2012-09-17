@@ -1,3 +1,13 @@
+option (ROBOARD
+    "Compile for Roboard" OFF)
+
+if (ROBOARD)
+    set (CMAKE_CXX_FLAGS "-m32 -mtune=i586 -march=i586"
+        CACHE STRING "")
+    set (CMAKE_CXX_COMPILER "g++-4.4"
+        CACHE STRING "")
+endif (ROBOARD)
+
 cmake_minimum_required (VERSION 2.6)
 project (RhobanUtilsTest)
 
