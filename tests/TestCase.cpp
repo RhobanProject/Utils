@@ -146,7 +146,10 @@ void TestCase::_assertEquals(char char1, char char2, bool neg)
 void TestCase::_assertEqualsDelta(float f1, float f2, float delta)
 {
     if (abs(f1-f2) > delta) {
-        error("Number differs");
+        ostringstream oss;
+
+        oss << "Numbers differs (" << f1 << ", " << f2 << ")";
+        error(oss.str());
     } else {
         pass();
     }
