@@ -69,6 +69,7 @@ set(DIRECTORIES
     timing
     threading
     xml
+    graph
     serial
     sockets
     )
