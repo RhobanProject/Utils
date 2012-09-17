@@ -3,8 +3,8 @@
 #ifdef HAVE_ZMQ
 #include <zmq.h>
 #include <zhelpers.h>
-#include "ZMQGraph.h"
 #endif
+#include "ZMQGraph.h"
 #include "Curve.h"
 
 using namespace std;
