@@ -98,6 +98,8 @@ if (HAVE_ZMQ)
     if(UNIX AND NOT APPLE)
         set (EXTRA_LIBS ${EXTRA_LIBS} rt)
     endif()
+
+    include_directories ("${ZMQ_HEADERS}")
 endif (HAVE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
