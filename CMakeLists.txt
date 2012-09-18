@@ -94,6 +94,10 @@ set(DIRECTORIES
 if (HAVE_ZMQ)
     add_subdirectory(zmq)
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
+
+    if(UNIX AND NOT APPLE)
+        set (EXTRA_LIBS ${EXTRA_LIBS} rt)
+    endif()
 endif (HAVE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
