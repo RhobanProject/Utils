@@ -91,6 +91,11 @@ set(DIRECTORIES
     sockets
     )
 
+if (HAVE_ZMQ)
+    add_subdirectory(zmq)
+    set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
+endif (HAVE_ZMQ)
+
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
