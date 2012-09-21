@@ -1,6 +1,6 @@
 set (CONFIG_FILE_GENERATOR "${RHOBAN_UTILS_DIRECTORY}/configfile/generate.py")
 
-macro (config_file NAME DEPENDS)
+macro (config_file NAME)
     set (OUTPUT_DIR "${PROJECT_BINARY_DIR}/configs")
     set (GENERATE_FILES
         "${OUTPUT_DIR}/${NAME}.h"
@@ -12,7 +12,7 @@ macro (config_file NAME DEPENDS)
     add_custom_command(
         OUTPUT ${GENERATE_FILES}
         COMMAND "${CONFIG_FILE_GENERATOR}" "${PROJECT_SOURCE_DIR}" "${NAME}" "${OUTPUT_DIR}"
-        DEPENDS "${YAML_FILE}" ${DEPENDS}
+        DEPENDS "${YAML_FILE}" ${ARGN}
         )
     set (ALL_SOURCES ${ALL_SOURCES}
         "${OUTPUT_DIR}/${NAME}.cpp"
