@@ -161,14 +161,13 @@ USART_INIT_ERROR:
     return -1;
 #elif LINUX
     struct termios newtio;
-    struct serial_struct serinfo;
 
     memset(&newtio, 0, sizeof(newtio));
 
     if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
         cerr << "device open error: " << deviceName << endl;
         goto USART_INIT_ERROR;
-    }   
+    }
 
     newtio.c_cflag              = B38400|CS8|CLOCAL|CREAD;
     newtio.c_iflag              = IGNPAR;
@@ -177,24 +176,13 @@ USART_INIT_ERROR:
     newtio.c_cc[VTIME]  = 0;    // time-out ê°’ (TIME * 0.1ì´ˆ) 0 : disable
     newtio.c_cc[VMIN]   = 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
 
+    cfsetispeed(&newtio, deviceBaudrate);
+    cfsetospeed(&newtio, deviceBaudrate);
+
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd, TCSANOW, &newtio);
 
     if (fd == -1) {
-        goto USART_INIT_ERROR;
-    }
-
-    if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0) {
-        fprintf(stderr, "Cannot get serial info\n");
-        goto USART_INIT_ERROR;
-    }
-
-    serinfo.flags &= ~ASYNC_SPD_MASK;
-    serinfo.flags |= ASYNC_SPD_CUST;
-    serinfo.custom_divisor = serinfo.baud_base / (float)deviceBaudrate;
-
-    if(ioctl(fd, TIOCSSERIAL, &serinfo) < 0) {
-        fprintf(stderr, "Cannot set serial info\n");
         goto USART_INIT_ERROR;
     }
 
@@ -247,25 +235,16 @@ void Serial::setSpeed(int baudrate)
 #ifdef WIN32
     fprintf(stderr, "usart_set_channel_speed not implemented for WIN32\n");
 #elif LINUX
-    struct serial_struct serinfo;
+    struct termios tio;
 
     if (fd == -1) {
         return;
     }
-
-    if(ioctl(fd, TIOCGSERIAL, &serinfo) < 0) {
-        fprintf(stderr, "Cannot get serial info\n");
-        return;
-    }
-
-    serinfo.flags &= ~ASYNC_SPD_MASK;
-    serinfo.flags |= ASYNC_SPD_CUST;
-    serinfo.custom_divisor = serinfo.baud_base / baudrate;
-
-    if(ioctl(fd, TIOCSSERIAL, &serinfo) < 0) {
-        fprintf(stderr, "Cannot set serial info\n");
-        return;
-    }
+    
+    tcgetattr(fd, &tio);
+    cfsetispeed(&tio, deviceBaudrate);
+    cfsetospeed(&tio, deviceBaudrate);
+    tcsetattr(fd, TCSANOW, &tio);
 #endif
 }
 
