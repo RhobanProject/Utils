@@ -107,7 +107,7 @@ class StateMachine {
   State * next_state;
   int frequency;
 
-  void set_debug(bool debug) { debug = false; };
+  void set_debug(bool debug_mode) { debug = debug_mode; };
   bool debug_mode() { return debug; };
 
   StateMachine();

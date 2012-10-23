@@ -87,6 +87,7 @@ set(DIRECTORIES
     threading
     xml
     graph
+    observer
     serial
     sockets
     )

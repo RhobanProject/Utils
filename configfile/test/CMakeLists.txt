@@ -5,14 +5,15 @@ project (ConfigTest)
 set (RHOBAN_UTILS_DIRECTORY
     "${PROJECT_SOURCE_DIR}/../../" CACHE STRING "")
 
-add_subdirectory ("${RHOBAN_UTILS_DIR}" utils)
+add_subdirectory ("${RHOBAN_UTILS_DIRECTORY}" utils)
 set (EXTRA_LIBS RhobanUtils)
-include_directories ("${RHOBAN_UTILS_DIR}")
+include_directories ("${RHOBAN_UTILS_DIRECTORY}")
 
 # Config file
-include ("${RHOBAN_UTILS_DIR}/configfile/ConfigFile.cmake")
+include ("${RHOBAN_UTILS_DIRECTORY}/configfile/ConfigFile.cmake")
 config_file (config/ConfigFile
     "something/Something.h"
+    "something/Other.h"
     )
 
 # Sources
