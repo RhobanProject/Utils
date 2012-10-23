@@ -122,7 +122,7 @@ s_set_id (void *socket)
 static void
 s_sleep (int msecs)
 {
-#if (defined (__WINDOWS__))
+#ifdef WIN32
     Sleep (msecs);
 #else
     struct timespec t;
