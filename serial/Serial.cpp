@@ -39,12 +39,18 @@
 
 using namespace std;
 
-Serial::Serial(string deviceName, int deviceBaudrate): handle(0), recording(false), recorded("")
+Serial::Serial(string deviceName, int deviceBaudrate): record_stream(""), handle(0), recording(false)
 {
 	setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
 }
 
+Serial::~Serial()
+{
+	if(recording)
+		record_stream.close();
+	recording = false;
+}
 
 void Serial::setRts(int value)
 {
@@ -77,136 +83,145 @@ void Serial::fdClose()
  */
 int Serial::connect()
 {
+	if(device_is_file)
+	{
+		handle = fopen(deviceName, "r");
+		if(!handle)
+			return -1;
+	}
+	else
+	{
 #ifdef WIN32
 
-	DCB Dcb;
-	COMMTIMEOUTS Timeouts;
-	DWORD dwError;
+		DCB Dcb;
+		COMMTIMEOUTS Timeouts;
+		DWORD dwError;
 
-	// Open serial device
-	handle = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
+		// Open serial device
+		handle = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
 
-	if( handle == INVALID_HANDLE_VALUE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( handle == INVALID_HANDLE_VALUE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	// Setting communication property
-	Dcb.DCBlength = sizeof(DCB);
+		// Setting communication property
+		Dcb.DCBlength = sizeof(DCB);
 
-	if( GetCommState( handle, &Dcb ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( GetCommState( handle, &Dcb ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	// Set baudrate
-	Dcb.BaudRate                        = (DWORD)deviceBaudrate;
-	Dcb.ByteSize                        = 8;                                    // Data bit = 8bit
-	Dcb.Parity                          = NOPARITY;                             // No parity
-	Dcb.StopBits                        = ONESTOPBIT;                   // Stop bit = 1
-	Dcb.fParity                         = NOPARITY;                             // No Parity check
-	Dcb.fBinary                         = 1;                                    // Binary mode
-	Dcb.fNull                           = 0;                                    // Get Null byte
-	Dcb.fAbortOnError           		= 1;
-	Dcb.fErrorChar                      = 0;
+		// Set baudrate
+		Dcb.BaudRate                        = (DWORD)deviceBaudrate;
+		Dcb.ByteSize                        = 8;                                    // Data bit = 8bit
+		Dcb.Parity                          = NOPARITY;                             // No parity
+		Dcb.StopBits                        = ONESTOPBIT;                   // Stop bit = 1
+		Dcb.fParity                         = NOPARITY;                             // No Parity check
+		Dcb.fBinary                         = 1;                                    // Binary mode
+		Dcb.fNull                           = 0;                                    // Get Null byte
+		Dcb.fAbortOnError           		= 1;
+		Dcb.fErrorChar                      = 0;
 
-	// Not using XOn/XOff
-	Dcb.fOutX                           = 0;
-	Dcb.fInX                            = 0;
+		// Not using XOn/XOff
+		Dcb.fOutX                           = 0;
+		Dcb.fInX                            = 0;
 
-	// Not using H/W flow control
-	Dcb.fDtrControl                     = DTR_CONTROL_DISABLE;
-	Dcb.fRtsControl                     = RTS_CONTROL_DISABLE;
-	Dcb.fDsrSensitivity         = 0;
-	Dcb.fOutxDsrFlow            = 0;
-	Dcb.fOutxCtsFlow            = 0;
+		// Not using H/W flow control
+		Dcb.fDtrControl                     = DTR_CONTROL_DISABLE;
+		Dcb.fRtsControl                     = RTS_CONTROL_DISABLE;
+		Dcb.fDsrSensitivity         = 0;
+		Dcb.fOutxDsrFlow            = 0;
+		Dcb.fOutxCtsFlow            = 0;
 
-	if( SetCommState(handle, &Dcb) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( SetCommState(handle, &Dcb) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	if( SetCommMask( handle, 0 ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( SetCommMask( handle, 0 ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	if( SetupComm(handle, 4096, 4096 ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( SetupComm(handle, 4096, 4096 ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	if( PurgeComm( handle, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( PurgeComm( handle, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	if( ClearCommError( handle, &dwError, NULL ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( ClearCommError( handle, &dwError, NULL ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	if( GetCommTimeouts( handle, &Timeouts ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( GetCommTimeouts( handle, &Timeouts ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	Timeouts.ReadIntervalTimeout = 1;
-	Timeouts.ReadTotalTimeoutMultiplier = 0;
-	Timeouts.ReadTotalTimeoutConstant = 1; // must not be zero.
-	Timeouts.WriteTotalTimeoutMultiplier = 0;
-	Timeouts.WriteTotalTimeoutConstant = 0;
+		Timeouts.ReadIntervalTimeout = 1;
+		Timeouts.ReadTotalTimeoutMultiplier = 0;
+		Timeouts.ReadTotalTimeoutConstant = 1; // must not be zero.
+		Timeouts.WriteTotalTimeoutMultiplier = 0;
+		Timeouts.WriteTotalTimeoutConstant = 0;
 
-	if( SetCommTimeouts( handle, &Timeouts ) == FALSE ) {
-		goto USART_INIT_ERROR;
-	}
+		if( SetCommTimeouts( handle, &Timeouts ) == FALSE ) {
+			goto USART_INIT_ERROR;
+		}
 
-	return 0;
+		return 0;
 
-	USART_INIT_ERROR:
-	return -1;
+		USART_INIT_ERROR:
+		return -1;
 #elif LINUX
-    struct termios newtio;
+		struct termios newtio;
 
-	memset(&newtio, 0, sizeof(newtio));
+		memset(&newtio, 0, sizeof(newtio));
 
-    if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
-        cerr << "device open error: " << deviceName << endl;
-        goto USART_INIT_ERROR;
-    }
+		if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
+			cerr << "device open error: " << deviceName << endl;
+			goto USART_INIT_ERROR;
+		}
 
-	newtio.c_cflag              = B38400|CS8|CLOCAL|CREAD;
-	newtio.c_iflag              = IGNPAR;
-	newtio.c_oflag              = 0;
-	newtio.c_lflag              = 0;
-	newtio.c_cc[VTIME]  = 0;    // time-out ê°’ (TIME * 0.1ì´ˆ) 0 : disable
-	newtio.c_cc[VMIN]   = 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
+		newtio.c_cflag              = B38400|CS8|CLOCAL|CREAD;
+		newtio.c_iflag              = IGNPAR;
+		newtio.c_oflag              = 0;
+		newtio.c_lflag              = 0;
+		newtio.c_cc[VTIME]  = 0;    // time-out ê°’ (TIME * 0.1ì´ˆ) 0 : disable
+		newtio.c_cc[VMIN]   = 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
 
-    cfsetispeed(&newtio, deviceBaudrate);
-    cfsetospeed(&newtio, deviceBaudrate);
+		cfsetispeed(&newtio, deviceBaudrate);
+		cfsetospeed(&newtio, deviceBaudrate);
 
-    tcflush(fd, TCIFLUSH);
-    tcsetattr(fd, TCSANOW, &newtio);
+		tcflush(fd, TCIFLUSH);
+		tcsetattr(fd, TCSANOW, &newtio);
 
-	if (fd == -1) {
-		goto USART_INIT_ERROR;
-	}
+		if (fd == -1) {
+			goto USART_INIT_ERROR;
+		}
 
-	fdClose();
+		fdClose();
 
-	if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
-		cerr << "device open error: " << deviceName << endl;
-		goto USART_INIT_ERROR;
-	}
+		if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
+			cerr << "device open error: " << deviceName << endl;
+			goto USART_INIT_ERROR;
+		}
 
-	newtio.c_cflag = B38400|CS8|CLOCAL|CREAD;
-	newtio.c_iflag = IGNPAR;
-	newtio.c_oflag = 0;
-	newtio.c_lflag = 0;
-	newtio.c_cc[VTIME]  = 0;
-	newtio.c_cc[VMIN]   = 0;
+		newtio.c_cflag = B38400|CS8|CLOCAL|CREAD;
+		newtio.c_iflag = IGNPAR;
+		newtio.c_oflag = 0;
+		newtio.c_lflag = 0;
+		newtio.c_cc[VTIME]  = 0;
+		newtio.c_cc[VMIN]   = 0;
 
-	tcflush(fd, TCIFLUSH);
-	tcsetattr(fd, TCSANOW, &newtio);
+		tcflush(fd, TCIFLUSH);
+		tcsetattr(fd, TCSANOW, &newtio);
 
-	return 0;
+		return 0;
 
-	USART_INIT_ERROR:
-	fdClose();
-	return -1;
+		USART_INIT_ERROR:
+		fdClose();
+		return -1;
 #endif
+	}
 }
 
 /**
@@ -232,6 +247,13 @@ void Serial::setDevice(string name)
 		name = "\\\\.\\" + name;
 #endif
 	deviceName = name;
+	device_is_file = false;
+}
+
+void Serial::setFileDevice(string name)
+{
+	deviceName = name;
+	device_is_file = true;
 }
 
 /**
@@ -242,16 +264,16 @@ void Serial::setSpeed(int baudrate)
 #ifdef WIN32
 	fprintf(stderr, "usart_set_channel_speed not implemented for WIN32\n");
 #elif LINUX
-    struct termios tio;
+	struct termios tio;
 
 	if (fd == -1) {
 		return;
 	}
-    
-    tcgetattr(fd, &tio);
-    cfsetispeed(&tio, deviceBaudrate);
-    cfsetospeed(&tio, deviceBaudrate);
-    tcsetattr(fd, TCSANOW, &tio);
+
+	tcgetattr(fd, &tio);
+	cfsetispeed(&tio, deviceBaudrate);
+	cfsetospeed(&tio, deviceBaudrate);
+	tcsetattr(fd, TCSANOW, &tio);
 #endif
 }
 
@@ -286,7 +308,7 @@ size_t Serial::receive(char *destination, size_t size)
 		n = read(fd, destination, size);
 #endif
 		if(recording && n>0)
-			recorded += "Received: " + string(destination, n) + "\n";
+			record_stream << string(destination, n);
 	}
 
 	return n;
@@ -364,7 +386,7 @@ size_t Serial::send(const char *data, size_t size)
 #endif
 
 	if(recording)
-		recorded += "Sent: " + string(data, got) + "\n";
+		record_stream += "Sent: " + string(data, got) + "\n";
 
 	return got;
 }
@@ -373,7 +395,7 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 {
 	string buf = "";
 	while(buf.size() < pattern.size())
-	try
+		try
 	{
 			char c = receiveChar();
 			buf += c ;
@@ -399,6 +421,14 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 	}
 	if(to_wait >0)
 		cerr << "seek_pattern: thrown " << to_wait << "chars to garbage" << endl;
-	cerr << endl;
+}
+
+void Serial::record(string filename)
+{
+	record_stream.open(filename.c_str() , ios::app );
+	if(record_stream.is_open())
+		recording = true;
+	else
+		throw string("Failed to open serial log file ") + filename;
 }
 

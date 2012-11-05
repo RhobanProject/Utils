@@ -22,7 +22,7 @@
 #endif
 
 // Provide random number from 0..(num-1)
-#if (defined (__WINDOWS__))
+#ifdef WIN32
 # define randof(num) (int) ((float) (num) * rand () / (RAND_MAX + 1.0))
 #else
 # define randof(num) (int) ((float) (num) * random () / (RAND_MAX + 1.0))
@@ -48,7 +48,7 @@ s_recv (void *socket) {
 
 // Convert C string to 0MQ string and send to socket
 static int
-s_send (void *socket, char *string) {
+s_send (void *socket, const char *string) {
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
@@ -59,7 +59,7 @@ s_send (void *socket, char *string) {
 
 // Sends string as 0MQ string, as multipart non-terminal
 static int
-s_sendmore (void *socket, char *string) {
+s_sendmore (void *socket, const char *string) {
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));

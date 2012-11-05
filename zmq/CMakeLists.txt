@@ -1,6 +1,12 @@
 cmake_minimum_required (VERSION 2.6)
 project (ZeroMQ)
 
+IF(DEFINED WIN32)
+	SET(SYSTEM_OS "WINDOWS")
+	SET(ZMQ_HAVE_WINDOWS 1)
+	SET(ZMQ_HAVE_MINGW32 1)
+ENDIF(DEFINED WIN32)
+
 set (ALL_SOURCES
     src/address.cpp  src/epoll.cpp          src/kqueue.cpp   src/pgm_receiver.cpp  src/push.cpp          src/socket_base.cpp    src/xsub.cpp
     src/clock.cpp    src/err.cpp            src/lb.cpp       src/pgm_sender.cpp    src/random.cpp        src/stream_engine.cpp  src/zmq.cpp

@@ -27,6 +27,7 @@ class Serial
 {
     public:
         Serial(string deviceName, int deviceBaudrate);
+        ~Serial();
 
         /**
          * Connects the serial device
@@ -47,6 +48,11 @@ class Serial
          * Sets the device name
          */
         void setDevice(string name);
+
+        /*
+         * Sets the file to read characters from
+         */
+         void setFileDevice(string filename);
 
         /**
          * Flushes the internal buffer
@@ -75,16 +81,16 @@ class Serial
     	void seekPattern(string pattern, int max_chars_wait = 4096);
 
     	/*!
-    	 * record all traffic to a buffer
+    	 * record all traffic to a file buffer
     	 */
-    	void record(){ recording = true; }
-        string recorded;
+    	void record(string filename);
 
     private:
         /**
          * Device name
          */
         string deviceName;
+        bool device_is_file;
         
         /**
          * Device baudrate
@@ -110,6 +116,7 @@ class Serial
         /*
          * Logging
          */
+       	fstream record_stream;
         bool recording;
 };
 
