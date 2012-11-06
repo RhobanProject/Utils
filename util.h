@@ -94,5 +94,7 @@ std::list<T> vector_to_list(std::vector<T> & V) {
   return L;
 }
 
+vector<string> &split(const string &s, char delim, vector<string> &elems);
+
 /*@}*/
 #endif
