@@ -18,6 +18,8 @@
 #include <windows.h>
 #endif
 
+#include <fstream>
+
 using namespace std;
 
 /**
@@ -62,8 +64,8 @@ class Serial
         /**
          * Read some data
          */
-        size_t receive(char *destination, size_t size);
-        string receive(size_t size);
+        size_t receive(char *destination, size_t size, bool blocking = false);
+        string receive(size_t size, bool blocking = false);
         char receiveChar();
     	short receiveShort();
     	int receiveInt();
@@ -78,20 +80,21 @@ class Serial
     	/*!
     	 * read characters until the pattern is found
     	 */
-    	void seekPattern(string pattern, int max_chars_wait = 4096);
+    	void seekPattern(string pattern, int max_chars_wait = 8192);
 
     	/*!
     	 * record all traffic to a file buffer
     	 */
     	void record(string filename);
 
-    private:
         /**
          * Device name
          */
         string deviceName;
         bool device_is_file;
-        
+
+    private:
+
         /**
          * Device baudrate
          */
@@ -116,7 +119,7 @@ class Serial
         /*
          * Logging
          */
-       	fstream record_stream;
+       	ofstream record_stream;
         bool recording;
 };
 

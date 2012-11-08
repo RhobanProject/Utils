@@ -24,6 +24,14 @@
 
 class TimedThread : public Thread, public Player
 {
+protected:
+
+    /*!
+     * The action to perform between two ticks
+     * This method must be implemented in derived subclasses
+     */
+    virtual void step()=0;
+
     public:
         /*!
          * after the construction, the thread is not started yet
@@ -70,11 +78,6 @@ class TimedThread : public Thread, public Player
          * asks the tick machine to kill the thread and delete it (and stop scheduling it of course)
          */
         void kill_and_delete_me();
-
-        /*!
-         * The action to perform between two ticks
-         */
-        virtual void step()=0;
 
         /*!
          * The core of the thread

@@ -39,7 +39,7 @@
 
 using namespace std;
 
-Serial::Serial(string deviceName, int deviceBaudrate): record_stream(""), handle(0), recording(false)
+Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
 {
 	setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
@@ -85,7 +85,7 @@ int Serial::connect()
 {
 	if(device_is_file)
 	{
-		handle = fopen(deviceName, "r");
+		handle = fopen(deviceName.c_str(), "r");
 		if(!handle)
 			return -1;
 	}
@@ -133,39 +133,39 @@ int Serial::connect()
 		Dcb.fOutxDsrFlow            = 0;
 		Dcb.fOutxCtsFlow            = 0;
 
-		if( SetCommState(handle, &Dcb) == FALSE ) {
+		if( SetCommState(handle, &Dcb) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
-		if( SetCommMask( handle, 0 ) == FALSE ) {
+		if( SetCommMask( handle, 0 ) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
-		if( SetupComm(handle, 4096, 4096 ) == FALSE ) {
+		if( SetupComm(handle, 4096, 4096 ) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
-		if( PurgeComm( handle, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR ) == FALSE ) {
+		if( PurgeComm( handle, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR ) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
-		if( ClearCommError( handle, &dwError, NULL ) == FALSE ) {
+		if( ClearCommError( handle, &dwError, NULL ) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
-		if( GetCommTimeouts( handle, &Timeouts ) == FALSE ) {
+		if( GetCommTimeouts( handle, &Timeouts ) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
-		Timeouts.ReadIntervalTimeout = 1;
-		Timeouts.ReadTotalTimeoutMultiplier = 0;
-		Timeouts.ReadTotalTimeoutConstant = 1; // must not be zero.
+		/* from http://msdn.microsoft.com/en-us/library/windows/desktop/aa363190%28v=vs.85%29.aspx
+		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
+    If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
+    If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
+    If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out.
+		 *
+		 */
+		Timeouts.ReadIntervalTimeout = MAXDWORD;
+		Timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
+		Timeouts.ReadTotalTimeoutConstant = 10;
 		Timeouts.WriteTotalTimeoutMultiplier = 0;
 		Timeouts.WriteTotalTimeoutConstant = 0;
 
-		if( SetCommTimeouts( handle, &Timeouts ) == FALSE ) {
+		if( SetCommTimeouts( handle, &Timeouts ) == FALSE )
 			goto USART_INIT_ERROR;
-		}
 
 		return 0;
 
@@ -222,6 +222,7 @@ int Serial::connect()
 		return -1;
 #endif
 	}
+	return 0;
 }
 
 /**
@@ -281,52 +282,67 @@ void Serial::setSpeed(int baudrate)
 /**
  * Reads
  */
-size_t Serial::receive(char *destination, size_t size)
+size_t Serial::receive(char *destination, size_t size, bool blocking)
 {
-	int n = 0;
+	//cout << "Receiving " << size << " bytes " << endl;
+	size_t total = 0;
 
 #ifdef WIN32
 	DWORD dwToRead, dwRead;
 #endif
 
-	if (size > 0) {
+	while (total < size) {
 #ifdef WIN32
 
-		dwToRead = (DWORD)size;
+		dwToRead = (DWORD)(size - total);
 		dwRead = 0;
 
-		FlushFileBuffers(handle);
-
-		if( ReadFile(handle, destination, dwToRead, &dwRead, NULL ) == FALSE ) {
+		if( ReadFile(handle, destination +  total, dwToRead, &dwRead, NULL ) == FALSE ) {
 			DWORD error_code = GetLastError();
-			cerr << "Com Port Error " << error_code << endl;
+			stringstream err; err << "Serial Port Error " << error_code;
+			if(blocking)
+				throw "Failed to read from serial port:\n\t" + err.str();
+			else
+				cerr << err.str() << endl;
 			return 0;
 		}
-		n = dwRead;
+		int n = dwRead;
 
 #else
-		n = read(fd, destination, size);
+		int n = read(fd, destination, size);
 #endif
 		if(recording && n>0)
 			record_stream << string(destination, n);
+		total += n;
+		//cout << "Receiving " << size << " got total " << total << " this loop " << n << " blocking " << (blocking ? 1 : 0) << endl;
+		if(!blocking) break;
+		if(n==0)
+		{
+			//cout << "Received nothing waiting 50 ms" << endl;
+			syst_wait_ms(50);
+		}
 	}
 
-	return n;
+	return total;
 }
 
-string Serial::receive(size_t size)
+string Serial::receive(size_t size, bool blocking)
 {
 	char result[size];
-	int nb = receive(result, size);
+	int nb = receive(result, size, blocking);
 	return string(result, nb);
 }
 
 char Serial::receiveChar()
 {
 	char result;
-	int nb = receive(&result,1);
-	if(nb != 1)
-		throw string("Failed to read one char from device " + deviceName);
+	int nb = receive(&result,1, true);
+	if(nb < 0)
+		throw string("Wrong stuff when waiting char from device " + deviceName);
+	if(nb == 0)
+		throw string("No char received from device " + deviceName);
+	if(nb >1)
+		throw string("More than one char received from device " + deviceName);
 	return result;
 }
 
@@ -335,12 +351,17 @@ char Serial::receiveChar()
  */
 short Serial::receiveShort()
 {
-	return receiveChar() | (receiveChar() << 8) ;
+	char b[2];
+	receive(b,2, true);
+	return b[0] | (b[1] << 8) ;
 }
 
 int Serial::receiveInt()
 {
-	return  receiveChar() | (receiveChar() << 8) |  (receiveChar() << 16) | (receiveChar() << 24);
+	char b[4];
+	receive(b,4, true);
+	return b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24);
+	//return  receiveChar() | (receiveChar() << 8) |  (receiveChar() << 16) | (receiveChar() << 24);
 }
 
 /**
@@ -364,16 +385,18 @@ size_t Serial::send(string data)
 
 size_t Serial::send(const char *data, size_t size)
 {
-	size_t got;
+	size_t got = 0;
 
 #ifdef WIN32
-	DWORD dwToWrite, dwWritten;
-
-	dwToWrite = (DWORD)size;
-	dwWritten = 0;
-
-	WriteFile(handle, data, dwToWrite, &dwWritten, NULL);
-	got = dwWritten;
+	DWORD dwToWrite = (DWORD)size;
+	while(got < size)
+	{
+		DWORD dwWritten = 0;
+		//cout << "Sending " << dwToWrite - got << " bytes " << endl;
+		WriteFile(handle, data + got, dwToWrite - got, &dwWritten, NULL);
+		got += dwWritten;
+		//cout << "Sent " << got <<"/" << size <<  endl;
+	}
 	FlushFileBuffers(handle);
 #else
 #ifdef ROBOARD
@@ -384,9 +407,6 @@ size_t Serial::send(const char *data, size_t size)
 	setRts(0);
 #endif
 #endif
-
-	if(recording)
-		record_stream += "Sent: " + string(data, got) + "\n";
 
 	return got;
 }
@@ -400,10 +420,11 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 			char c = receiveChar();
 			buf += c ;
 	}
-	catch(...)//(string exc)
+	catch(string exc)
 	{
-		//cerr << "Problem while seeking pattern " << exc << endl;
-		syst_wait_ms(100);
+		timeval t;
+		gettimeofday(&t, 0);
+		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern " << exc << endl;
 	}
 
 	int to_wait = 0;
@@ -417,15 +438,16 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 			cerr << "seek_pattern: waited too long (" << max_chars_wait << ") for pattern" << endl;
 			throw string("seek_pattern: waited too long for pattern");
 		}
-		//cerr << (int) c << " ";
+		//cout <<c;
 	}
+	//cout << endl;
 	if(to_wait >0)
 		cerr << "seek_pattern: thrown " << to_wait << "chars to garbage" << endl;
 }
 
 void Serial::record(string filename)
 {
-	record_stream.open(filename.c_str() , ios::app );
+	record_stream.open(filename.c_str());
 	if(record_stream.is_open())
 		recording = true;
 	else

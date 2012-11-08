@@ -21,6 +21,7 @@ using namespace std;
 
 Condition::Condition()
 {
+	condition = 0;
     int ret = pthread_cond_init(&condition, 0 );
 
     if(ret==-1) {
@@ -30,10 +31,11 @@ Condition::Condition()
 
 Condition::~Condition()
 {
-    pthread_cond_destroy(&condition);
+	if(condition)
+		pthread_cond_destroy(&condition);
 }
 
-int Condition::wait(Mutex *mutex, unsigned int timeout = 0)
+int Condition::wait(Mutex *mutex, unsigned int timeout)
 {
     int ret;
     struct timespec time;
@@ -56,7 +58,7 @@ int Condition::wait(Mutex *mutex, unsigned int timeout = 0)
     }
 
     if (ret == ETIMEDOUT) {
-        return 0;
+        throw string("Timeout while waiting for condition");
     }
 
     if (ret < 0) {

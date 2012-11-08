@@ -20,7 +20,7 @@ public:
   ~Condition();
 
   // wait for the condition to be brodcasted (optional timeout in ms)
-  int wait(Mutex *mutex, unsigned int timeout);
+  int wait(Mutex *mutex, unsigned int timeout = 0);
   
   // broadcast a condition
   void broadcast();
