@@ -35,7 +35,7 @@ Condition::~Condition()
 		pthread_cond_destroy(&condition);
 }
 
-int Condition::wait(Mutex *mutex, unsigned int timeout)
+int Condition::wait(Mutex * mutex, unsigned int timeout)
 {
     int ret;
     struct timespec time;
@@ -52,9 +52,9 @@ int Condition::wait(Mutex *mutex, unsigned int timeout)
     }
 
     if (timeout > 0) {
-        ret = pthread_cond_timedwait(&condition, &mutex->_mutex, &time);
+        ret = pthread_cond_timedwait(&condition, &(mutex->_mutex), &time);
     } else {
-        ret = pthread_cond_wait(&condition, &mutex->_mutex);
+        ret = pthread_cond_wait(&condition, &(mutex->_mutex));
     }
 
     if (ret == ETIMEDOUT) {
@@ -66,6 +66,11 @@ int Condition::wait(Mutex *mutex, unsigned int timeout)
     }
 
     return 1;
+}
+
+int Condition::wait(unsigned int timeout)
+{
+	wait(this, timeout);
 }
 
 void Condition::broadcast()

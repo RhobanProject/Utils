@@ -85,9 +85,15 @@ int Serial::connect()
 {
 	if(device_is_file)
 	{
+#ifdef WIN32
+		handle = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if(handle == INVALID_HANDLE_VALUE)
+			return -1;
+#else
 		handle = fopen(deviceName.c_str(), "r");
 		if(!handle)
 			return -1;
+#endif
 	}
 	else
 	{
@@ -284,8 +290,8 @@ void Serial::setSpeed(int baudrate)
  */
 size_t Serial::receive(char *destination, size_t size, bool blocking)
 {
-	//cout << "Receiving " << size << " bytes " << endl;
 	size_t total = 0;
+	//cout << "Receiving " << size << " bytes, blocking " << blocking << endl;
 
 #ifdef WIN32
 	DWORD dwToRead, dwRead;
@@ -303,8 +309,10 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 			if(blocking)
 				throw "Failed to read from serial port:\n\t" + err.str();
 			else
+			{
 				cerr << err.str() << endl;
-			return 0;
+				dwRead = 0;
+			}
 		}
 		int n = dwRead;
 
@@ -314,7 +322,8 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		if(recording && n>0)
 			record_stream << string(destination, n);
 		total += n;
-		//cout << "Receiving " << size << " got total " << total << " this loop " << n << " blocking " << (blocking ? 1 : 0) << endl;
+		//if(total < size)
+			//cout << "Receiving " << size << " got total " << total << " this loop " << n << " blocking " << (blocking ? 1 : 0) << endl;
 		if(!blocking) break;
 		if(n==0)
 		{
@@ -322,7 +331,6 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 			syst_wait_ms(50);
 		}
 	}
-
 	return total;
 }
 
@@ -349,11 +357,11 @@ char Serial::receiveChar()
 /*
  * reads one short
  */
-short Serial::receiveShort()
+unsigned short Serial::receiveShort()
 {
 	char b[2];
 	receive(b,2, true);
-	return b[0] | (b[1] << 8) ;
+	return ((unsigned char) b[0]) | (((unsigned char) b[1]) << 8) ;
 }
 
 int Serial::receiveInt()
@@ -385,6 +393,13 @@ size_t Serial::send(string data)
 
 size_t Serial::send(const char *data, size_t size)
 {
+
+	if(device_is_file)
+	{
+		syst_wait_ms(1 + size / 50);
+		return size;
+	}
+
 	size_t got = 0;
 
 #ifdef WIN32
@@ -424,7 +439,7 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 	{
 		timeval t;
 		gettimeofday(&t, 0);
-		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern " << exc << endl;
+		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern \n\t" << exc << endl;
 	}
 
 	int to_wait = 0;

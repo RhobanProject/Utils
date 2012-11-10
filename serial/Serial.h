@@ -67,7 +67,7 @@ class Serial
         size_t receive(char *destination, size_t size, bool blocking = false);
         string receive(size_t size, bool blocking = false);
         char receiveChar();
-    	short receiveShort();
+    	unsigned short receiveShort();
     	int receiveInt();
 
 
@@ -121,6 +121,7 @@ class Serial
          */
        	ofstream record_stream;
         bool recording;
+
 };
 
 #endif // UTILS_SERIAL_H

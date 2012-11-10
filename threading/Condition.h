@@ -12,7 +12,13 @@
 
 #include "Mutex.h"
 
-class Condition
+
+/* Hugo I inherit agin from Mutex because
+ * The effect of using more than one mutex for concurrent pthread_cond_timedwait() or pthread_cond_wait() operations on the same condition variable is undefined; that is, a condition variable becomes bound to a unique mutex when a thread waits on the condition variable, and this (dynamic) binding shall end when the wait returns.
+ *
+ */
+
+class Condition : public Mutex
 {
 public:
 
@@ -20,8 +26,12 @@ public:
   ~Condition();
 
   // wait for the condition to be brodcasted (optional timeout in ms)
-  int wait(Mutex *mutex, unsigned int timeout = 0);
+  //the condition should be locked before use
+  int wait(unsigned int timeout = 0);
   
+  //wait for the condition with a particular Mutex
+  int wait(Mutex * mutex, unsigned int timeout = 0);
+
   // broadcast a condition
   void broadcast();
 
