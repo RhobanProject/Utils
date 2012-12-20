@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import sys, os, re, codecs
-from CppHeaderParser import CppHeaderParser
+from CppHeaderParser import CppHeaderParser3
 
 class Template(object):
     def __init__(self, filename):
-        self.content = unicode(file(os.path.join(os.path.dirname(__file__), 'templates', filename), 'r').read(), 'utf-8')
+        self.content = open(os.path.join(os.path.dirname(__file__), 'templates', filename), 'r').read()
         self.variables = {}
 
     def render(self, filename):
@@ -99,11 +99,11 @@ class Generator(object):
 
             if matches != None:
                 data = matches.groups()[2].split(',', 2)
-                data = map(lambda x: x.strip(), data)
+                data = list(map(lambda x: x.strip(), data))
                 self.properties += [Parameter(self.entry, data[0], property['name'], property['type'], data[1], data[2])]
 
     def generate(self, outputDirectory, headerTemplate, cppTemplate, configClass):
-        header = CppHeaderParser.CppHeader(os.path.join(self.directory, self.headerFile))
+        header = CppHeaderParser3.CppHeader(os.path.join(self.directory, self.headerFile))
 
         if self.className not in header.classes:
             raise Exception('Class '+self.className+' not found in header file')

@@ -1,12 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys, os, yaml
-from CppHeaderParser import CppHeaderParser
 from generator import Generator, Template
 
 if len(sys.argv) != 4:
-    print "Usage: ./generate.py <inputDirectory> <configFile> <outputDirectory>"
+    print("Usage: ./generate.py <inputDirectory> <configFile> <outputDirectory>")
     exit()
 
 (directory, name, outputDirectory) = sys.argv[1:]
@@ -17,7 +16,7 @@ targetDirectory = os.path.dirname(os.path.join(outputDirectory, name))
 if not os.path.exists(targetDirectory):
     os.makedirs(targetDirectory)
 
-config = yaml.load(file(configFile, 'r').read())
+config = yaml.load(open(configFile, 'r').read())
 
 headerTemplate = Template('ConfigFile.h')
 cppTemplate = Template('ConfigFile.cpp')
