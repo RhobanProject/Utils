@@ -65,7 +65,7 @@ class TickTimer : public Playable
 
     bool is_tickable();
 
-    protected:
+protected:
 
 
     /*! 
