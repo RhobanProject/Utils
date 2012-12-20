@@ -63,6 +63,8 @@ class TickTimer : public Playable
     /* get the real frequency of the timer */
     double get_frequency() const {return frequency;}
 
+    bool is_tickable();
+
     protected:
 
 

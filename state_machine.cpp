@@ -77,7 +77,7 @@ int StateMachine::tic() {
 }
 
 StateMachine::StateMachine() : 
-  debug(true),
+  debug(false),
   transition_delay(0),
   init_state(NULL), 
   active_state(NULL), 

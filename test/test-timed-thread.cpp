@@ -8,38 +8,106 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 /*****************************************************************************/
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <iostream>
+#include <time.h>
+#include "util.h"
+#include "ticks.h"
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include <ticks.h>
 #include <threading/TimedThread.h>
 #include <timing/TickMachine.h>
+#include <tests/TestCase.h>
 
-#define OUTPUT(msg...) printf(msg); fflush(stdout);
+using namespace std;
 
-int n = 0;
+int freq = 50;
+double accuracy = 0.01;
 
-class MyThread : public TimedThread {
-  void step() {
-    OUTPUT("inside the thread step %d\n", n++); 
-  };
+
+class TestTimedThread : public TestCase
+{
+	class MyTimedThread : 	public TimedThread
+	{
+	public:
+		int count;
+		MyTimedThread(string name):count(0){this->name = name;}
+
+		bool accurate()
+		{
+			return real_time - count*1.0/frequency < accuracy;
+		}
+
+	protected:
+		string name;
+		void step()
+		{
+			cout <<  name;
+			//		if(count < 3*freq)
+			cout << " step " << ++count << " at "<< real_time << " and frequency "<< frequency << endl;
+
+			//		else
+			//		{
+			//			cout << " killing myself... ";
+			//			kill_and_delete_me();
+			//			cout << "... my last blow." << endl;
+			//		}
+
+		}
+	};
+
+
+	public:
+
+	void testAccuracy()
+	{
+		cout << "Creating thread" << endl;
+		MyTimedThread thread1("Thread1");
+		cout << "Initializing thread" << endl;
+		thread1.init(freq*2);
+		//thread2->init(20,true);
+		//cout << "Waiting 2 secs..." << endl;
+		syst_wait_ms(2000);
+
+
+		cout << "Creating thread2" << endl;
+		MyTimedThread thread2("Thread2");
+		cout << "Initializing thread2" << endl;
+		thread2.init(freq);
+
+		cout << "Creating thread3" << endl;
+		MyTimedThread thread3("Thread3");
+		cout << "Initializing thread3" << endl;
+		thread3.init_suspended(freq/2);
+		cout << "Waiting 300 ms before starting thread 3..." << endl;
+		//syst_wait_ms(2000);
+		cout << "Resuming thread 3" << endl;
+		thread3.resume();
+
+
+		syst_wait_ms(2000);
+
+		assertTrue(thread1.accurate());
+		assertTrue(thread2.accurate());
+		assertTrue(thread3.accurate());
+
+	}
+
+	protected:
+	void _run()
+	{
+		testAccuracy();
+	}
 };
 
-int main(int argc, char * argv[]) {
-
-  //  TickMachine::init_tick_machine();
-
-  MyThread my_thread;
-  my_thread.init(10.0, true);
-  OUTPUT("Started !\n");
-  syst_wait_ms(2000);
-  
-  my_thread.kill();
-} 
-
-// TODO est-ce qu'un thread peut dire qu'il est mort:
-// par exemple step pourrait retourner un booleen
-
-// Est-ce que ticks.h est toujours utilisé ?
-
+int main(int argc, char **argv)
+{
+	TestTimedThread test;
+	test.run();
+}
 /*****************************************************************************/

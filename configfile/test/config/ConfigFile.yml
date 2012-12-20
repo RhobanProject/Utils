@@ -6,3 +6,7 @@ something:
 something2:
     class: Something
     header: something/Something.h
+
+other:
+    class: Other
+    header: something/Other.h

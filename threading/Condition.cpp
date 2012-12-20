@@ -21,6 +21,7 @@ using namespace std;
 
 Condition::Condition()
 {
+	condition = 0;
     int ret = pthread_cond_init(&condition, 0 );
 
     if(ret==-1) {
@@ -30,19 +31,20 @@ Condition::Condition()
 
 Condition::~Condition()
 {
-    pthread_cond_destroy(&condition);
+	if(condition)
+		pthread_cond_destroy(&condition);
 }
 
-int Condition::wait(Mutex *mutex, unsigned int timeout = 0)
+int Condition::wait(Mutex * mutex, unsigned int timeout)
 {
     int ret;
     struct timespec time;
-	struct timeval tv;
+    struct timeval tv;
 
-	gettimeofday(&tv, NULL);
+    gettimeofday(&tv, NULL);
 
     time.tv_sec = tv.tv_sec + (timeout/1000);
-    time.tv_nsec += (tv.tv_usec*1000) + ((timeout%1000) * 1000000);
+    time.tv_nsec = (tv.tv_usec*1000) + ((timeout%1000) * 1000000);
 
     if (time.tv_nsec >= 1000000000L) {
         time.tv_sec++;
@@ -50,20 +52,25 @@ int Condition::wait(Mutex *mutex, unsigned int timeout = 0)
     }
 
     if (timeout > 0) {
-        ret = pthread_cond_timedwait(&condition, &mutex->_mutex, &time);
+        ret = pthread_cond_timedwait(&condition, &(mutex->_mutex), &time);
     } else {
-        ret = pthread_cond_wait(&condition, &mutex->_mutex);
+        ret = pthread_cond_wait(&condition, &(mutex->_mutex));
     }
 
     if (ret == ETIMEDOUT) {
-        return 0;
+        throw string("Timeout while waiting for condition");
     }
 
-    if (ret != 0) {
+    if (ret < 0) {
         throw string("Failed to wait condition");
     }
 
     return 1;
+}
+
+int Condition::wait(unsigned int timeout)
+{
+	wait(this, timeout);
 }
 
 void Condition::broadcast()

@@ -22,6 +22,10 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 /*! \brief ticks frequency */
 #define DEFAULT_TICKS_FREQUENCY 50
 #define MAX_TICKS_FREQUENCY 100
@@ -46,7 +50,14 @@ void wait_n_ticks(ui32 tick_nb);
 void sleep_ms_ticks(ui32 ms);
 void sleep_ticks(struct timeval duration);
 
-inline void syst_wait_ms(int ms) { usleep(1000 * ms); };
+inline void syst_wait_ms(int ms)
+{
+#ifndef WIN32
+	usleep(1000 * ms);
+#else
+	Sleep(ms);
+#endif
+};
 void sleep_ms(ui32 ms);
 void sleep_ms(int ms); // TODO pas terrible... les 2 sleep_ms...
 void wait_ms(int ms);

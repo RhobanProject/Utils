@@ -79,10 +79,13 @@ public:
     {						\
   lock();
 
-#define BEGIN_SAFE(l)				\
+
+  #define BEGIN_SAFE(l)				\
   try						\
     {						\
   l.lock();
+
+  //	  cout << "Locking " << #l << endl;
 
 #define END_THREAD_SAFE					\
   unlock();						\
@@ -111,6 +114,8 @@ public:
 	   l.unlock();					\
 	   throw string("Unknown exception in thread");	\
 	 }
+
+  //		  cout << "Unlocking "<<  #l << endl;
 
 protected:
 

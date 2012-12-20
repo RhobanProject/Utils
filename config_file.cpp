@@ -26,9 +26,9 @@
 /****************************************************************************/
 FILE * fd;
 
-int verbose = 0;
-void config_file_verbose() { verbose = 1; }
-void config_file_silent() { verbose = 0; }
+int cf_verbose = 0;
+void config_file_verbose() { cf_verbose = 1; }
+void config_file_silent() { cf_verbose = 0; }
 
 #define is_space(x) (x==' ' || x=='\t')
 
@@ -84,10 +84,10 @@ int get_value(char * file, char * id) {
 
 		eat_lexem(length-1);
 		if (strcmp(id, lexem_buffer) == 0) { found = 1; print_it = 1; }
-		if (verbose && print_it == 1) printf("%s = ", lexem_buffer);
+		if (cf_verbose && print_it == 1) printf("%s = ", lexem_buffer);
 		eat_char('=', length-1);
 		eat_lexem(length-1);
-		if (verbose && print_it == 1) { printf("%s\n", lexem_buffer); print_it = 0; }
+		if (cf_verbose && print_it == 1) { printf("%s\n", lexem_buffer); print_it = 0; }
 	}
 	fclose(fd);
 	if (found) return 0;
@@ -100,8 +100,8 @@ int get_int_value(char * file, char * id, int * value) {
 		*value = atoi(lexem_buffer);
 		return 0;
 	} else {
-		printf("%s = %d [Default value]\n", id, *value);
-		return ret;
+	  if (cf_verbose) printf("%s = %d [Default value]\n", id, *value);
+	  return ret;
 	}
 }
 
@@ -111,8 +111,8 @@ int get_double_value(char * file, char * id, double * value) {
 		*value = atof(lexem_buffer);
 		return 0;
 	} else {
-		printf("%s = %f [Default value]\n", id, *value);
-		return ret;
+	  if (cf_verbose) printf("%s = %f [Default value]\n", id, *value);
+	  return ret;
 	}
 }
 

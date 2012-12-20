@@ -21,10 +21,17 @@
 #include <timing/Player.h>
 
 #include "Thread.h"
-#include "Mutex.h"
 
 class TimedThread : public Thread, public Player
 {
+protected:
+
+    /*!
+     * The action to perform between two ticks
+     * This method must be implemented in derived subclasses
+     */
+    virtual void step()=0;
+
     public:
         /*!
          * after the construction, the thread is not started yet
@@ -38,19 +45,20 @@ class TimedThread : public Thread, public Player
 
         /*!
          * @param frequency_
-         * this sets the tick frequency and creates and starts the thread
+         * this sets the tick frequency and creates and starts the timed thread
          *
-         * depending on the boolean
-         * this will create or not a new thread
+         * The TimedThread will be automatically animated and the step() method will be called at the given frequency
          *
-         *in case a thread is not created, the tick machine will animate the TimedThread
-         *in this case the running time of the call to step() should be very small,
-         *because in the meantime other threads animated by the tick machine are waiting
+         * The running time of the call to step() should be quite small,
+         * because in the meantime other TimedThreads are waiting
+         *
+         * If the running time of the call to step() is large, create a thread
+         * and use a TickTimer instead
          *
          * @return
          */
-        void init(double hertz, bool threaded);
-        void init_suspended(double hertz, bool threaded);
+        void init(double hertz);
+        void init_suspended(double hertz);
 
         /*!
          * frequency can be changed using set_frequency() inherited from TickTimer
@@ -70,11 +78,6 @@ class TimedThread : public Thread, public Player
          * asks the tick machine to kill the thread and delete it (and stop scheduling it of course)
          */
         void kill_and_delete_me();
-
-        /*!
-         * The action to perform between two ticks
-         */
-        virtual void step()=0;
 
         /*!
          * The core of the thread

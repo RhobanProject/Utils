@@ -1,6 +1,51 @@
+option (ROBOARD
+    "Compile for Roboard" OFF)
+
+if (ROBOARD)
+    set (CMAKE_CXX_FLAGS "-m32 -mtune=i586 -march=i586"
+        CACHE STRING "")
+    set (CMAKE_CXX_COMPILER "g++-4.4"
+        CACHE STRING "")
+endif (ROBOARD)
+
 cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
+
+option (HAVE_COLORS 
+    "Have terminal colors" ON)
+
+if (HAVE_COLORS)
+    add_definitions (-DHAVE_COLORS)
+endif (HAVE_COLORS)
+
+option (HAVE_ZMQ
+    "Have ZMQ" OFF)
+
+if (HAVE_ZMQ)
+    add_definitions (-DHAVE_ZMQ)
+endif (HAVE_ZMQ)
+
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   # Mac OS X specific code
+   SET(SYSTEM_OS "MACOSX")
+   add_definitions(-DMACOSX)
+   MESSAGE ("-- Running on Mac OS X platform")
+ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    # Linux specific code
+   SET(SYSTEM_OS "LINUX")
+   add_definitions(-DLINUX)
+   MESSAGE ("-- Running on Linux platform")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+IF(DEFINED WIN32)
+    # Windows specific code
+    SET(SYSTEM_OS "WINDOWS")
+    add_definitions(-DWINDOWS)
+    MESSAGE ("-- Running on Windows platform")
+ENDIF(DEFINED WIN32)
 
 # Options
 option (RHOBANMATH
@@ -36,13 +81,27 @@ set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 # Sources
 set(DIRECTORIES
     .
+    logging
     tests
     timing
     threading
     xml
+    graph
+    observer
     serial
     sockets
     )
+
+if (HAVE_ZMQ)
+    add_subdirectory(zmq)
+    set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
+
+    if(UNIX AND NOT APPLE)
+        set (EXTRA_LIBS ${EXTRA_LIBS} rt)
+    endif()
+
+    include_directories ("${ZMQ_HEADERS}")
+endif (HAVE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")

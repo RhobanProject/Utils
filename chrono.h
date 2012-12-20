@@ -20,6 +20,9 @@
 /*****************************************************************************/
 /*!\brief A chrono is just a type value
  *****************************************************************************/
+#ifdef WIN32
+#include <sys/time.h>
+#endif
 
 typedef struct timeval chrono;
 

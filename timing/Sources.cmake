@@ -4,4 +4,5 @@ set(SOURCES
     Player.cpp
     TickMachine.cpp
     TickTimer.cpp
+    sleep.cpp
     )

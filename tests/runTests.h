@@ -22,7 +22,12 @@ void runTests(string message)
 {
     T tests;
     cout << "===== " << message << endl;
-    tests.run();
+
+    try {
+        tests.run();
+    } catch (string error) {
+        cout << "ERROR: " << error << endl;
+    }
 }
 
 #endif // _RUNTESTS_H
