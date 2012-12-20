@@ -39,7 +39,11 @@
 
 using namespace std;
 
+#ifndef WIN32
+Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
+#else
 Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
+#endif
 {
 	setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
@@ -90,8 +94,8 @@ int Serial::connect()
 		if(handle == INVALID_HANDLE_VALUE)
 			return -1;
 #else
-		handle = fopen(deviceName.c_str(), "r");
-		if(!handle)
+		fd = open(deviceName.c_str(), O_RDONLY);
+		if(fd == -1 || fd==0)
 			return -1;
 #endif
 	}
