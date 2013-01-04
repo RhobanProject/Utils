@@ -368,7 +368,7 @@ int Serial::receiveInt()
 {
 	char b[4];
 	receive(b,4, true);
-	return b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24);
+	return (unsigned char) b[0] | ((unsigned char) b[1] << 8) | ((unsigned char) b[2] << 16) | ((unsigned char) b[3] << 24);
 	//return  receiveChar() | (receiveChar() << 8) |  (receiveChar() << 16) | (receiveChar() << 24);
 }
 

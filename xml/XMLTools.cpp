@@ -55,7 +55,8 @@ double XMLTools::get_double_element(TiXmlNode * node, const char * id) {
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
-        if (the_child) return atof(the_child->Value());
+        if (the_child)
+        	return strtod(the_child->Value(),0);
         else xml_parse_error(string("Xml parsing: could not read double with label ") + id + " in node " + string(node->Value()));
     }
     else
@@ -69,7 +70,7 @@ float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
-        if (the_child) return atof(the_child->Value());
+        if (the_child) return strtod(the_child->Value(),0);
         else xml_parse_error(string("Xml parsing: could not read double with label ") + id + " in node " + string(node->Value()));
     }
     else
