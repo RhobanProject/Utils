@@ -34,6 +34,7 @@
 #define XML_WRITE_INT(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
 #define XML_WRITE_CHAR(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
 #define XML_WRITE_BOOL(result, truc){ result << "<" << # truc << ">" << ( truc ? "true" : "false") << "</" << # truc << ">"; }
+#define XML_WRITE_DOUBLE(result, truc){ result.precision(100); result << "<" << # truc << ">" << truc << "</" << # truc << ">"; }
 #define	XML_READ_INT(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_BOOL(node, truc){ truc = XMLTools::get_bool_element(node, # truc); }
 #define	XML_READ_CHAR(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
