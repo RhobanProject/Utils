@@ -39,11 +39,19 @@
 
 using namespace std;
 
+#ifdef WIN32
 Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
 {
 	setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
 }
+#else
+Serial::Serial(string deviceName, int deviceBaudrate): record_stream(""), recording(false)
+{
+	setDevice(deviceName);
+	this->deviceBaudrate = deviceBaudrate;
+}
+#endif
 
 Serial::~Serial()
 {
@@ -89,10 +97,10 @@ int Serial::connect()
 		handle = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(handle == INVALID_HANDLE_VALUE)
 			return -1;
-#else
 		handle = fopen(deviceName.c_str(), "r");
 		if(!handle)
 			return -1;
+#else
 #endif
 	}
 	else

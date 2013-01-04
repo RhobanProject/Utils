@@ -21,18 +21,22 @@ using namespace std;
 
 Condition::Condition()
 {
-	condition = 0;
-    int ret = pthread_cond_init(&condition, 0 );
-
-    if(ret==-1) {
-        throw string("Failed to init condition");
-    }
+#ifdef WIN32
+  condition = 0;
+#endif
+  int ret = pthread_cond_init(&condition, 0 );
+  
+  if(ret==-1) {
+    throw string("Failed to init condition");
+  }
 }
 
 Condition::~Condition()
 {
-	if(condition)
-		pthread_cond_destroy(&condition);
+#ifdef WIN32
+  if (condition)
+    pthread_cond_destroy(&condition);
+#endif
 }
 
 int Condition::wait(Mutex * mutex, unsigned int timeout)
