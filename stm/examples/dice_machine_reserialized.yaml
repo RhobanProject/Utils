@@ -1,0 +1,6 @@
+machine:
+    frequency: 1.0
+    states:
+    -   name: Initial
+    -   name: Final
+    submachines: []

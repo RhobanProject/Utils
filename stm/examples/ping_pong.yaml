@@ -1,0 +1,66 @@
+name: PingPongMachine
+
+description: |
+    The PingPong machine contains the PingMachine and the PongMachine
+    
+submachines: 
+    -   name: PingMachine
+
+        description: |
+            The ping machine
+        
+        frequency: 10
+        preamble: |
+            from time import time
+    
+        states:
+        -   name: Initial
+            enter: |
+                   print('Starting ping machine')
+                   self.begin = time()
+            transitions:
+            -   next: Send
+
+        -   name: Send
+            transitions:
+            -   next: Wait
+                do: |
+                    print("Ping ",end="")
+                    PongMachine.set_state("Receive")
+    
+        -   name: Wait
+        -   name: Receive
+            enter: print(str(time() - PingMachine.begin) )
+            transitions:
+            -    next: Send
+        
+        -   name: Final
+    
+    -   name: PongMachine
+        description: |
+            The pong machine
+        frequency: 5
+        states:
+        -   name: Initial
+            enter: |
+                   print('Starting pong machine')
+                   PongMachine.begin = time()
+            transitions:
+            -   next: Wait
+            
+        -   name: Send
+            transitions:
+            -   next: Wait
+                do: |
+                    print("Pong ",end="")
+                    PingMachine.set_state("Receive")
+                
+        -   name: Wait
+
+        -   name: Receive
+            enter: print(str(time() - PongMachine.begin))
+            transitions:
+            -    next: Send
+        
+        -   name: Final
+        

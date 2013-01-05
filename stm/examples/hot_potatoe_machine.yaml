@@ -1,0 +1,51 @@
+name: HotPotatoeMachine
+
+description: Contains 100 people playing hot potatoe
+
+preamble: |
+    from random import randint
+
+states:
+    -   name: Initial
+        enter: |
+            print("HotPotatoeMachine says \"A potatoe catcher shall not give the potatoe to itself\"")
+            PotatoeCatcher[1].set_state("Potatoe")
+            
+    -   name: KillAll
+        transitions:
+        -   do: |
+                print("Boum!!")
+                for i in range(1,101):
+                    PotatoeCatcher[i].set_state("Final")
+            next: Final
+    
+    -   name: Final
+    
+submachines:
+    -   name: PotatoeCatcher
+    
+        instances: 100
+    
+        description: |
+             A potatoe catcher chooses randomly another potatoe catcher to give the potatoe to
+        
+        frequency: 20
+      
+        states:
+
+        -   name: Initial
+        
+        -   name: Potatoe
+            transitions:
+            -   do: |
+                    index = randint(1,100)
+                    print(self.name + " giving potatoe to " + PotatoeCatcher[index].name)
+                    if index != self.index:
+                        PotatoeCatcher[index].set_state("Potatoe")
+                    else:
+                        print("Oh no!")
+                        HotPotatoeMachine.set_state("KillAll")
+                next: Initial
+
+        -   name: Final
+        
