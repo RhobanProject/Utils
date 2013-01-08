@@ -11,3 +11,6 @@ bin/
 /C:/Users/Hugo/Documents/utils/.externalToolBuilders
 /C:/Users/Hugo/Documents/utils/.settings
 /.cproject
+/zmq/conf7880.dir
+.externalToolBuilders
+.settings

@@ -21,7 +21,6 @@ using namespace std;
 
 Condition::Condition()
 {
-	condition = 0;
     int ret = pthread_cond_init(&condition, 0 );
 
     if(ret==-1) {
@@ -31,7 +30,6 @@ Condition::Condition()
 
 Condition::~Condition()
 {
-	if(condition)
 		pthread_cond_destroy(&condition);
 }
 

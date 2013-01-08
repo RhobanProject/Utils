@@ -39,11 +39,23 @@
 
 using namespace std;
 
+#ifndef WIN32
+Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
+#else
+
 Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
+#endif
 {
 	setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
 }
+
+
+
+
+
+
+
 
 Serial::~Serial()
 {
@@ -88,11 +100,11 @@ int Serial::connect()
 #ifdef WIN32
 		handle = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(handle == INVALID_HANDLE_VALUE)
+			throw string("Could not open device ") + deviceName;
+		fd = open(deviceName.c_str(), O_RDONLY);
+		if(fd==-1 || fd == 0)
 			return -1;
 #else
-		handle = fopen(deviceName.c_str(), "r");
-		if(!handle)
-			return -1;
 #endif
 	}
 	else
@@ -368,7 +380,7 @@ int Serial::receiveInt()
 {
 	char b[4];
 	receive(b,4, true);
-	return b[0] | (b[1] << 8) | (b[2] << 16) | (b[3] << 24);
+	return (unsigned char) b[0] | ((unsigned char) b[1] << 8) | ((unsigned char) b[2] << 16) | ((unsigned char) b[3] << 24);
 	//return  receiveChar() | (receiveChar() << 8) |  (receiveChar() << 16) | (receiveChar() << 24);
 }
 
