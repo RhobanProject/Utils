@@ -1,0 +1,47 @@
+description: |
+    Simulates a game where we throw a dice and win iff we make a six in less than
+    n tries
+        
+frequency: 50
+      
+name: TheDiceMachine
+preamble: |
+    from random import randint
+   
+    def throw_dice():
+        print('Throwing dice')
+        TheDiceMachine.dice = randint(1,6)
+        TheDiceMachine.tries += 1
+        print('Dice is ', TheDiceMachine.dice)
+
+        
+states:
+
+-   name: Initial
+    enter: |
+        TheDiceMachine.tries = 0
+        TheDiceMachine.dice = 0
+    loop: throw_dice()
+    transitions:
+    -   condition: TheDiceMachine.dice==6
+        next: Won
+    -   condition: TheDiceMachine.tries>5
+        do: TheDiceMachine.tries=0
+        next: Lost
+            
+-   name: Lost
+    loop: print("You've lost")
+    bye: print("Game Over")
+    transitions:
+    -   next: Final
+       
+-   name: Won
+    transitions:
+    -   do : |
+            print("You've won an extra game!")
+        next: Initial
+        
+-   name: Final
+    loop: print('Over, dice is ', TheDiceMachine.dice)
+        
+        
