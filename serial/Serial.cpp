@@ -101,10 +101,10 @@ int Serial::connect()
 		handle = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(handle == INVALID_HANDLE_VALUE)
 			throw string("Could not open device ") + deviceName;
+#else
 		fd = open(deviceName.c_str(), O_RDONLY);
 		if(fd==-1 || fd == 0)
 			return -1;
-#else
 #endif
 	}
 	else
