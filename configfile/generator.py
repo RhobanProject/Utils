@@ -6,7 +6,7 @@ from CppHeaderParser import CppHeaderParser3
 
 class Template(object):
     def __init__(self, filename):
-        self.content = open(os.path.join(os.path.dirname(__file__), 'templates', filename), 'r').read()
+        self.content = open(os.path.join(os.path.dirname(__file__), 'templates', filename), 'r', encoding='utf-8').read()
         self.variables = {}
 
     def render(self, filename):
