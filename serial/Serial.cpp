@@ -296,6 +296,22 @@ void Serial::setSpeed(int baudrate)
 #endif
 }
 
+/**
+ * Read data from the port directly
+ */
+size_t Serial::doRead(char *destination, size_t size)
+{
+#ifdef WIN32
+    ReadFile(handle, destination +  total, dwToRead, &dwRead, NULL );
+    int n = dwRead;
+
+#else
+    int n = read(fd, destination, size);
+#endif
+
+    return n;
+}
+
 
 /**
  * Reads

@@ -64,6 +64,7 @@ class Serial
         /**
          * Read some data
          */
+        size_t doRead(char *destination, size_t size);
         size_t receive(char *destination, size_t size, bool blocking = false);
         string receive(size_t size, bool blocking = false);
         char receiveChar();
