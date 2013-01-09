@@ -90,6 +90,7 @@ set(DIRECTORIES
     observer
     serial
     sockets
+    configfile
     )
 
 if (HAVE_ZMQ)

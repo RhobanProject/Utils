@@ -20,4 +20,3 @@ macro (config_file NAME)
 endmacro (config_file)
 
 include_directories ("${PROJECT_BINARY_DIR}/configs")
-include_directories ("${YAML_HEADERS}")
