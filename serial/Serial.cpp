@@ -93,7 +93,7 @@ void Serial::fdClose()
 /**
  * Initializes the usart device
  */
-int Serial::connect()
+int Serial::connect(bool blocking)
 {
 	if(device_is_file)
 	{
@@ -190,11 +190,18 @@ int Serial::connect()
 		USART_INIT_ERROR:
 		return -1;
 #elif LINUX
+                int flags;
 		struct termios newtio;
+
+                flags = O_RDWR|O_NOCTTY;
+
+                if (!blocking) {
+                    flags |= O_NONBLOCK;
+                }
 
 		memset(&newtio, 0, sizeof(newtio));
 
-		if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
+		if((fd = open(deviceName.c_str(), flags)) < 0) {
 			cerr << "device open error: " << deviceName << endl;
 			goto USART_INIT_ERROR;
 		}
@@ -218,7 +225,7 @@ int Serial::connect()
 
 		fdClose();
 
-		if((fd = open(deviceName.c_str(), O_RDWR|O_NOCTTY|O_NONBLOCK)) < 0) {
+		if((fd = open(deviceName.c_str(), flags)) < 0) {
 			cerr << "device open error: " << deviceName << endl;
 			goto USART_INIT_ERROR;
 		}

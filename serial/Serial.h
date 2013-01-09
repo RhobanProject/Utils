@@ -34,7 +34,7 @@ class Serial
         /**
          * Connects the serial device
          */
-        int connect();
+        int connect(bool blocking = false);
 
         /**
          * Closes the device
