@@ -66,7 +66,7 @@ class Playable
          */
         bool try_play();
 
-        string status();
+        virtual string status();
 
         /*! \brief Time elapsed since last play start */
         double real_time;

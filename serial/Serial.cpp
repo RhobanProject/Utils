@@ -104,7 +104,7 @@ int Serial::connect()
 #else
 		fd = open(deviceName.c_str(), O_RDONLY);
 		if(fd==-1 || fd == 0)
-			return -1;
+			throw string("Could not open device ") + deviceName;
 #endif
 	}
 	else
