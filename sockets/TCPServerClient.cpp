@@ -8,6 +8,7 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 #include <fcntl.h>
+#include <unistd.h>
 #include <iostream>
 
 #include "TCPServerClient.h"

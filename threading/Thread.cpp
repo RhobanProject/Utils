@@ -8,6 +8,7 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 #include <iostream>
+#include <unistd.h>
 #include <signal.h>
 
 #include "Thread.h"
