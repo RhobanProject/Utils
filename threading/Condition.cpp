@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <cerrno>
 #include <sys/time.h>
+#include <iostream>
 
 #include "Condition.h"
 
@@ -68,13 +69,24 @@ int Condition::wait(Mutex * mutex, unsigned int timeout)
 
 int Condition::wait(unsigned int timeout)
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " waiting condition " << (int) this << endl;
+#endif
 	wait(this, timeout);
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " waited condition " << (int) this << endl;
+#endif
 }
 
 void Condition::broadcast()
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " broadcasting condition " << (int) this << endl;
+#endif
     int ret = pthread_cond_broadcast(&condition);
-
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " broadcasted condition " << (int) this << endl;
+#endif
     if(ret==-1) {
         throw string("Failed to broadcast condition");
     }
