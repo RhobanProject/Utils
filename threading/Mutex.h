@@ -12,8 +12,11 @@
 
 #include <pthread.h>
 
+class Condition;
+
 class Mutex
 {
+	friend class Condition;
 public:
   Mutex(void);
   ~Mutex(void);
