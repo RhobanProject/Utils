@@ -9,6 +9,7 @@
  *************************************************/
 #include <pthread.h>
 #include <string>
+#include <iostream>
 
 #include "Mutex.h"
 
@@ -26,10 +27,22 @@ Mutex::~Mutex(void)
 
 void Mutex::lock(void)
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " locking mutex " << (int) this << endl;
+#endif
     pthread_mutex_lock(&_mutex);
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " locked mutex " << (int) this << endl;
+#endif
 }
 
 void Mutex::unlock(void)
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  pthread_self().p << " unlocking mutex " << (int) this << endl;
+#endif
     pthread_mutex_unlock(&_mutex);
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  pthread_self().p << " unlocked mutex " << (int) this << endl;
+#endif
 }

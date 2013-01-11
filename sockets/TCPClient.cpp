@@ -62,7 +62,7 @@ namespace Rhoban
         if(connect(clientSocket, (SOCKADDR *)&sin, sizeof(SOCKADDR)) == SOCKET_ERROR)
         {   
             connected = false;
-            throw string("Could not connect");
+            throw  string("Could not connect TCP client to ") + string(address);
         } 
 
         connected = true;

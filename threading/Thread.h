@@ -139,6 +139,10 @@ protected:
   */
   void run(void);
 
+  /*
+   * The id of the thread
+   */
+  int ThreadId(void);
 
   /**
    * starting point of the thread
