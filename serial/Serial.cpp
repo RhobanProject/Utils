@@ -309,7 +309,8 @@ void Serial::setSpeed(int baudrate)
 size_t Serial::doRead(char *destination, size_t size)
 {
 #ifdef WIN32
-    ReadFile(handle, destination +  total, dwToRead, &dwRead, NULL );
+	DWORD dwToRead, dwRead;
+    ReadFile(handle, destination, dwToRead, &dwRead, NULL );
     int n = dwRead;
 
 #else
