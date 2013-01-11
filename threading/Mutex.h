@@ -23,8 +23,6 @@ public:
   void lock(void);
   void unlock(void);
 
-  friend class Condition;
-
 protected:
   pthread_mutex_t _mutex;
 };
