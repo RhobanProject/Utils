@@ -310,9 +310,9 @@ size_t Serial::doRead(char *destination, size_t size)
 {
 #ifdef WIN32
 	DWORD dwToRead, dwRead;
+	dwToRead = size;
     ReadFile(handle, destination, dwToRead, &dwRead, NULL );
     int n = dwRead;
-
 #else
     int n = read(fd, destination, size);
 #endif
