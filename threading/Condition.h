@@ -23,17 +23,17 @@ class Condition : public Mutex
 public:
 
   Condition();
-  ~Condition();
+  virtual ~Condition();
 
   // wait for the condition to be brodcasted (optional timeout in ms)
   //the condition should be locked before use
-  int wait(unsigned int timeout = 0);
+  virtual int wait(unsigned int timeout = 0);
   
   //wait for the condition with a particular Mutex
-  int wait(Mutex * mutex, unsigned int timeout = 0);
+  virtual int wait(Mutex * mutex, unsigned int timeout = 0);
 
   // broadcast a condition
-  void broadcast();
+  virtual void broadcast();
 
 private:
 

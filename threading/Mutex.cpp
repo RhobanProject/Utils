@@ -17,12 +17,24 @@ using namespace std;
 
 Mutex::Mutex(void)
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " initializing mutex " << (int) this << endl;
+#endif
     pthread_mutex_init(&_mutex, NULL);
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " inittilized mutex " << (int) this << endl;
+#endif
 }
 
 Mutex::~Mutex(void)
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " destroying mutex " << (int) this << endl;
+#endif
     pthread_mutex_destroy(&_mutex);
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " destroyed mutex " << (int) this << endl;
+#endif
 }
 
 void Mutex::lock(void)
