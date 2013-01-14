@@ -63,9 +63,12 @@ class TickTimer : public Playable
     /* get the real frequency of the timer */
     double get_frequency() const {return frequency;}
 
-    bool is_tickable();
+    bool is_tickable(timeval now);
 
     protected:
+
+    /*! \brief Initializes the the variables before play. */
+    virtual void prepare_play(bool forever, timeval durations);
 
 
     /*! 

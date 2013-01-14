@@ -21,92 +21,25 @@
 
 using namespace std;
 
-TimedThread::TimedThread()
-{
-}
-
-TimedThread::~TimedThread()
-{
-    kill();
-}
-
-void TimedThread::resume()
-{
-    Player::resume();
-    resume_thread();
-}
-
-void TimedThread::suspend()
-{
-    Player::suspend();
-    suspend_thread();
-}
 
 void TimedThread::init(double hertz)
 {
     Player::init(hertz,true);
     play_state = playing;
     forever = true;
-    thread_state = Running;
 }
 
 void TimedThread::init_suspended(double hertz)
 {
-    pause_mutex.lock();
     Player::init(hertz,true);
     gettimeofday( &suspend_start , 0);
     forever = true;
 
-    thread_state = Suspended;
     play_state = suspended;
-}
-
-void TimedThread::execute()
-{
-    while(thread_state != Dying)
-    {
-        wait_for_resume(true);
-        step();
-        pause_mutex.unlock();
-        wait_next_tick();
-    }
-}
-
-void TimedThread::kill()
-{
-    wait_started();
-#ifndef WIN32
-    if(_Thread)
-#else
-        if(_Thread.p)
-#endif
-        {
-            if(thread_state== Dead || thread_state == Dying) return;
-            if(thread_state==Suspended)
-            {
-                TM_DEBUG_MSG("Resuming TimedThread before killing it");
-                resume();
-                thread_state = Dying;
-            }
-            else
-            {
-                thread_state=Dying;
-            }
-            TM_DEBUG_MSG("TimedThread dying, waiting to join...");
-            pthread_join(_Thread, NULL);
-#ifndef WIN32
-            _Thread=0;
-#else
-            _Thread.p=0;
-#endif
-        }
-    TM_DEBUG_MSG("TimedThread dead");
-    thread_state = Dead;
 }
 
 void TimedThread::kill_and_delete_me()
 {
-    wait_started();
     tm_kill_me = true; 
 }
 
