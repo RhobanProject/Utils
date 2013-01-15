@@ -22,6 +22,7 @@
 #include <string.h>
 #include <string>
 #include <sstream>
+#include "util.h"
 
 #include "TCPClientBase.h"
 
