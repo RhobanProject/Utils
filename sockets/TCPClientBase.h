@@ -27,6 +27,11 @@ namespace Rhoban
             int transmit(const char *buffer, int size);
 
             /**
+             * Sends a buffer until everything was sent
+             */
+            void transmitAll(const char *buffer, int size);
+
+            /**
              * Sends a string
              */
             void transmitString(string str, bool lineTerminates = false);
@@ -62,6 +67,11 @@ namespace Rhoban
             void setBlocking(int blocking);
 
             /**
+             * Waits the internal socket to be ready for reading
+             */
+            bool waitReady(int timeout);
+
+            /**
              * Closes the connection
              */
             void stop();
@@ -70,7 +80,7 @@ namespace Rhoban
             /**
              * Internal socket
              */
-            SOCKET clientSocket;
+            volatile SOCKET clientSocket;
     };
 }
 
