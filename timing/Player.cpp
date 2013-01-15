@@ -31,7 +31,7 @@ void Player::init(double hertz, bool animated_by_tick_machine_)
 
 void Player::tick()
 {
-    TM_DEBUG_MSG("Ticking player");
+    TM_DEBUG_MSG("Ticking player " << (int) this << " at frequency " << frequency);
 
     TickTimer::tick();
 
@@ -42,7 +42,7 @@ void Player::tick()
             if(try_play())
                 step();
             else
-                TM_DEBUG_MSG("Player not running " << (suspended ? " suspended " : ""));
+                TM_DEBUG_MSG("Player " << (int) this << " at frequency " << frequency << " not running " << (suspended ? " suspended " : ""));
         }
         catch(string exc)
         {

@@ -22,7 +22,7 @@
 
 #include "Thread.h"
 
-class TimedThread : public Thread, public Player
+class TimedThread : public Player
 {
 protected:
 
@@ -33,29 +33,28 @@ protected:
     virtual void step()=0;
 
     public:
-        /*!
-         * after the construction, the thread is not started yet
-         */
-        TimedThread();
-        virtual ~TimedThread();
-
-        /*suspend and resume the thread*/
-        virtual void suspend();
-        virtual void resume();
 
         /*!
          * @param frequency_
          * this sets the tick frequency and creates and starts the timed thread
          *
-         * The TimedThread will be automatically animated and the step() method will be called at the given frequency
+         * The TimedThread will be automatically animated and the step()
+         *  method will be called at the given frequency
          *
-         * The running time of the call to step() should be quite small,
+         * TimedThreads are stepped one by one, one at a time.
+         *
+         * As a consequence, the running time of the call to step() should be quite small,
          * because in the meantime other TimedThreads are waiting
          *
-         * If the running time of the call to step() is large, create a thread
-         * and use a TickTimer instead
+         * If the running time of the call to step() is large,
+         * please dont use TickTimer. Instead, create a thread
+         * and use a TickTimer inside the thread i.e. something like
+
+         * TickTimer timer(100);
+         * while(true)
+         * 		do the job
+         * 		timer->wait_next_tick();
          *
-         * @return
          */
         void init(double hertz);
         void init_suspended(double hertz);
@@ -64,25 +63,15 @@ protected:
          * frequency can be changed using set_frequency() inherited from TickTimer
          */
 
-        /*!
-         * Puts the thread in dying mode and waits for the thread to
-         * execute its last step and then die.
-         *
-         * Returns when the thread is in Dead state.
-         */
-        virtual void kill();
-
-
     protected:
         /*!
          * asks the tick machine to kill the thread and delete it (and stop scheduling it of course)
          */
         void kill_and_delete_me();
 
-        /*!
-         * The core of the thread
-         */
-        void execute();
+        Mutex mutex;
+        void lock(){ mutex.lock(); }
+        void unlock() { mutex.unlock(); }
 
 };
 

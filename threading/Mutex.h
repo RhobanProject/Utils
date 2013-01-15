@@ -12,15 +12,18 @@
 
 #include <pthread.h>
 
+//#define DEBUG_MUTEXES
+
+class Condition;
+
 class Mutex
 {
+	friend class Condition;
 public:
   Mutex(void);
-  ~Mutex(void);
-  void lock(void);
-  void unlock(void);
-
-  friend class Condition;
+  virtual ~Mutex(void);
+  virtual void lock(void);
+  virtual void unlock(void);
 
 protected:
   pthread_mutex_t _mutex;

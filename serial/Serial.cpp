@@ -104,7 +104,7 @@ int Serial::connect(bool blocking)
 #else
 		fd = open(deviceName.c_str(), O_RDONLY);
 		if(fd==-1 || fd == 0)
-			return -1;
+			throw string("Could not open device ") + deviceName;
 #endif
 	}
 	else
@@ -309,9 +309,9 @@ void Serial::setSpeed(int baudrate)
 size_t Serial::doRead(char *destination, size_t size)
 {
 #ifdef WIN32
-    ReadFile(handle, destination +  total, dwToRead, &dwRead, NULL );
+	DWORD dwRead;
+    ReadFile(handle, destination, size, &dwRead, NULL );
     int n = dwRead;
-
 #else
     int n = read(fd, destination, size);
 #endif

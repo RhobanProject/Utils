@@ -152,14 +152,17 @@ string Playable::status()
 {
     std::ostringstream s;
 
-    if(is_suspended())
-        s << "[suspended] since " << real_time - to_secs(suspend_start);
-    else if(is_running())
-        s << "[playing]";
-    else
-        s << "[stopped]";
-
-    s << " suspend time " << suspend_time;
+    switch(play_state)
+    {
+    case suspended:
+        s << "[suspended] " << suspend_time << "s"; break;
+    case playing:
+        s << "[playing] " << real_time << "s"; break;
+    case stopped:
+        s << "[stopped]"; break;
+    default:
+    	s << "[?]"; break;
+    }
 
     return s.str();
 

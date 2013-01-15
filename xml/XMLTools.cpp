@@ -232,7 +232,7 @@ TiXmlDocument * XMLTools::stream_to_node(const string xml_stream)
     TiXmlDocument * doc = new TiXmlDocument();
 
     if(!doc->Parse(xml_stream.c_str()))
-        throw string("failed to parse xml stream.");
+        throw string("failed to parse xml stream:\n\t") + xml_stream;
 
     TiXmlNode* firstnode = doc->FirstChild();
     if(!firstnode)
@@ -374,10 +374,10 @@ void Serializable::save_file(string filename_)
 void Serializable::from_xml(string xml_stream)
 {
     TiXmlDocument * doc = XMLTools::stream_to_node(xml_stream);
-    if(!doc) throw string("Failed to parse xml stream");
+    if(!doc) throw string("Failed to parse xml stream:\n\t") + xml_stream;
 
     TiXmlNode * node = doc->FirstChild();
-    if(!node) throw string("Failed to find node in xml stream");
+    if(!node) throw string("Failed to find node in xml stream\n\t") + xml_stream;
 
     from_xml(node);
 

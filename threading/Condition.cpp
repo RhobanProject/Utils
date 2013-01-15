@@ -22,7 +22,13 @@ using namespace std;
 
 Condition::Condition()
 {
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " initializing condition " << (int) this << endl;
+#endif
     int ret = pthread_cond_init(&condition, 0 );
+#ifdef DEBUG_MUTEXES
+	cout << "Thread " <<  (int) pthread_self().p << " initialized condition " << (int) this << endl;
+#endif
 
     if(ret==-1) {
         throw string("Failed to init condition");

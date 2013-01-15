@@ -257,7 +257,10 @@ void TickMachine::execute()
 
 void TickMachine::tick_players()
 {
-    TM_DEBUG_MSG(players.size()<<" players to tick");
+	timeval now;
+	gettimeofday(&now,0);
+
+    //TM_DEBUG_MSG(players.size()<<" players to tick");
     for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
     {
         TickTimer * timer = *timer_;
@@ -271,13 +274,11 @@ void TickMachine::tick_players()
         else
         {
 #ifndef WIN32
-            if(--(timer->tick_counter) <= 0)
-                timer->tick();
+        	if(--(timer->tick_counter) <= 0)
+        		timer->tick();
 #else
-        	timeval now;
-        	gettimeofday(&now,0);
-        	decrease(now, timer->start_time);
-        	if( to_secs(now ) * timer->frequency - timer->ticks_elapsed >= 0)
+        	//We cannot trust tick counter because we dont have a precise timing signal like SIGALARM is (to be checked)
+        	if(timer->is_tickable(now))
         		timer->tick();
 #endif
         }
