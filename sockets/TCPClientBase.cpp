@@ -84,7 +84,7 @@ namespace Rhoban
             stop();
 #ifdef _WIN32
             int err = WSAGetLastError();
-            throw string("Client : select error (WSA error code "+my_itoa(err)+ ")");
+            throw string("Client : select error (WSA error code)");
 #else
             throw string ("Client : select error");
 #endif
