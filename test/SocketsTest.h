@@ -27,7 +27,7 @@ using namespace Rhoban;
 class EchoClient : public TCPServerClient
 {
     public:
-        EchoClient(int socket) : TCPServerClient(socket)
+        EchoClient() : TCPServerClient()
         {
         }
 

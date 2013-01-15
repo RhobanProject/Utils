@@ -25,6 +25,8 @@
 
 #include "TCPClientBase.h"
 
+#define FD_ZERO2(p)     memset((p), 0, sizeof(*(p)))
+
 using namespace std;
 
 namespace Rhoban
@@ -57,6 +59,38 @@ namespace Rhoban
             buffer += n;
             size -= n;
         }
+    }
+            
+    bool TCPClientBase::waitReady(int timeout_ms)
+    {
+        fd_set rdfs;
+        struct timeval tv;
+        int res = 0;
+
+        FD_ZERO2(&rdfs);
+        FD_SET(clientSocket, &rdfs);
+
+        if (timeout_ms) {
+            tv.tv_sec = timeout_ms / 1000;
+            tv.tv_usec = 1000 * (timeout_ms % 1000);
+            res = select(clientSocket + 1, &rdfs, NULL, NULL, &tv);
+        } else {
+            res = select(clientSocket + 1, &rdfs, NULL, NULL, NULL);
+        }
+
+        if (res == 0) {
+            return false;
+        } else if( res == -1) {
+            stop();
+#ifdef _WIN32
+            int err = WSAGetLastError();
+            throw string("Client : select error (WSA error code "+my_itoa(err)+ ")");
+#else
+            throw string ("Client : select error");
+#endif
+        }
+
+        return true;
     }
 
     string TCPClientBase::receiveString(bool lineTerminates)
@@ -103,6 +137,17 @@ namespace Rhoban
         }
 
         return n;
+    }
+    
+    void TCPClientBase::transmitAll(const char *buffer, int size)
+    {
+        int n;
+
+        while (size > 0) {
+            n = transmit(buffer, size);
+            buffer += n;
+            size -= n;
+        }
     }
 
     void TCPClientBase::transmitString(string str, bool lineTerminates)

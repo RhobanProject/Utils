@@ -40,15 +40,9 @@ namespace Rhoban
 
                 ~TCPServer()
                 {
-                    close(socketDescriptor);
+                    shutdown();
 
-                    while (clients->size() > 0) {
-                        TCPServerClient *client = clients->back();
-                        delete client;
-
-                        clients->pop_back();
-                    }
-
+                    deleteAllClients();
                     delete clients;
 
 #ifdef WIN32
@@ -57,11 +51,24 @@ namespace Rhoban
                 }
 
                 /**
+                 * Deleting the server clients
+                 */
+                void deleteAllClients()
+                {
+                    while (clients->size() > 0) {
+                        TCPServerClient *client = clients->back();
+                        delete client;
+
+                        clients->pop_back();
+                    }
+                }
+
+                /**
                  * Starts listening on the given port
                  *
                  * This will be blocking and will call
                  */
-                virtual void run(int port, int localhostOnly = 0)
+                virtual void run(int port, bool localhostOnly = false)
                 {
 #ifdef WIN32
                     WSADATA wsa;
@@ -109,9 +116,22 @@ namespace Rhoban
                 }
 
                 /**
+                 * Shutdowns the server
+                 */
+                virtual void shutdown()
+                {
+                    if (socketDescriptor) {
+                        close(socketDescriptor);
+                    }
+
+                    socketDescriptor = 0;
+                }
+
+                /**
                  * Deletes a client
                  */
-                virtual void deleteClient(TCPServerClient *client) {
+                virtual void deleteClient(TCPServerClient *client)
+                {
                     for (vector<TCPServerClient*>::iterator i = clients->begin(); i != clients->end(); i++) {
                         TCPServerClient *current = *i;
 
@@ -122,6 +142,16 @@ namespace Rhoban
 
                             break;
                         }
+                    }
+                }
+
+                /**
+                 * Delete clients
+                 */
+                void deleteClients(vector<TCPServerClient *> &clients)
+                {
+                    for (vector<TCPServerClient*>::iterator i = clients.begin(); i != clients.end(); i++) {
+                        deleteClient(*i);
                     }
                 }
 
@@ -142,6 +172,14 @@ namespace Rhoban
                 vector<TCPServerClient*> *clients;
 
                 /**
+                 * Creating a client, can be overloaded
+                 */
+                virtual T *createClient()
+                {
+                    return new T();
+                }
+
+                /**
                  * Accepting connection loop
                  */
                 void acceptLoop()
@@ -149,11 +187,12 @@ namespace Rhoban
                     int addrSize;
                     SOCKET clientSocket;
                     struct sockaddr_in clientAddr;
-                    vector<TCPServerClient*> *dead;
+                    vector<TCPServerClient*> dead;
 
-                    while (1) {
+                    while (socketDescriptor) {
                         addrSize = sizeof(clientAddr);
 
+                        // Waiting for a connection
 #ifdef _WIN32
                         clientSocket = accept(socketDescriptor, (SOCKADDR*)&clientAddr, &addrSize);
 #else
@@ -161,35 +200,29 @@ namespace Rhoban
 #endif
 
                         if (clientSocket != INVALID_SOCKET) {
-                            TCPServerClient *client = new T(clientSocket);
+                            TCPServerClient *client = createClient();
+                            client->setSocket(clientSocket);
                             clients->push_back(client);
                             client->run();
                         } else {
-                            throw string("Error while accepting a connection");
+                            socketDescriptor = 0;
                         }
 
-                        dead = NULL;
-
+                        // Deleting dead clients
                         for (vector<TCPServerClient*>::iterator i = clients->begin(); i != clients->end(); i++) {
                             TCPServerClient *client = *i;
 
                             if (client->isDead()) {
-                                if (dead == NULL) {
-                                    dead = new vector<TCPServerClient*>;
-                                }
-
-                                dead->push_back(client);
+                                dead.push_back(client);
                             }
                         }
 
-                        if (dead != NULL) {
-                            for (vector<TCPServerClient*>::iterator i = dead->begin(); i != dead->end(); i++) {
-                                deleteClient(*i);
-                            }
-
-                            delete dead;
-                        }
+                        deleteClients(dead);
+                        dead.clear();
                     }
+
+                    // Deleting all the clients
+                    deleteAllClients();
                 }
         };
 }

@@ -17,49 +17,54 @@
 
 namespace Rhoban 
 {
-  class TCPServerClient : public TCPClientBase
-  {
-  public:
-    TCPServerClient(int socket);
-    ~TCPServerClient();
+    class TCPServerClient : public virtual TCPClientBase
+    {
+        public:
+            TCPServerClient();
+            ~TCPServerClient();
 
-    /**
-     * Starts the client
-     */
-    virtual void loop()=0;
+            /**
+             * Starts the client
+             */
+            virtual void loop()=0;
 
-    /**
-     * Runs the client (starts the thread)
-     */
-    virtual void run();
+            /**
+             * Runs the client (starts the thread)
+             */
+            virtual void run();
 
-    /**
-     * Stops the client
-     */
-    virtual void stop();
+            /**
+             * Stops the client
+             */
+            virtual void stop();
 
-    /**
-     * Is this client dead ?
-     */
-    virtual bool isDead();
+            /**
+             * Is this client dead ?
+             */
+            virtual bool isDead();
 
-    /**
-     * Entry point to run a thread
-     */
-    static void *clientThread(void *client);
+            /**
+             * Sets the socket
+             */
+            void setSocket(SOCKET socket);
 
-  protected:
+            /**
+             * Entry point to run a thread
+             */
+            static void *clientThread(void *client);
 
-    /**
-     * Bool for isDead
-     */
-    bool dead;
+        protected:
 
-    /**
-     * Internal thread
-     */
-    pthread_t thread;
-  };
+            /**
+             * Bool for isDead
+             */
+            bool dead;
+
+            /**
+             * Internal thread
+             */
+            pthread_t thread;
+    };
 }
 
 #endif // _TCPSERVERCLIENT_H

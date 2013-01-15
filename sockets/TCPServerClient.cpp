@@ -17,9 +17,8 @@ using namespace std;
 
 namespace Rhoban
 {
-    TCPServerClient::TCPServerClient(int socket)
+    TCPServerClient::TCPServerClient()
     {
-        clientSocket = socket;
         dead = false;
     }
 
@@ -43,6 +42,11 @@ namespace Rhoban
     void TCPServerClient::run()
     {
         pthread_create(&thread, NULL, TCPServerClient::clientThread, (void*)this);
+    }
+
+    void TCPServerClient::setSocket(SOCKET socket)
+    {
+        clientSocket = socket;
     }
 
     void *TCPServerClient::clientThread(void *clientPtr)
