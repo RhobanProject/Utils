@@ -142,6 +142,14 @@ namespace Rhoban
                 vector<TCPServerClient*> *clients;
 
                 /**
+                 * Creating a client, can be overloaded
+                 */
+                virtual T *createClient(int socket)
+                {
+                    return new T(socket);
+                }
+
+                /**
                  * Accepting connection loop
                  */
                 void acceptLoop()
@@ -161,7 +169,7 @@ namespace Rhoban
 #endif
 
                         if (clientSocket != INVALID_SOCKET) {
-                            TCPServerClient *client = new T(clientSocket);
+                            TCPServerClient *client = createClient(clientSocket);
                             clients->push_back(client);
                             client->run();
                         } else {
