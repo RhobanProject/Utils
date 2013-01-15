@@ -49,8 +49,10 @@ public:
   /*!
    * true iff the thread is suspended
    */
+  virtual bool is_running();
   virtual bool is_suspended();
   virtual bool is_dead();
+  virtual bool is_alive();
 
 
   /**

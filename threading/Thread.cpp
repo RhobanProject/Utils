@@ -101,10 +101,21 @@ bool Thread::is_suspended()
     return thread_state==Suspended;
 }
 
+bool Thread::is_running()
+{
+    wait_started();
+    return thread_state==Running;
+}
+
 bool Thread::is_dead()
 {
     wait_started();
     return thread_state==Dead;
+}
+
+bool Thread::is_alive()
+{
+    return thread_state!=Dead && thread_state != Unborn && thread_state != Dying;
 }
 
 /*!
@@ -130,8 +141,8 @@ void Thread::wait_for_resume(bool lock)
 
 void Thread::kill(void)
 {
+    if(!is_alive()) return;
     wait_started();
-    if(thread_state== Dead || thread_state == Dying) return;
     thread_state = Dying;
 #ifndef WIN32
     if(_Thread)
@@ -210,6 +221,7 @@ void Thread::setup(void)
  */
 void Thread::wait_started()
 {
+	//Hugo: We should use a condion instead
     while(thread_state == Unborn || thread_state==Starting)
     {
 #ifdef WIN32

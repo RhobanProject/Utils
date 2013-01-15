@@ -22,9 +22,27 @@
 
 #include "Thread.h"
 
+/*
+ *       * TimedThreads are stepped one by one, one at a time.
+ *       * A step is a call to step()
+         *
+         * As a consequence, the running time of the call to step() should be quite small,
+         * because in the meantime other TimedThreads are waiting
+         *
+         * If the running time of the call to step() is large,
+         * dont use TimedThread but SlowTimedThread instead.
+         */
+
 class TimedThread : public Player
 {
 protected:
+
+	TimedThread();
+
+	/*
+	 * This constructors avoid to use init(frequency)
+	 */
+	TimedThread(double frequency);
 
     /*!
      * The action to perform between two ticks
@@ -41,19 +59,6 @@ protected:
          * The TimedThread will be automatically animated and the step()
          *  method will be called at the given frequency
          *
-         * TimedThreads are stepped one by one, one at a time.
-         *
-         * As a consequence, the running time of the call to step() should be quite small,
-         * because in the meantime other TimedThreads are waiting
-         *
-         * If the running time of the call to step() is large,
-         * please dont use TickTimer. Instead, create a thread
-         * and use a TickTimer inside the thread i.e. something like
-
-         * TickTimer timer(100);
-         * while(true)
-         * 		do the job
-         * 		timer->wait_next_tick();
          *
          */
         void init(double hertz);
@@ -72,6 +77,47 @@ protected:
         Mutex mutex;
         void lock(){ mutex.lock(); }
         void unlock() { mutex.unlock(); }
+
+};
+
+class SlowTimedThread : public Thread
+{
+public:
+	SlowTimedThread();
+	SlowTimedThread(double frequency);
+
+    /*!
+     * @param frequency_
+     * this sets the tick frequency and creates and starts the timed thread
+     *
+     * The TimedThread will be automatically animated and the step()
+     *  method will be called at the given frequency
+     *
+     *
+     */
+    void init(double hertz);
+    void init_suspended(double hertz);
+
+    /*!
+     * frequency can be changed using set_frequency()
+     */
+    void set_frequency(double frequency);
+
+    /*
+     * stops the timed thread
+     */
+    void stop();
+
+protected:
+
+    /*!
+     * The action to perform between two ticks
+     * This method must be implemented in derived subclasses
+     */
+    virtual void step()=0;
+    void execute();
+
+TickTimer timer;
 
 };
 
