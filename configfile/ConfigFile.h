@@ -20,7 +20,9 @@ class ConfigFile
 
         void read(string node, string name, int value, int &output);
         void read(string node, string name, double value, double &output);
+        void read(string node, string name, double value, float &output);
         void read(string node, string name, string value, string &output);
+        void read(string node, string name, bool value, bool &output);
 
         void help();
 

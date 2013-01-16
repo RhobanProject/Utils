@@ -1,0 +1,6 @@
+
+test:
+    svalue: Hello
+    ivalue: 10
+    fvalue: 1.23
+    bvalue: false

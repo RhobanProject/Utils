@@ -92,6 +92,13 @@ void ConfigFile::read(string node, string name, double defaultValue, double &out
     entries[node].push_back(new ConfigFileEntry("double", name, oss.str()));
 }
 
+void ConfigFile::read(string node, string name, double value, float &output)
+{
+    double tmp;
+    read(node, name, value, tmp);
+    output = tmp;
+}
+
 void ConfigFile::read(string node, string name, string defaultValue, string &output)
 {
     string fullName = getFullName(node, name);
@@ -110,6 +117,38 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
     }
 
     entries[node].push_back(new ConfigFileEntry("string", name, defaultValue));
+}
+
+void ConfigFile::read(string node, string name, bool defaultValue, bool &output)
+{
+    string fullName = getFullName(node, name);
+    string noName = "no-" + name;
+    string fullNoName = "no-" + fullName;
+    AnyOption options;
+    const YAML::Node *yaml = getYaml(node);;
+    const YAML::Node *nodeY;
+    
+    options.setFlag(name.c_str());
+    options.setFlag(fullName.c_str());
+    if (argv != NULL) {
+        options.processCommandArgs(argc, argv);
+    }
+
+    if (options.getFlag(name.c_str())) {
+        output = true;
+    } else if (options.getFlag(noName.c_str())) {
+        output = false;
+    } else if (options.getFlag(fullName.c_str())) {
+        output = true;
+    } else if (options.getFlag(fullNoName.c_str())) {
+        output = false;
+    } else if (yaml && (nodeY = yaml->FindValue(name))) {
+        *nodeY >> output;
+    } else {
+        output = defaultValue;
+    }
+
+    entries[node].push_back(new ConfigFileEntry("bool", name, defaultValue ? "true" : "false"));
 }
 
 void ConfigFile::help()

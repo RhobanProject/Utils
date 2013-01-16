@@ -8,6 +8,7 @@
 #include "TimedThreadTest.h"
 #include "TestCaseTest.h"
 #include "ObserverTest.h"
+#include "ConfigFileTest.h"
 
 #include <timing/TickMachine.h>
 
@@ -21,4 +22,5 @@ int main()
     runTests<LoggingTest>("Testing logging");
     runTests<SocketsTest>("Testing sockets");
     runTests<TimedThreadTest>("Testing timed thread");
+    runTests<ConfigFileTest>("Testing configfile");
 }
