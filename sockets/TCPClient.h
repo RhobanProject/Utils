@@ -15,7 +15,7 @@
 
 namespace Rhoban
 {
-    class TCPClient : public TCPClientBase
+    class TCPClient : virtual public TCPClientBase
     {
         public:
             TCPClient();

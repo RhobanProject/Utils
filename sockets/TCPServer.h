@@ -35,7 +35,6 @@ namespace Rhoban
             public:
                 TCPServer()
                 {
-                    clients = new vector<TCPServerClient*>;
                 }
 
                 ~TCPServer()
@@ -43,7 +42,6 @@ namespace Rhoban
                     shutdown();
 
                     deleteAllClients();
-                    delete clients;
 
 #ifdef WIN32
                     WSACleanup();
@@ -55,11 +53,11 @@ namespace Rhoban
                  */
                 void deleteAllClients()
                 {
-                    while (clients->size() > 0) {
-                        TCPServerClient *client = clients->back();
-                        delete client;
+                    while (clients.size() > 0) {
+                       T *client = clients.back();
+                        cleanClient(client);
 
-                        clients->pop_back();
+                        clients.pop_back();
                     }
                 }
 
@@ -128,17 +126,25 @@ namespace Rhoban
                 }
 
                 /**
+                 * Cleans a client (default behaviour is removing it)
+                 */
+                virtual void cleanClient(T * client)
+                {
+                    delete client;
+                }
+
+                /**
                  * Deletes a client
                  */
-                virtual void deleteClient(TCPServerClient *client)
+                virtual void deleteClient(T *client)
                 {
-                    for (vector<TCPServerClient*>::iterator i = clients->begin(); i != clients->end(); i++) {
-                        TCPServerClient *current = *i;
+                    for (typename vector<T *>::iterator i = clients.begin(); i != clients.end(); i++) {
+                        T *current = *i;
 
                         if (current == client) {
                             client->stop();
-                            clients->erase(i);
-                            delete client;
+                            clients.erase(i);
+                            cleanClient(client);
 
                             break;
                         }
@@ -148,9 +154,9 @@ namespace Rhoban
                 /**
                  * Delete clients
                  */
-                void deleteClients(vector<TCPServerClient *> &clients)
+                void deleteClients(vector<T *> &clients)
                 {
-                    for (vector<TCPServerClient*>::iterator i = clients.begin(); i != clients.end(); i++) {
+                    for (typename vector<T *>::iterator i = clients.begin(); i != clients.end(); i++) {
                         deleteClient(*i);
                     }
                 }
@@ -169,7 +175,7 @@ namespace Rhoban
                 /**
                  * Clients
                  */
-                vector<TCPServerClient*> *clients;
+                vector<T *> clients;
 
                 /**
                  * Creating a client, can be overloaded
@@ -187,7 +193,7 @@ namespace Rhoban
                     int addrSize;
                     SOCKET clientSocket;
                     struct sockaddr_in clientAddr;
-                    vector<TCPServerClient*> dead;
+                    vector<T *> dead;
 
                     while (socketDescriptor) {
                         addrSize = sizeof(clientAddr);
@@ -200,17 +206,17 @@ namespace Rhoban
 #endif
 
                         if (clientSocket != INVALID_SOCKET) {
-                            TCPServerClient *client = createClient();
+                            T *client = createClient();
                             client->setSocket(clientSocket);
-                            clients->push_back(client);
+                            clients.push_back(client);
                             client->run();
                         } else {
                             socketDescriptor = 0;
                         }
 
                         // Deleting dead clients
-                        for (vector<TCPServerClient*>::iterator i = clients->begin(); i != clients->end(); i++) {
-                            TCPServerClient *client = *i;
+                        for (typename vector<T *>::iterator i = clients.begin(); i != clients.end(); i++) {
+                            T *client = *i;
 
                             if (client->isDead()) {
                                 dead.push_back(client);
