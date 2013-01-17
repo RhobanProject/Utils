@@ -46,6 +46,11 @@ class Serial
          */
         void setSpeed(int baudrate);
 
+        /**
+         * Gets the baudrate
+         */
+        int getSpeed();
+
         /*
          * Sets the device name
          */
@@ -77,6 +82,11 @@ class Serial
          */
         size_t send(const char *data, size_t size);
         size_t send(string);
+        
+        /**
+         * Sends some data, but not all of it
+         */
+        size_t doSend(const char *data, size_t size);
 
     	/*!
     	 * read characters until the pattern is found

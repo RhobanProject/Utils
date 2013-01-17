@@ -51,12 +51,6 @@ Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(
 }
 
 
-
-
-
-
-
-
 Serial::~Serial()
 {
 	if(recording)
@@ -281,6 +275,11 @@ void Serial::setFileDevice(string name)
 	device_is_file = true;
 }
 
+int Serial::getSpeed()
+{
+    return deviceBaudrate;
+}
+
 /**
  * Changes the channel speed
  */
@@ -305,6 +304,7 @@ void Serial::setSpeed(int baudrate)
 
         ioctl(fd, TIOCSSERIAL, &serinfo);
 #endif
+        deviceBaudrate = baudrate;
 }
 
 /**
@@ -428,6 +428,30 @@ void Serial::flush()
 size_t Serial::send(string data)
 {
 	return send(data.c_str(), data.size());
+}
+
+size_t Serial::doSend(const char *data, size_t size)
+{
+	size_t got = 0;
+
+#ifdef WIN32
+	DWORD dwToWrite = (DWORD)size;
+        DWORD dwWritten = 0;
+        //cout << "Sending " << dwToWrite - got << " bytes " << endl;
+        WriteFile(handle, data + got, dwToWrite - got, &dwWritten, NULL);
+        got += dwWritten;
+        //cout << "Sent " << got <<"/" << size <<  endl;
+	FlushFileBuffers(handle);
+#else
+#ifdef ROBOARD
+	setRts(1);
+#endif
+	got = write(fd, data, size);
+#ifdef ROBOARD
+	setRts(0);
+#endif
+#endif
+	return got;
 }
 
 size_t Serial::send(const char *data, size_t size)
