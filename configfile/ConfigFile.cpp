@@ -34,7 +34,7 @@ const YAML::Node *ConfigFile::getYaml(string node)
     if (doc.size()) {
         const YAML::Node *nod = doc.FindValue(node);
 
-        if (nod->size() != 0) {
+        if (nod && nod->size() != 0) {
             return nod;
         }
     }
