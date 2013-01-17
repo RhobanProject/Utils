@@ -213,8 +213,7 @@ int Serial::connect(bool blocking)
 		newtio.c_cc[VTIME]  = 0;    // time-out ê°’ (TIME * 0.1ì´ˆ) 0 : disable
 		newtio.c_cc[VMIN]   = 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
 
-		cfsetispeed(&newtio, deviceBaudrate);
-		cfsetospeed(&newtio, deviceBaudrate);
+                setSpeed(deviceBaudrate);
 
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &newtio);
@@ -290,16 +289,21 @@ void Serial::setSpeed(int baudrate)
 #ifdef WIN32
 	fprintf(stderr, "usart_set_channel_speed not implemented for WIN32\n");
 #elif LINUX
-	struct termios tio;
+        struct serial_struct serinfo;
 
 	if (fd == -1) {
 		return;
 	}
 
-	tcgetattr(fd, &tio);
-	cfsetispeed(&tio, deviceBaudrate);
-	cfsetospeed(&tio, deviceBaudrate);
-	tcsetattr(fd, TCSANOW, &tio);
+        if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0) {
+            return;
+        }
+
+        serinfo.flags &= ~ASYNC_SPD_MASK;
+        serinfo.flags |= ASYNC_SPD_CUST;
+        serinfo.custom_divisor = serinfo.baud_base / baudrate;
+
+        ioctl(fd, TIOCSSERIAL, &serinfo);
 #endif
 }
 
