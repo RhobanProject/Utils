@@ -209,7 +209,7 @@ namespace Rhoban
                             T *client = createClient();
                             client->setSocket(clientSocket);
                             clients.push_back(client);
-                            client->run();
+                            client->start(NULL);
                         } else {
                             socketDescriptor = 0;
                         }

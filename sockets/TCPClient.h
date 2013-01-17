@@ -29,7 +29,7 @@ namespace Rhoban
             /**
              * Is the connection established ?
              */
-            bool isConnected();
+            virtual bool isConnected();
 
         protected:
             /**

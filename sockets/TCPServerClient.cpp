@@ -39,28 +39,19 @@ namespace Rhoban
         dead = true;
     }
 
-    void TCPServerClient::run()
+    void TCPServerClient::execute()
     {
-        pthread_create(&thread, NULL, TCPServerClient::clientThread, (void*)this);
+        try {
+            loop();
+        } catch (string exception_) {
+            cout << "Closing client (" << exception_ << ")" << endl;
+        }
+
+        stop();
     }
 
     void TCPServerClient::setSocket(SOCKET socket)
     {
         clientSocket = socket;
-    }
-
-    void *TCPServerClient::clientThread(void *clientPtr)
-    {
-        TCPServerClient *client = (TCPServerClient *)clientPtr;
-
-        try {
-            client->loop();
-        } catch (string exception_) {
-            cout << "Closing client (" << exception_ << ")" << endl;
-        }
-
-        client->stop();
-
-        return NULL;
     }
 }

@@ -10,14 +10,14 @@
 #ifndef _TCPSERVERCLIENT_H
 #define _TCPSERVERCLIENT_H
 
-#include <pthread.h>
+#include <threading/Thread.h>
 
 #include "common.h"
 #include "TCPClientBase.h"
 
 namespace Rhoban 
 {
-    class TCPServerClient : public virtual TCPClientBase
+    class TCPServerClient : public virtual TCPClientBase, public virtual Thread
     {
         public:
             TCPServerClient();
@@ -31,7 +31,7 @@ namespace Rhoban
             /**
              * Runs the client (starts the thread)
              */
-            virtual void run();
+            virtual void execute();
 
             /**
              * Stops the client
