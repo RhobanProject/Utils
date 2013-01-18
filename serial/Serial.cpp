@@ -419,6 +419,8 @@ void Serial::flush()
 #ifdef WIN32
 	FlushFileBuffers(handle);
 	PurgeComm(handle, PURGE_RXABORT|PURGE_RXCLEAR);
+#else
+	tcflush(fd, TCIFLUSH);
 #endif
 }
 
