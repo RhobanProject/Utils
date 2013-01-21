@@ -106,7 +106,6 @@ int Serial::connect(bool blocking)
 #ifdef WIN32
 
 		DCB Dcb;
-		COMMTIMEOUTS Timeouts;
 		DWORD dwError;
 
 		// Open serial device
@@ -307,10 +306,78 @@ void Serial::setSpeed(int baudrate)
         deviceBaudrate = baudrate;
 }
 
+bool Serial::waitForData(int timeout_us)
+{
+#ifdef WIN32
+    return true;
+#else
+    fd_set read_fds;
+    FD_ZERO(&read_fds);
+    FD_SET(fd, &read_fds);
+
+    // Set timeout 
+    struct timeval timeout;
+    timeout.tv_sec = timeout_us/1000000;
+    timeout.tv_usec = timeout_us%1000000;
+
+    // Wait for data to be available
+    return select(fd + 1, &read_fds, NULL, NULL, &timeout)>0;
+#endif
+}
+
+/**
+ * Read data with some timeout
+ */
+size_t Serial::readTimeout(char *destination, size_t size, int timeout_us)
+{
+#ifdef WIN32
+    DWORD dwBytesRead;
+
+    Timeouts.ReadTotalTimeoutConstant = timeout_us/1000;
+    if (!SetCommTimeouts(handle, &Timeouts)) {
+        return 0;
+    }
+    if (!ReadFile(handle , destination, size, &dwBytesRead, NULL))  {
+        return 0;
+    }
+
+    return dwBytesRead;
+#else
+    char sret;
+    size_t readed = 0;
+
+    // Initialize file descriptor sets
+    fd_set read_fds;
+    FD_ZERO(&read_fds);
+    FD_SET(fd, &read_fds);
+
+    // Set timeout 
+    struct timeval timeout;
+    timeout.tv_sec = timeout_us/1000000;
+    timeout.tv_usec = timeout_us%1000000;
+
+    cout << "Entering select..." << endl;
+
+    // Wait for data to be available
+    while (readed < size && (sret=select(fd + 1, &read_fds, NULL, NULL, &timeout)) > 0) {
+        size_t ret = doRead(destination+readed, size-readed);
+
+        if (ret > 0) {
+            readed += ret;
+        }
+    
+        FD_ZERO(&read_fds);
+        FD_SET(fd, &read_fds);
+    }
+
+    return readed;
+#endif
+}
+
 /**
  * Read data from the port directly
  */
-size_t Serial::doRead(char *destination, size_t size)
+int Serial::doRead(char *destination, size_t size)
 {
 #ifdef WIN32
 	DWORD dwRead;
@@ -419,6 +486,8 @@ void Serial::flush()
 #ifdef WIN32
 	FlushFileBuffers(handle);
 	PurgeComm(handle, PURGE_RXABORT|PURGE_RXCLEAR);
+#else
+        tcflush(fd, TCIFLUSH);
 #endif
 }
 

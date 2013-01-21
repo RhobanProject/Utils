@@ -69,12 +69,15 @@ class Serial
         /**
          * Read some data
          */
-        size_t doRead(char *destination, size_t size);
+        int doRead(char *destination, size_t size);
+        size_t readTimeout(char *destination, size_t size, int timeout_us);
         size_t receive(char *destination, size_t size, bool blocking = false);
         string receive(size_t size, bool blocking = false);
         char receiveChar();
     	unsigned short receiveShort();
     	int receiveInt();
+
+        bool waitForData(int timeout_us);
 
 
         /**
@@ -123,6 +126,7 @@ class Serial
 
 #ifdef WIN32
         HANDLE handle;
+	COMMTIMEOUTS Timeouts;
 #else
         int fd;
 #endif
