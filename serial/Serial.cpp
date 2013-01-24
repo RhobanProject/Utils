@@ -204,7 +204,7 @@ int Serial::connect(bool blocking)
 		newtio.c_oflag              = 0;
 		newtio.c_lflag              = 0;
 		newtio.c_cc[VTIME]  = 0;    // time-out ê°’ (TIME * 0.1ì´ˆ) 0 : disable
-		newtio.c_cc[VMIN]   = 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
+		newtio.c_cc[VMIN]   = blocking ? 1 : 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
 
                 setSpeed(deviceBaudrate);
 
@@ -227,7 +227,7 @@ int Serial::connect(bool blocking)
 		newtio.c_oflag = 0;
 		newtio.c_lflag = 0;
 		newtio.c_cc[VTIME]  = 0;
-		newtio.c_cc[VMIN]   = 0;
+		newtio.c_cc[VMIN]   = blocking ? 1 : 0;
 
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &newtio);
@@ -299,6 +299,7 @@ void Serial::setSpeed(int baudrate)
 
         serinfo.flags &= ~ASYNC_SPD_MASK;
         serinfo.flags |= ASYNC_SPD_CUST;
+        serinfo.flags |= ASYNC_LOW_LATENCY;
         serinfo.custom_divisor = serinfo.baud_base / baudrate;
 
         ioctl(fd, TIOCSSERIAL, &serinfo);
