@@ -10,7 +10,6 @@
 #include <iostream>
 #include <unistd.h>
 #include <signal.h>
-
 #include "Thread.h"
 
 using namespace std;
@@ -167,9 +166,10 @@ int Thread::ThreadId(void)
 #ifdef WIN32
 	return (int) pthread_self().p;
 #else
-	return (int) pthread_self();
+	return (long int) pthread_self();
 #endif
 }
+
 void Thread::run(void)
 {
     try {
