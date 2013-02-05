@@ -19,11 +19,11 @@ if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)
 
-option (HAVE_ZMQ
-    "Have ZMQ" OFF)
-
 option (COMPILE_ZMQ
-    "Compile ZMQ" OFF)
+    "Do we need to compile ZMQ" OFF)
+
+option (HAVE_ZMQ
+    "Do we have ZMQ" OFF)
 
 if (HAVE_ZMQ)
     add_definitions (-DHAVE_ZMQ)
