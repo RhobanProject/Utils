@@ -22,6 +22,9 @@ endif (HAVE_COLORS)
 option (HAVE_ZMQ
     "Have ZMQ" OFF)
 
+option (COMPILE_ZMQ
+    "Compile ZMQ" OFF)
+
 if (HAVE_ZMQ)
     add_definitions (-DHAVE_ZMQ)
 endif (HAVE_ZMQ)
@@ -93,7 +96,7 @@ set(DIRECTORIES
     configfile
     )
 
-if (HAVE_ZMQ)
+if (COMPILE_ZMQ)
     add_subdirectory(zmq)
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
 
@@ -102,7 +105,7 @@ if (HAVE_ZMQ)
     endif()
 
     include_directories ("${ZMQ_HEADERS}")
-endif (HAVE_ZMQ)
+endif (COMPILE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")
