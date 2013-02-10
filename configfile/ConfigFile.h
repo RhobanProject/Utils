@@ -24,6 +24,8 @@ class ConfigFile
         void read(string node, string name, string value, string &output);
         void read(string node, string name, bool value, bool &output);
 
+        string readStringIfExists(string node, string name);
+
         void help();
 
     protected:

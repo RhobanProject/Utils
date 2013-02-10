@@ -373,15 +373,26 @@ void Serializable::save_file(string filename_)
 
 void Serializable::from_xml(string xml_stream)
 {
-    TiXmlDocument * doc = XMLTools::stream_to_node(xml_stream);
+	TiXmlDocument * doc = 0;
+	TiXmlNode * node = 0;
+
+	try
+	{
+    doc = XMLTools::stream_to_node(xml_stream);
     if(!doc) throw string("Failed to parse xml stream:\n\t") + xml_stream;
 
-    TiXmlNode * node = doc->FirstChild();
+    node = doc->FirstChild();
     if(!node) throw string("Failed to find node in xml stream\n\t") + xml_stream;
 
     from_xml(node);
+	}
+	catch(string exc)
+	{
+	    delete doc;
+	    cout << "Failed to extract data from xml stream:\n\t" << exc << endl;
+		throw string("Failed to extract data from xml stream:\n\t") + exc;
+	}
 
-    delete doc;
 }
 
 void Serializable::pretty_print() const

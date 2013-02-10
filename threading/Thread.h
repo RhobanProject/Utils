@@ -37,7 +37,7 @@ public:
    * @param arg argument of the thread
    * @return phread_create value return
    */
-  int start(void * arg);
+  int start(void * arg = 0);
 
   /*!
    * Pause and resume,
