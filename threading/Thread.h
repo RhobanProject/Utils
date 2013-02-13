@@ -72,7 +72,6 @@ public:
   void lock();
   void unlock();
 
-
   /* Attention, il ne faut pas imbriquer les sections critiques
    * l'utilisation de mutex récursifs résoudrait le problème mais ils sont buggués sur la mmnet
    */

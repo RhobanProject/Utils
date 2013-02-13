@@ -31,7 +31,7 @@ Thread::~Thread()
     {
         if(thread_state != Dead)
         {
-            cerr << "Cancelling thread from destructor " << endl;
+            cout << "Cancelling thread from destructor " << endl;
 #ifndef WIN32
             if(_Thread)
 #else
@@ -46,7 +46,7 @@ Thread::~Thread()
                     _Thread.p=0;
 #endif
                 }
-            cerr << "Cancelled thread from destructor " << endl;
+            cout << "Cancelled thread from destructor " << endl;
         }
         thread_state = Dead;
     }
@@ -150,13 +150,16 @@ void Thread::kill(void)
         if(_Thread.p)
 #endif
         {
+        	cout << "Cancelling thread " << ThreadId() << endl;
             pthread_cancel(_Thread);
+        	cout << "Joining thread " << ThreadId() << endl;
             pthread_join(_Thread, NULL);
 #ifndef WIN32
             _Thread=0;
 #else
             _Thread.p=0;
 #endif
+        	cout << "Joined thread " << ThreadId() << endl;
         }
 
     thread_state = Dead;
@@ -165,9 +168,9 @@ void Thread::kill(void)
 int Thread::ThreadId(void)
 {
 #ifdef WIN32
-	return (int) pthread_self().p;
+	return (int) _Thread.p;
 #else
-	return (int) pthread_self();
+	return (int) _Thread;
 #endif
 }
 void Thread::run(void)
@@ -240,6 +243,7 @@ void Thread::unlock()
 {
     safe_mutex.unlock();
 }
+
 
 void Thread::wait(void)
 {
