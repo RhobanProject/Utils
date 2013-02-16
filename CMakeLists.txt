@@ -81,6 +81,7 @@ set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
 include_directories ("${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 
+
 # Sources
 set(DIRECTORIES
     .
@@ -102,10 +103,17 @@ if (COMPILE_ZMQ)
 
     if(UNIX AND NOT APPLE)
         set (EXTRA_LIBS ${EXTRA_LIBS} rt)
-    endif()
-
-    include_directories ("${ZMQ_HEADERS}")
+    endif(UNIX AND NOT APPLE)
 endif (COMPILE_ZMQ)
+
+if(HAVE_ZMQ)
+    include_directories ("${ZMQ_HEADERS}")
+    if (WIN32)
+		set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
+    		CACHE STRING "Directory where to find the zmq lib")
+    	link_directories ("${ZMQ_LIB_DIR}")
+	endif (WIN32)
+endif(HAVE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")
