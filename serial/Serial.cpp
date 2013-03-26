@@ -205,11 +205,9 @@ int Serial::connect(bool blocking)
 		newtio.c_cc[VTIME]  = 0;    // time-out ê°’ (TIME * 0.1ì´ˆ) 0 : disable
 		newtio.c_cc[VMIN]   = blocking ? 1 : 0;    // MIN ì�€ read ê°€ return ë�˜ê¸° ìœ„í•œ ìµœì†Œ ë¬¸ìž� ê°œìˆ˜
 
-                setSpeed(deviceBaudrate);
-
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &newtio);
-
+                
 		if (fd == -1) {
 			goto USART_INIT_ERROR;
 		}
@@ -240,6 +238,8 @@ int Serial::connect(bool blocking)
   
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &newtio);
+                
+                setSpeed(deviceBaudrate);
 
 		return 0;
 
@@ -302,16 +302,46 @@ void Serial::setSpeed(int baudrate)
 		return;
 	}
 
-        if (ioctl(fd, TIOCGSERIAL, &serinfo) < 0) {
-            return;
+        if (ioctl(fd, TIOCGSERIAL, &serinfo) >= 0) {
+            serinfo.flags &= ~ASYNC_SPD_MASK;
+            serinfo.flags |= ASYNC_SPD_CUST;
+            serinfo.flags |= ASYNC_LOW_LATENCY;
+            serinfo.custom_divisor = serinfo.baud_base / baudrate;
+
+            ioctl(fd, TIOCSSERIAL, &serinfo);
+        } else { 	
+            struct termios newtio;
+            tcgetattr(fd, &newtio);
+            int baudrate_code;
+            switch (baudrate) {
+                case 1200: baudrate_code = B1200; break;
+                case 1800: baudrate_code = B1800; break;
+                case 2400: baudrate_code = B2400; break;
+                case 9600: baudrate_code = B9600; break;
+                case 19200: baudrate_code = B19200; break;
+                case 38400: baudrate_code = B38400; break;
+                case 57600: baudrate_code = B57600; break;
+                case 115200: baudrate_code = B115200; break;
+                case 230400: baudrate_code = B230400; break;
+                case 460800: baudrate_code = B460800; break; 
+                case 500000: baudrate_code = B500000; break; 
+                case 576000: baudrate_code = B576000; break; 
+                case 921600: baudrate_code = B921600; break; 
+                case 1000000: baudrate_code = B1000000; break; 
+                case 1152000: baudrate_code = B1152000; break; 
+                case 1500000: baudrate_code = B1500000; break; 
+                case 2000000: baudrate_code = B2000000; break; 
+                case 2500000: baudrate_code = B2500000; break; 
+                case 3000000: baudrate_code = B3000000; break; 
+                case 3500000: baudrate_code = B3500000; break; 
+                case 4000000: baudrate_code = B4000000; break; 
+                default:
+                  throw "Serial::setSpeed: unknown baudrate"; 
+            }
+            cfsetispeed(&newtio, baudrate_code);
+            cfsetospeed(&newtio, baudrate_code);
+            tcsetattr(fd, TCSANOW, &newtio);
         }
-
-        serinfo.flags &= ~ASYNC_SPD_MASK;
-        serinfo.flags |= ASYNC_SPD_CUST;
-        serinfo.flags |= ASYNC_LOW_LATENCY;
-        serinfo.custom_divisor = serinfo.baud_base / baudrate;
-
-        ioctl(fd, TIOCSSERIAL, &serinfo);
 #elif MACOSX
         
         int baudrate_code;
