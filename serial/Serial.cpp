@@ -22,6 +22,8 @@
 #include <linux/serial.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 
 #ifdef MACOSX
