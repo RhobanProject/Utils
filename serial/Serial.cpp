@@ -418,7 +418,7 @@ size_t Serial::readTimeout(char *destination, size_t size, int timeout_us)
     timeout.tv_sec = timeout_us/1000000;
     timeout.tv_usec = timeout_us%1000000;
 
-    cout << "Entering select..." << endl;
+    // cout << "Entering select..." << endl;
 
     // Wait for data to be available
     while (readed < size && (sret=select(fd + 1, &read_fds, NULL, NULL, &timeout)) > 0) {
