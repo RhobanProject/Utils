@@ -19,8 +19,11 @@ if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)
 
+option (COMPILE_ZMQ
+    "Do we need to compile ZMQ" OFF)
+
 option (HAVE_ZMQ
-    "Have ZMQ" OFF)
+    "Do we have ZMQ" OFF)
 
 if (HAVE_ZMQ)
     add_definitions (-DHAVE_ZMQ)
@@ -78,6 +81,7 @@ set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
 include_directories ("${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 
+
 # Sources
 set(DIRECTORIES
     .
@@ -93,16 +97,23 @@ set(DIRECTORIES
     configfile
     )
 
-if (HAVE_ZMQ)
+if (COMPILE_ZMQ)
     add_subdirectory(zmq)
+    include_directories ("${ZMQ_HEADERS}")
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
 
     if(UNIX AND NOT APPLE)
         set (EXTRA_LIBS ${EXTRA_LIBS} rt)
-    endif()
+    endif(UNIX AND NOT APPLE)
+endif (COMPILE_ZMQ)
 
-    include_directories ("${ZMQ_HEADERS}")
-endif (HAVE_ZMQ)
+if(HAVE_ZMQ)
+    if (WIN32)
+		set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
+    		CACHE STRING "Directory where to find the zmq lib")
+    	link_directories ("${ZMQ_LIB_DIR}")
+	endif (WIN32)
+endif(HAVE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")

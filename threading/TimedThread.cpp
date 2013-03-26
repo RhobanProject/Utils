@@ -24,9 +24,9 @@ using namespace std;
 
 void TimedThread::init(double hertz)
 {
+    forever = true;
     Player::init(hertz,true);
     play_state = playing;
-    forever = true;
 }
 
 TimedThread::TimedThread() { frequency = 1;};

@@ -56,13 +56,13 @@ Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(
 Serial::~Serial()
 {
 	if(recording)
-		record_stream.close();
+          record_stream.close();
 	recording = false;
 }
 
 void Serial::setRts(int value)
 {
-#if defined(LINUX) || defined(ROBOARD)
+#ifndef WIN32
 	int cmd;
 
 	ioctl(fd, TIOCMGET, &cmd);
@@ -106,7 +106,6 @@ int Serial::connect(bool blocking)
 	else
 	{
 #ifdef WIN32
-
 		DCB Dcb;
 		DWORD dwError;
 
@@ -165,12 +164,10 @@ int Serial::connect(bool blocking)
 			goto USART_INIT_ERROR;
 
 		/* from http://msdn.microsoft.com/en-us/library/windows/desktop/aa363190%28v=vs.85%29.aspx
-		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
-    If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
-    If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
-    If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out.
-		 *
-		 */
+		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value                  * greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
+                 * If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
+                 * If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
+                 * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. */
 		Timeouts.ReadIntervalTimeout = MAXDWORD;
 		Timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
 		Timeouts.ReadTotalTimeoutConstant = 10;
@@ -184,7 +181,7 @@ int Serial::connect(bool blocking)
 
 		USART_INIT_ERROR:
 		return -1;
-#elif LINUX
+#else
                 int flags;
 		struct termios newtio;
 
@@ -224,13 +221,23 @@ int Serial::connect(bool blocking)
 			goto USART_INIT_ERROR;
 		}
 
-		newtio.c_cflag = B38400|CS8|CLOCAL|CREAD;
-		newtio.c_iflag = IGNPAR;
-		newtio.c_oflag = 0;
-		newtio.c_lflag = 0;
-		newtio.c_cc[VTIME]  = 0;
-		newtio.c_cc[VMIN]   = blocking ? 1 : 0;
-
+  
+#ifdef LINUX
+                newtio.c_cflag = B38400|CS8|CLOCAL|CREAD;
+#elif MACOSX
+                cfsetispeed(&newtio,B115200);
+                cfsetospeed(&newtio,B115200);                
+                newtio.c_cflag |= CLOCAL | CREAD | CS8; 
+                newtio.c_cflag &= ~PARENB; 
+                newtio.c_cflag &= ~CSTOPB; 
+                newtio.c_cflag &= ~CSIZE; 
+#endif
+                newtio.c_iflag = IGNPAR;
+                newtio.c_oflag = 0;
+                newtio.c_lflag = 0;
+                newtio.c_cc[VTIME]  = 0;
+                newtio.c_cc[VMIN]   = blocking ? 1 : 0;
+  
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &newtio);
 
@@ -305,6 +312,28 @@ void Serial::setSpeed(int baudrate)
         serinfo.custom_divisor = serinfo.baud_base / baudrate;
 
         ioctl(fd, TIOCSSERIAL, &serinfo);
+#elif MACOSX
+        
+        int baudrate_code;
+        switch (baudrate) {
+        case 1200: baudrate_code = B1200; break;
+        case 1800: baudrate_code = B1800; break;
+        case 2400: baudrate_code = B2400; break;
+        case 9600: baudrate_code = B9600; break;
+        case 19200: baudrate_code = B19200; break;
+        case 38400: baudrate_code = B38400; break;
+        case 57600: baudrate_code = B57600; break;
+        case 115200: baudrate_code = B115200; break;
+        case 230400: baudrate_code = B230400; break;
+        default:
+          throw "Serial::setSpeed: unknown baudrate"; 
+        }
+ 
+        struct termios tio;
+        cfmakeraw(&tio);
+        cfsetispeed(&tio,baudrate_code);
+        cfsetospeed(&tio,baudrate_code);
+        tcsetattr(fd, TCSANOW, &tio);  
 #endif
         deviceBaudrate = baudrate;
 }
