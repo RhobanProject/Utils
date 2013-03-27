@@ -27,6 +27,8 @@ option (HAVE_ZMQ
 
 if (HAVE_ZMQ)
     add_definitions (-DHAVE_ZMQ)
+    set(ZMQ_HEADERS "${BASE}/Utils/zmq/include"
+        CACHE STRING "ZMQ headers directory")
 endif (HAVE_ZMQ)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
