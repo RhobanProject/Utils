@@ -85,6 +85,7 @@ class SlowTimedThread : public Thread
 public:
 	SlowTimedThread();
 	SlowTimedThread(double frequency);
+	~SlowTimedThread();
 
     /*!
      * @param frequency_
@@ -104,9 +105,15 @@ public:
     void set_frequency(double frequency);
 
     /*
-     * stops the timed thread
+     * asynchronously stops the timed thread
      */
     void stop();
+
+    /*
+     * synchronously stops the timed thread
+     * CALLING THIS FROM ANOTHER TIMED THREAD WILL RESULT IN DEADLOCK
+     */
+    virtual void kill();
 
 protected:
 
