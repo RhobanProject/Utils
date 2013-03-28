@@ -109,8 +109,8 @@ protected:
     double frequency;
 
 
-    Mutex even;
-    Mutex odd;
+    Rhoban::Mutex even;
+    Rhoban::Mutex odd;
 };
 
 #endif // TICKTIMER_H_

@@ -13,6 +13,7 @@
 #include "Thread.h"
 
 using namespace std;
+using namespace Rhoban;
 
 Thread::Thread()
 {

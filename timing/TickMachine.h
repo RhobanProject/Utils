@@ -48,7 +48,7 @@ using namespace std;
 #endif
 /*****************************************************************************/
 
-class TickMachine : public Thread
+class TickMachine : public Rhoban::Thread
 {
     friend class TickTimer;
     friend class Player;
@@ -116,7 +116,7 @@ class TickMachine : public Thread
 
     /*! This mutex is used to restrict access to public methods
      *  to the moments where the TickMachine is idle. */
-    Mutex safe;
+    Rhoban::Mutex safe;
 
     /*************************************************************************/
     // used by constructors and destructors of timers
