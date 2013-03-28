@@ -32,6 +32,7 @@
          * If the running time of the call to step() is large,
          * dont use TimedThread but SlowTimedThread instead.
          */
+using namespace Rhoban;
 
 class TimedThread : public Player
 {
@@ -74,7 +75,7 @@ protected:
          */
         void kill_and_delete_me();
 
-        Mutex mutex;
+        Rhoban::Mutex mutex;
         void lock(){ mutex.lock(); }
         void unlock() { mutex.unlock(); }
 

@@ -26,6 +26,9 @@
 #include "Mutex.h"
 #include "Condition.h"
 
+namespace Rhoban
+{
+
 class Thread
 {
 public:
@@ -193,5 +196,6 @@ protected:
 
 };
 
+}
 #endif
 
