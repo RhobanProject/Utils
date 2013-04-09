@@ -40,6 +40,7 @@
 #define	XML_READ_CHAR(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_DOUBLE(node, truc){ truc = XMLTools::get_double_element(node, # truc); }
 #define	XML_READ_STRING(node, truc){ truc = XMLTools::get_string_element(node, # truc); }
+#define	XML_READ_STRING_ARRAY(node, truc){ truc = XMLTools::get_string_array(node, # truc); }
 
 using namespace std;
 /*****************************************************************************/

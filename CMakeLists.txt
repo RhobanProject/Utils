@@ -99,6 +99,7 @@ set(DIRECTORIES
 
 if (COMPILE_ZMQ)
     add_subdirectory(zmq)
+    include_directories ("${ZMQ_HEADERS}")
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
 
     if(UNIX AND NOT APPLE)

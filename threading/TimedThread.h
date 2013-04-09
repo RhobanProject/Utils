@@ -32,6 +32,7 @@
          * If the running time of the call to step() is large,
          * dont use TimedThread but SlowTimedThread instead.
          */
+using namespace Rhoban;
 
 class TimedThread : public Player
 {
@@ -74,7 +75,7 @@ protected:
          */
         void kill_and_delete_me();
 
-        Mutex mutex;
+        Rhoban::Mutex mutex;
         void lock(){ mutex.lock(); }
         void unlock() { mutex.unlock(); }
 
@@ -85,6 +86,7 @@ class SlowTimedThread : public Thread
 public:
 	SlowTimedThread();
 	SlowTimedThread(double frequency);
+	~SlowTimedThread();
 
     /*!
      * @param frequency_
@@ -104,9 +106,15 @@ public:
     void set_frequency(double frequency);
 
     /*
-     * stops the timed thread
+     * asynchronously stops the timed thread
      */
     void stop();
+
+    /*
+     * synchronously stops the timed thread
+     * CALLING THIS FROM ANOTHER TIMED THREAD WILL RESULT IN DEADLOCK
+     */
+    virtual void kill();
 
 protected:
 

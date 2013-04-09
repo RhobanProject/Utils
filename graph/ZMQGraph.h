@@ -4,7 +4,7 @@
 #include <threading/Thread.h>
 #include "Graph.h"
 
-class ZMQGraph : public Graph, public Thread
+class ZMQGraph : public Graph, public Rhoban::Thread
 {
     public:
         ZMQGraph(string address);

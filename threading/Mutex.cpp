@@ -14,6 +14,7 @@
 #include "Mutex.h"
 
 using namespace std;
+using namespace Rhoban;
 
 Mutex::Mutex(void)
 {
@@ -31,7 +32,7 @@ Mutex::~Mutex(void)
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " destroying mutex " << (int) this << endl;
 #endif
-    pthread_mutex_destroy(&_mutex);
+	pthread_mutex_destroy(&_mutex);
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " destroyed mutex " << (int) this << endl;
 #endif

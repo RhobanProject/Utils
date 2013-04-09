@@ -101,10 +101,25 @@ void ConfigFile::read(string node, string name, double value, float &output)
 
 void ConfigFile::read(string node, string name, string defaultValue, string &output)
 {
+	try
+	{
+		output = readStringIfExists(node, name);
+	}
+	catch(...)
+	{
+		output = defaultValue;
+	}
+    entries[node].push_back(new ConfigFileEntry("string", name, defaultValue));
+}
+
+string ConfigFile::readStringIfExists(string node, string name)
+{
     string fullName = getFullName(node, name);
     AnyOption options = processOptions(node, name, fullName);
-    const YAML::Node *yaml = getYaml(node);;
+    const YAML::Node *yaml = getYaml(node);
     const YAML::Node *nodeY;
+
+    string output;
 
     if (char *value = options.getValue(name.c_str())) {
         output = string(value);
@@ -113,10 +128,10 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
     } else if (yaml && (nodeY = yaml->FindValue(name))) {
         *nodeY >> output;
     } else {
-        output = defaultValue;
+    	throw string("Could not find node with path '") + name + "' or '" + fullName + "' in yaml file'";
     }
 
-    entries[node].push_back(new ConfigFileEntry("string", name, defaultValue));
+    return output;
 }
 
 void ConfigFile::read(string node, string name, bool defaultValue, bool &output)

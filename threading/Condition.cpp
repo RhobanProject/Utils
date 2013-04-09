@@ -19,6 +19,7 @@
 #include "Condition.h"
 
 using namespace std;
+using namespace Rhoban;
 
 Condition::Condition()
 {

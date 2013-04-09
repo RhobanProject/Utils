@@ -65,7 +65,7 @@ class TickTimer : public Playable
 
     bool is_tickable(timeval now);
 
-    protected:
+protected:
 
     /*! \brief Initializes the the variables before play. */
     virtual void prepare_play(bool forever, timeval durations);
@@ -109,8 +109,8 @@ class TickTimer : public Playable
     double frequency;
 
 
-    Mutex even;
-    Mutex odd;
+    Rhoban::Mutex even;
+    Rhoban::Mutex odd;
 };
 
 #endif // TICKTIMER_H_

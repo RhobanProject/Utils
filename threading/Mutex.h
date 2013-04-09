@@ -14,6 +14,8 @@
 
 //#define DEBUG_MUTEXES
 
+namespace Rhoban
+{
 class Condition;
 
 class Mutex
@@ -28,6 +30,6 @@ public:
 protected:
   pthread_mutex_t _mutex;
 };
-
+}
 #endif
 

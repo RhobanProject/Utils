@@ -27,3 +27,6 @@ execute_process (COMMAND cp "${PROJECT_SOURCE_DIR}/config.yml" ${PROJECT_BINARY_
 
 add_custom_target (send 
     ${PROJECT_SOURCE_DIR}/send.sh ${ROBOARD_IP})
+
+add_executable(TestSerial serial.cpp)
+target_link_libraries (TestSerial ${EXTRA_LIBS})

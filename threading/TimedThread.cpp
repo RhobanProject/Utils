@@ -32,6 +32,11 @@ void TimedThread::init(double hertz)
 TimedThread::TimedThread() { frequency = 1;};
 TimedThread::TimedThread(double frequency){init(frequency);};
 SlowTimedThread::SlowTimedThread(): timer(1){};
+SlowTimedThread::~SlowTimedThread()
+{
+	thread_state = Dead;
+}
+
 SlowTimedThread::SlowTimedThread(double frequency): timer(frequency){init(frequency);};
 
 void SlowTimedThread::init(double hertz)
@@ -56,22 +61,36 @@ void SlowTimedThread::set_frequency(double frequency)
 }
 
 /*
- * stops the timed thread
+ * asynchronously stops the timed thread
+ *
+ * We do not use Thread::kill() because join is blocking from another TimedThread
+ *
  */
 void SlowTimedThread::stop()
 {
 	if(is_alive())
-		kill();
+	{
+		wait_started();
+		    thread_state = Dying;
+	}
 }
+
+void SlowTimedThread::kill()
+{
+	Thread::kill();
+}
+
+
 
 
 void SlowTimedThread::execute()
 {
-	while(true)
+	while(thread_state != Dying && thread_state != Dead)
 	{
 		step();
 		timer.wait_next_tick();
 	}
+	thread_state = Dead;
 }
 
 void TimedThread::init_suspended(double hertz)

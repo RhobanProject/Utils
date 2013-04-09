@@ -24,6 +24,13 @@ using namespace std;
 
 bool is_in_vector_string(vector<string> vector, string testval);
 
+template <typename T>
+bool is_in(vector<T> lst, T x) {
+  for (int i=0; i < (int) lst.size(); i++)
+    if (x==lst[i]) return true;
+  return false;
+}
+
 inline string my_itoa(int i)
 {
 	ostringstream os;

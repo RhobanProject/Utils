@@ -26,6 +26,9 @@
 #include "Mutex.h"
 #include "Condition.h"
 
+namespace Rhoban
+{
+
 class Thread
 {
 public:
@@ -37,7 +40,7 @@ public:
    * @param arg argument of the thread
    * @return phread_create value return
    */
-  int start(void * arg);
+  int start(void * arg = 0);
 
   /*!
    * Pause and resume,
@@ -71,7 +74,6 @@ public:
 
   void lock();
   void unlock();
-
 
   /* Attention, il ne faut pas imbriquer les sections critiques
    * l'utilisation de mutex récursifs résoudrait le problème mais ils sont buggués sur la mmnet
@@ -194,5 +196,6 @@ protected:
 
 };
 
+}
 #endif
 
