@@ -44,7 +44,6 @@ using namespace std;
 #ifndef WIN32
 Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
 #else
-
 Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
 #endif
 {
@@ -99,8 +98,8 @@ int Serial::connect(bool blocking)
 			throw string("Could not open device ") + deviceName;
 #else
 		fd = open(deviceName.c_str(), O_RDONLY);
-		if(fd==-1 || fd == 0)
-			throw string("Could not open device ") + deviceName;
+		if(fd == -1 || fd==0)
+			return -1;
 #endif
 	}
 	else

@@ -23,9 +23,6 @@ using namespace Rhoban;
 
 Condition::Condition()
 {
-#ifdef DEBUG_MUTEXES
-	cout << "Thread " <<  (int) pthread_self().p << " initializing condition " << (int) this << endl;
-#endif
     int ret = pthread_cond_init(&condition, 0 );
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " initialized condition " << (int) this << endl;
@@ -38,7 +35,11 @@ Condition::Condition()
 
 Condition::~Condition()
 {
+<<<<<<< HEAD
 		pthread_cond_destroy(&condition);
+=======
+	pthread_cond_destroy(&condition);
+>>>>>>> origin/master
 }
 
 int Condition::wait(Mutex * mutex, unsigned int timeout)
