@@ -16,6 +16,10 @@
 #include <string.h>
 #include <time.h>
 
+#define LOG_LEVEL_ERROR   1
+#define LOG_LEVEL_MESSAGE 2
+#define LOG_LEVEL_DEBUG   3
+
 #ifdef HAVE_COLORS
 #define TEST_HAVE_COLORS 1
 #else

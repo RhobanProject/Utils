@@ -108,9 +108,10 @@ if (COMPILE_ZMQ)
 endif (COMPILE_ZMQ)
 
 if(HAVE_ZMQ)
+    # include_directories ("${ZMQ_HEADERS}")
     if (WIN32)
-		set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
-    		CACHE STRING "Directory where to find the zmq lib")
+        set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
+        CACHE STRING "Directory where to find the zmq lib")
     	link_directories ("${ZMQ_LIB_DIR}")
 	endif (WIN32)
 endif(HAVE_ZMQ)
