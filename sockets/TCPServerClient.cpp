@@ -10,6 +10,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <iostream>
+#ifndef WIN32
+#include <signal.h>
+#endif
 
 #include "TCPServerClient.h"
 
@@ -20,6 +23,9 @@ namespace Rhoban
     TCPServerClient::TCPServerClient()
     {
         dead = false;
+#ifndef WIN32
+        signal(SIGPIPE, SIG_IGN);
+#endif
     }
 
     TCPServerClient::~TCPServerClient()
@@ -33,9 +39,17 @@ namespace Rhoban
         return dead;
     }
 
+    void TCPServerClient::closeSocket()
+    {
+        if (clientSocket != INVALID_SOCKET) {
+            close(clientSocket);
+        }
+        clientSocket = INVALID_SOCKET;
+    }
+
     void TCPServerClient::stop()
     {
-        close(clientSocket);
+        closeSocket();
         dead = true;
     }
 

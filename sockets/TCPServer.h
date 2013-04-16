@@ -35,6 +35,9 @@ namespace Rhoban
             public:
                 TCPServer()
                 {
+#ifndef WIN32
+                    signal(SIGPIPE, SIG_IGN);
+#endif
                 }
 
                 ~TCPServer()
@@ -191,7 +194,7 @@ namespace Rhoban
                 void acceptLoop()
                 {
                     int addrSize;
-                    SOCKET clientSocket;
+                    volatile SOCKET newClient;
                     struct sockaddr_in clientAddr;
                     vector<T *> dead;
 
@@ -200,14 +203,14 @@ namespace Rhoban
 
                         // Waiting for a connection
 #ifdef _WIN32
-                        clientSocket = accept(socketDescriptor, (SOCKADDR*)&clientAddr, &addrSize);
+                        newClient = accept(socketDescriptor, (SOCKADDR*)&clientAddr, &addrSize);
 #else
-                        clientSocket = accept(socketDescriptor, (SOCKADDR*)&clientAddr, (socklen_t*) &addrSize);
+                        newClient = accept(socketDescriptor, (SOCKADDR*)&clientAddr, (socklen_t*) &addrSize);
 #endif
 
-                        if (clientSocket != INVALID_SOCKET) {
+                        if (newClient != INVALID_SOCKET) {
                             T *client = createClient();
-                            client->setSocket(clientSocket);
+                            client->setSocket(newClient);
                             clients.push_back(client);
                             client->start(NULL);
                         } else {
