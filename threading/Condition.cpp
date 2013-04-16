@@ -35,11 +35,7 @@ Condition::Condition()
 
 Condition::~Condition()
 {
-<<<<<<< HEAD
-		pthread_cond_destroy(&condition);
-=======
 	pthread_cond_destroy(&condition);
->>>>>>> origin/master
 }
 
 int Condition::wait(Mutex * mutex, unsigned int timeout)
