@@ -1,3 +1,4 @@
+#include <yaml-cpp/yaml.h>
 #include "ConfigFile.h"
 
 using namespace std;
@@ -6,7 +7,8 @@ ConfigFile::ConfigFile(string filename) : argv(NULL)
 {
     ifstream fin(filename.c_str());
     YAML::Parser parser(fin);
-    parser.GetNextDocument(doc);
+    doc = new YAML::Node();
+    parser.GetNextDocument(*doc);
 }
 
 string ConfigFile::getFullName(string node, string name)
@@ -31,8 +33,8 @@ AnyOption ConfigFile::processOptions(string node, string name, string fullName)
 
 const YAML::Node *ConfigFile::getYaml(string node)
 {
-    if (doc.size()) {
-        const YAML::Node *nod = doc.FindValue(node);
+    if (doc->size()) {
+        const YAML::Node *nod = doc->FindValue(node);
 
         if (nod && nod->size() != 0) {
             return nod;

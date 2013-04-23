@@ -4,12 +4,15 @@
 #include <map>
 #include <vector>
 #include <sstream>
-#include <yaml-cpp/yaml.h>
 #include <anyoption.h>
 
 #include "ConfigFileEntry.h"
 
 using namespace std;
+
+namespace YAML {
+    class Node;
+}
 
 class ConfigFile
 {
@@ -30,7 +33,7 @@ class ConfigFile
 
     protected:
         map<string, vector<ConfigFileEntry*> > entries;
-        YAML::Node doc;
+        YAML::Node *doc;
 
         int argc;
         char **argv;
