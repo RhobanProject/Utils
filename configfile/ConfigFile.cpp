@@ -5,7 +5,7 @@
 
 using namespace std;
 
-ConfigFile::ConfigFile() : argv(NULL)
+ConfigFile::ConfigFile() : argv(NULL), doc(NULL)
 {
 }
 
@@ -39,6 +39,10 @@ ConfigFile::~ConfigFile()
         for (vit = vect.begin(); vit != vect.end(); vit++) {
             delete (*vit);
         }
+    }
+
+    if (doc != NULL) {
+        delete doc;
     }
 }
 
@@ -88,7 +92,8 @@ void ConfigFile::write(string node, string name, float value)
         
 void ConfigFile::write(string node, string name, const char* value)
 {
-    write(node, name, new ConfigFileValue<string>(string(value)));
+    string temp(value);
+    write(node, name, new ConfigFileValue<string>(temp));
 }
         
 void ConfigFile::write(string node, string name, string value)

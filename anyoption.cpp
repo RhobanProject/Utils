@@ -93,7 +93,7 @@ AnyOption::~AnyOption()
 	//added by Hugo
 	for(int i = 0 ; i< option_counter; i++)
 	{
-		delete options[i];
+		delete[] options[i];
 		options[i] = NULL;
 	}
 	if(values != NULL)
