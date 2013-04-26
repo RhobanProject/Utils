@@ -39,7 +39,7 @@ namespace Rhoban
         SOCKADDR_IN sin = { 0 };
         struct hostent *hostinfo;
 
-        clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+        clientSocket = socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, 0);
 
         if (clientSocket == INVALID_SOCKET)
         {   
