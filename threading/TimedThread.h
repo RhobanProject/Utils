@@ -104,6 +104,7 @@ public:
      * frequency can be changed using set_frequency()
      */
     void set_frequency(double frequency);
+    double get_frequency(){ return timer.get_frequency(); };
 
     /*
      * asynchronously stops the timed thread
@@ -115,6 +116,11 @@ public:
      * CALLING THIS FROM ANOTHER TIMED THREAD WILL RESULT IN DEADLOCK
      */
     virtual void kill();
+
+    /*
+     * the effective calling freauency of the timed thread
+     */
+    double measured_frequency;
 
 protected:
 

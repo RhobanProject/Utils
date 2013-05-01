@@ -64,12 +64,12 @@ TickMachine * TickMachine::createTickMachine()
 
 TickMachine::TickMachine()
 {
-    safe.lock();
+	BEGIN_SAFE(safe)
     to_kill = 0;
     timer_should_be_updated = false;
     granularity.tv_sec = 0;
     granularity.tv_usec = (int) (1000000 / min_frequency);
-    safe.unlock();
+	END_SAFE(safe)
 }
 
 /*****************************************************************************/
@@ -95,14 +95,20 @@ void TickMachine::unregister_timer(TickTimer * timer)
 void TickMachine::internal_register_timer(TickTimer * timer)
 {
     //section critique
-    TM_DEBUG_MSG("registering timer with frequency " << timer->get_frequency() << "Hz ...")
+    TM_DEBUG_MSG("registering timer " << (long long int) timer << " with frequency " << timer->get_frequency() << "Hz ...")
 
-        safe.lock();
+	BEGIN_SAFE(safe)
     TM_DEBUG_MSG("safe locked");
     players.push_back(timer);
+    TM_DEBUG_MSG("pushed new timer " << (long long int) timer);
     update_granularity_and_players();
+    TM_DEBUG_MSG("updated granularity ");
     timer->set_relative();
-    safe.unlock();
+    TM_DEBUG_MSG("set relative of new timer ");
+    END_SAFE(safe)
+
+    TM_DEBUG_MSG("Done with registering timer with frequency " << timer->get_frequency() << "Hz ...")
+
     gettimeofday(&timer->start_time,0);
 
     timer->tick();
@@ -130,11 +136,11 @@ void TickMachine::internal_unregister_timer(TickTimer * timer)
     wait_started();
 
     TM_DEBUG_MSG("Locking");
-    safe.lock();
+    BEGIN_SAFE(safe)
     TM_DEBUG_MSG("Removing player from list");
     players.remove(timer);
     update_granularity_and_players();
-    safe.unlock();
+    END_SAFE(safe)
     TM_DEBUG_MSG("Timer unregistered");
 }
 
@@ -149,16 +155,18 @@ void TickMachine::internal_change_frequency(TickTimer * timer, double hertz)
         return;
     }
     else {
-        TM_DEBUG_MSG("Changing frequency of timer to " << hertz);
+        TM_DEBUG_MSG("Changing frequency of timer " << (long long int) timer << " to " << hertz);
     }
 
 
     /* Awaits for the tick machine to be ready */
     wait_started();
 
-    safe.lock();
+    TM_DEBUG_MSG("Internal change frequency changed to " << hertz);
+
+    BEGIN_SAFE(safe)
     update_granularity_and_players();
-    safe.unlock();
+    END_SAFE(safe)
 
     TM_DEBUG_MSG("Frequency changed " << hertz);
 
@@ -212,6 +220,7 @@ void TickMachine::update_timer()
 #endif
 }
 
+
 //return the time actually elapsed
 void TickMachine::wait_next_tick()
 {
@@ -233,25 +242,33 @@ void TickMachine::execute()
     TM_DEBUG_MSG("Starting Loop !");
     while(true)
     {
-
-        safe.lock();
+        TM_DEBUG_MSG("Ticking machine 1");
+    	BEGIN_SAFE(safe)
         if(timer_should_be_updated)
             update_timer();
+        TM_DEBUG_MSG("Ticking machine 2");
         tick_players();
-        safe.unlock();
+        END_SAFE(safe)
+        TM_DEBUG_MSG("Ticking machine 3");
 
         //we do not want to kill the timer while scanning the list of timers
         if(to_kill)
         {
             TM_DEBUG_MSG("Killing timer...");
             cout << "Killing timer..." << endl;
-            to_kill->even.unlock();
-            to_kill->odd.unlock();
+            if(to_kill->use_locks && to_kill->ticks_elapsed % 2)
+                to_kill->odd.unlock();
+            else
+            	to_kill->even.unlock();
             delete to_kill;
             to_kill = 0;
             TM_DEBUG_MSG("timer killed...");
         }
+        TM_DEBUG_MSG("Ticking machine 4");
+
         wait_next_tick();
+        TM_DEBUG_MSG("Ticking machine 5");
+
     }
 }
 
@@ -260,7 +277,7 @@ void TickMachine::tick_players()
 	timeval now;
 	gettimeofday(&now,0);
 
-    //TM_DEBUG_MSG(players.size()<<" players to tick");
+    TM_DEBUG_MSG(players.size()<<" players to tick");
     for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
     {
         TickTimer * timer = *timer_;
@@ -274,12 +291,22 @@ void TickMachine::tick_players()
         else
         {
 #ifndef WIN32
-        	if(--(timer->tick_counter) <= 0)
+        	if(timer->relative > 0 && --(timer->tick_counter) <= 0)
         		timer->tick();
 #else
         	//We cannot trust tick counter because we dont have a precise timing signal like SIGALARM is (to be checked)
+    		TM_DEBUG_MSG("Cheking whether timer " << (long long int) timer << " is tickable");
         	if(timer->is_tickable(now))
+        	{
+        		TM_DEBUG_MSG("Ticking timer " << (long long int) timer << " at " << timer->frequency);
         		timer->tick();
+        	}
+        	else
+        	{
+        		timeval now;
+        		gettimeofday(&now, NULL);
+        		TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
+        	}
 #endif
         }
     }
@@ -318,6 +345,7 @@ void TickMachine::update_granularity_and_players(double max_relative_error)
 
     //sets the new values for the timer
     set_granularity(new_gran);
+    TM_DEBUG_MSG("Done update_granularity_and_players");
 
 }
 

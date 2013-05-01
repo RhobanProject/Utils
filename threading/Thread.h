@@ -89,6 +89,11 @@ public:
     {						\
   l.lock();
 
+#define BEGIN_PSAFE(l)				\
+try						\
+  {						\
+l->lock();
+
   //	  cout << "Locking " << #l << endl;
 
 #define END_THREAD_SAFE					\
@@ -116,6 +121,20 @@ public:
        catch(...)					\
 	 {						\
 	   l.unlock();					\
+	   throw string("Unknown exception in thread");	\
+	 }
+
+#define END_PSAFE(l)					\
+  l->unlock();						\
+}							\
+       catch(string & str)				\
+	 {						\
+	   l->unlock();					\
+	   throw str;					\
+	 }						\
+       catch(...)					\
+	 {						\
+	   l->unlock();					\
 	   throw string("Unknown exception in thread");	\
 	 }
 

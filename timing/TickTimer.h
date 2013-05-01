@@ -108,7 +108,6 @@ protected:
     /*! \brief the frequency of the task */
     double frequency;
 
-
     Rhoban::Mutex even;
     Rhoban::Mutex odd;
 };
