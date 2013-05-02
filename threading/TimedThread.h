@@ -37,6 +37,8 @@ using namespace Rhoban;
 class TimedThread : public Player
 {
 protected:
+	/* A TimedThread should be killed and deleted using kill_and_delete_me() */
+	~TimedThread(){};
 
 	TimedThread();
 

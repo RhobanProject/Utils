@@ -62,10 +62,9 @@ TickMachine * TickMachine::createTickMachine()
     return new_tick_machine;
 }
 
-TickMachine::TickMachine()
+TickMachine::TickMachine() : to_kill(0)
 {
 	BEGIN_SAFE(safe)
-    to_kill = 0;
     timer_should_be_updated = false;
     granularity.tv_sec = 0;
     granularity.tv_usec = (int) (1000000 / min_frequency);

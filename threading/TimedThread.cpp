@@ -90,13 +90,18 @@ void SlowTimedThread::execute()
 
 	while(thread_state != Dying && thread_state != Dead)
 	{
-		//cout << /*TM_CAUTION_MSG*/ "Steping Timedthread " << this->ThreadId() << endl;
+		if(timer.get_frequency() < 0.00001)
+			measured_frequency = 0;
+
+		timer.wait_next_tick();
+
 		step();
+
 		struct timeval before = now;
 		gettimeofday(&now,NULL);
-	    measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now.tv_sec - before.tv_sec + (now.tv_usec - before.tv_usec) /1000000.0 ));
+		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now.tv_sec - before.tv_sec + (now.tv_usec - before.tv_usec) /1000000.0 ));
+
 		//cout << /*TM_CAUTION_MSG*/ "Waiting nexttick in Timedthread " << this->ThreadId() << endl;
-		timer.wait_next_tick();
 		//cout << /*TM_CAUTION_MSG*/ "Done Stepping Timedthread " << this->ThreadId() << endl;
 	}
 	thread_state = Dead;
