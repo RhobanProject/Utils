@@ -41,9 +41,9 @@
 
 #define LOG_CPP(level, loglevel, component, message) \
 		{ \
-	ostringstream oss__; \
-	oss__ << message; \
 	if (level <= loglevel) { \
+                ostringstream oss__; \
+                oss__ << message; \
 		struct tm now__; \
 		time_t timestamp__; \
 		\
