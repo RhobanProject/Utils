@@ -40,7 +40,7 @@ namespace Rhoban
 #endif
                 }
 
-                ~TCPServer()
+                virtual ~TCPServer()
                 {
                     shutdown();
 
@@ -57,7 +57,7 @@ namespace Rhoban
                 void deleteAllClients()
                 {
                     while (clients.size() > 0) {
-                       T *client = clients.back();
+                        T *client = clients.back();
                         cleanClient(client);
 
                         clients.pop_back();
