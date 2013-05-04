@@ -23,6 +23,29 @@
 #include "Thread.h"
 
 /*
+ * Repeated task with small CPU consumption
+ * are scheduled in a unique thread called the TickMachine
+ *
+ * the two following classes are the same
+ * 'RepeatedTask' is probably a better name
+ */
+class TimedThread;
+class RepeatedLightweightTask;
+
+
+/*
+ * RepeatedTask with possibly high CPU consumption
+ * are scheduled in individual threads
+ *
+ * the two following classes are the same
+ * 'RepeatedTask' is probably a better name
+ *
+ */
+class SlowTimedThread;
+class RepeatedTask;
+
+
+/*
  *       * TimedThreads are stepped one by one, one at a time.
  *       * A step is a call to step()
          *
@@ -136,5 +159,8 @@ protected:
 TickTimer timer;
 
 };
+
+class RepeatedLightweightTask : public TimedThread {};
+class RepeatedTask : public SlowTimedThread {};
 
 #endif /* TIMED_THREAD_HPP_ */
