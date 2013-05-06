@@ -290,8 +290,9 @@ void TickMachine::tick_players()
         else
         {
 #ifndef WIN32
-        	if(timer->relative > 0 && --(timer->tick_counter) <= 0)
-        		timer->tick();
+        	if(timer->relative > 0)
+        		if(--(timer->tick_counter) <= 0)
+        			timer->tick();
 #else
         	//We cannot trust tick counter because we dont have a precise timing signal like SIGALARM is (to be checked)
     		TM_DEBUG_MSG("Cheking whether timer " << (long long int) timer << " is tickable");
