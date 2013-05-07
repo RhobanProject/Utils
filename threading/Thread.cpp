@@ -162,7 +162,7 @@ void Thread::kill(void)
     thread_state = Dead;
 }
 
-int Thread::ThreadId(void)
+int Thread::currentThreadId(void)
 {
 #ifdef WIN32
 	return (int) pthread_self().p;
@@ -171,8 +171,15 @@ int Thread::ThreadId(void)
 #endif
 }
 
+int Thread::threadId()
+{
+    return myId;
+}
+
 void Thread::run(void)
 {
+    myId = Thread::currentThreadId();
+
     try {
         is_started.lock();
         setup();
@@ -183,7 +190,7 @@ void Thread::run(void)
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
     } catch (string exc) {
-        cerr << "Exception in thread " << ThreadId() <<" :"<< exc<< endl;
+        cerr << "Exception in thread " << myId <<" :"<< exc<< endl;
     }
 
     thread_state = Dead;

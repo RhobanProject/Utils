@@ -139,6 +139,11 @@ l->lock();
 	 }
 
   //		  cout << "Unlocking "<<  #l << endl;
+  
+  /**
+   * The id of the current thread
+   */
+  static int currentThreadId(void);
 
 protected:
 
@@ -162,10 +167,11 @@ protected:
   */
   void run(void);
 
-  /*
-   * The id of the thread
+
+  /**
+   * The Id of the target thread
    */
-  int ThreadId(void);
+  int threadId();
 
   /**
    * starting point of the thread
@@ -212,6 +218,8 @@ protected:
   Mutex safe_mutex;
 
   Condition is_started;
+
+  int myId;
 
 };
 
