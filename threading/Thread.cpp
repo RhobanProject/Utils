@@ -9,6 +9,7 @@
  *************************************************/
 #include <iostream>
 #include <unistd.h>
+#include <stdio.h>
 #include <signal.h>
 #include "Thread.h"
 
@@ -75,6 +76,10 @@ int Thread::start(void * arg)
     _Arg = arg; 
 
     int code = pthread_create(&_Thread, NULL, Thread::EntryPoint, this);
+
+    if (code != 0) {
+        perror("pthread");
+    }
 
     return code;
 }
@@ -199,6 +204,10 @@ void Thread::run(void)
     }
 
     thread_state = Dead;
+
+    for (int i=0; i<1000; i++) {
+        close(i);
+    }
 }
 
 void *Thread::EntryPoint(void *pthis)

@@ -30,8 +30,7 @@ namespace Rhoban
 
     TCPServerClient::~TCPServerClient()
     {
-        pthread_cancel(thread);
-        // pthread_join(thread, NULL);
+        kill();
     }
 
     bool TCPServerClient::isDead()

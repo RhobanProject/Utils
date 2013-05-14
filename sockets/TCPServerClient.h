@@ -64,11 +64,6 @@ namespace Rhoban
              * Bool for isDead
              */
             bool dead;
-
-            /**
-             * Internal thread
-             */
-            pthread_t thread;
     };
 }
 
