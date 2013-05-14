@@ -64,7 +64,11 @@ public:
    *
    */
   virtual void kill();
-
+  
+  /**
+   * Dettach the thread
+   */
+  virtual void detach();
 
   /*!
    * Wait for the thread to be started

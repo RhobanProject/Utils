@@ -64,6 +64,11 @@ Thread::~Thread()
     };
 }
 
+void Thread::detach()
+{
+    pthread_detach(_Thread);
+}
+
 int Thread::start(void * arg)
 {
     thread_state = Starting;
