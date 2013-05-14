@@ -204,10 +204,6 @@ void Thread::run(void)
     }
 
     thread_state = Dead;
-
-    for (int i=0; i<1000; i++) {
-        close(i);
-    }
 }
 
 void *Thread::EntryPoint(void *pthis)
