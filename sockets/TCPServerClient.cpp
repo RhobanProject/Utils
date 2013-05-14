@@ -30,7 +30,6 @@ namespace Rhoban
 
     TCPServerClient::~TCPServerClient()
     {
-        kill();
     }
 
     bool TCPServerClient::isDead()

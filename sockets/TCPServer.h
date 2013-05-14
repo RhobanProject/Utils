@@ -216,6 +216,7 @@ namespace Rhoban
                             client->setSocket(newClient);
                             clients.push_back(client);
                             client->start(NULL);
+                            client->detach();
                         } else {
                             socketDescriptor = 0;
                         }
