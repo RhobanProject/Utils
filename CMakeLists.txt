@@ -73,7 +73,7 @@ if (WIN32)
     set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif (WIN32)
 
-# Adding YAML support
+message("-- Adding YAML support")
 option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
 add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
 set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
@@ -81,6 +81,12 @@ set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
 include_directories ("${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 
+message("-- Adding JSON support")
+add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
+set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/json/include"
+    CACHE STRING "")
+include_directories ("${JSON_HEADERS}")
+set (EXTRA_LIBS ${EXTRA_LIBS} json)
 
 # Sources
 set(DIRECTORIES
