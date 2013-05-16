@@ -83,7 +83,7 @@ set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 
 message("-- Adding JSON support")
 add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
-set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/json/include"
+set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
     CACHE STRING "")
 include_directories ("${JSON_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} json)
