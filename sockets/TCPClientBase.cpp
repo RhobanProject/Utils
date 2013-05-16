@@ -45,6 +45,7 @@ namespace Rhoban
 #else 
         if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
 #endif
+            connected = false;
             ostringstream err;
             err << "Error while receiving data";
 #ifndef WIN32
@@ -139,6 +140,7 @@ namespace Rhoban
 #else 
         if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
 #endif
+            connected = false;
             throw string("Error while sending data");
         }
 
@@ -231,5 +233,12 @@ namespace Rhoban
         if (clientSocket) {
             close(clientSocket);
         }
+
+        connected = false;
+    }
+
+    bool TCPClientBase::isConnected()
+    {
+        return connected;
     }
 }

@@ -25,17 +25,6 @@ namespace Rhoban
              * Try to connect to address:port
              */
             virtual void connectTo(const char *address, int port);
-
-            /**
-             * Is the connection established ?
-             */
-            virtual bool isConnected();
-
-        protected:
-            /**
-             * State
-             */
-            bool connected;
     };
 }
 

@@ -69,9 +69,4 @@ namespace Rhoban
 
         connected = true;
     }
-
-    bool TCPClient::isConnected()
-    {
-        return connected;
-    }
 }
