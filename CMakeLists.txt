@@ -91,16 +91,17 @@ set (EXTRA_LIBS ${EXTRA_LIBS} json)
 # Sources
 set(DIRECTORIES
     .
-    logging
-    tests
-    timing
-    threading
-    xml
+    configfile
     graph
+    json
+    logging
     observer
     serial
     sockets
-    configfile
+    tests
+    threading
+    timing
+    xml
     )
 
 if (COMPILE_ZMQ)
