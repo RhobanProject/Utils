@@ -178,7 +178,7 @@ Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 
 vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id)
 {
-    if(!node) throw string("XMLTools getstringarray null node");
+    if(!node) throw string("XMLTools getstring array null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<string> result;
