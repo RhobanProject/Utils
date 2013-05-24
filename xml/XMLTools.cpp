@@ -81,7 +81,7 @@ float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
 
 float XMLTools::get_float_value(TiXmlNode * node)
 {
-	return strtod(node->Value(), 0);
+   	return strtod(node->FirstChild()->Value(), 0);
 }
 
 int XMLTools::get_int_element(TiXmlNode * node, const char * id) {
