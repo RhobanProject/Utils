@@ -64,7 +64,11 @@ public:
    *
    */
   virtual void kill();
-
+  
+  /**
+   * Dettach the thread
+   */
+  virtual void detach();
 
   /*!
    * Wait for the thread to be started
@@ -88,6 +92,11 @@ public:
   try						\
     {						\
   l.lock();
+
+#define BEGIN_PSAFE(l)				\
+try						\
+  {						\
+l->lock();
 
   //	  cout << "Locking " << #l << endl;
 
@@ -119,7 +128,26 @@ public:
 	   throw string("Unknown exception in thread");	\
 	 }
 
+#define END_PSAFE(l)					\
+  l->unlock();						\
+}							\
+       catch(string & str)				\
+	 {						\
+	   l->unlock();					\
+	   throw str;					\
+	 }						\
+       catch(...)					\
+	 {						\
+	   l->unlock();					\
+	   throw string("Unknown exception in thread");	\
+	 }
+
   //		  cout << "Unlocking "<<  #l << endl;
+  
+  /**
+   * The id of the current thread
+   */
+  static int currentThreadId(void);
 
 protected:
 
@@ -143,10 +171,11 @@ protected:
   */
   void run(void);
 
-  /*
-   * The id of the thread
+
+  /**
+   * The Id of the target thread
    */
-  int ThreadId(void);
+  int threadId();
 
   /**
    * starting point of the thread
@@ -193,6 +222,8 @@ protected:
   Mutex safe_mutex;
 
   Condition is_started;
+
+  int myId;
 
 };
 

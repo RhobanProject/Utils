@@ -14,6 +14,7 @@
 #include <io.h>
 #endif
 
+#include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,9 +36,12 @@ namespace Rhoban
             public:
                 TCPServer()
                 {
+#ifndef WIN32
+                    signal(SIGPIPE, SIG_IGN);
+#endif
                 }
 
-                ~TCPServer()
+                virtual ~TCPServer()
                 {
                     shutdown();
 
@@ -54,7 +58,7 @@ namespace Rhoban
                 void deleteAllClients()
                 {
                     while (clients.size() > 0) {
-                       T *client = clients.back();
+                        T *client = clients.back();
                         cleanClient(client);
 
                         clients.pop_back();
@@ -81,8 +85,11 @@ namespace Rhoban
                     sinserv.sin_addr.s_addr = localhostOnly ? inet_addr("127.0.0.1") : INADDR_ANY;
                     sinserv.sin_port = htons(port);
 
-                    socketDescriptor = socket(AF_INET, SOCK_STREAM, 0); 
-
+#ifndef WIN32
+                    socketDescriptor = socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, 0); 
+#else
+                    socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+#endif
                     if (socketDescriptor == INVALID_SOCKET)
                     {  
                         perror("socket()");
@@ -191,7 +198,7 @@ namespace Rhoban
                 void acceptLoop()
                 {
                     int addrSize;
-                    SOCKET clientSocket;
+                    volatile SOCKET newClient;
                     struct sockaddr_in clientAddr;
                     vector<T *> dead;
 
@@ -200,16 +207,17 @@ namespace Rhoban
 
                         // Waiting for a connection
 #ifdef _WIN32
-                        clientSocket = accept(socketDescriptor, (SOCKADDR*)&clientAddr, &addrSize);
+                        newClient = accept(socketDescriptor, (SOCKADDR*)&clientAddr, &addrSize);
 #else
-                        clientSocket = accept(socketDescriptor, (SOCKADDR*)&clientAddr, (socklen_t*) &addrSize);
+                        newClient = accept(socketDescriptor, (SOCKADDR*)&clientAddr, (socklen_t*) &addrSize);
 #endif
 
-                        if (clientSocket != INVALID_SOCKET) {
+                        if (newClient != INVALID_SOCKET) {
                             T *client = createClient();
-                            client->setSocket(clientSocket);
+                            client->setSocket(newClient);
                             clients.push_back(client);
                             client->start(NULL);
+                            client->detach();
                         } else {
                             socketDescriptor = 0;
                         }

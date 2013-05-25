@@ -23,6 +23,29 @@
 #include "Thread.h"
 
 /*
+ * Repeated task with small CPU consumption
+ * are scheduled in a unique thread called the TickMachine
+ *
+ * the two following classes are the same
+ * 'RepeatedTask' is probably a better name
+ */
+class TimedThread;
+class RepeatedLightweightTask;
+
+
+/*
+ * RepeatedTask with possibly high CPU consumption
+ * are scheduled in individual threads
+ *
+ * the two following classes are the same
+ * 'RepeatedTask' is probably a better name
+ *
+ */
+class SlowTimedThread;
+class RepeatedTask;
+
+
+/*
  *       * TimedThreads are stepped one by one, one at a time.
  *       * A step is a call to step()
          *
@@ -37,6 +60,8 @@ using namespace Rhoban;
 class TimedThread : public Player
 {
 protected:
+	/* A TimedThread should be killed and deleted using kill_and_delete_me() */
+	~TimedThread(){};
 
 	TimedThread();
 
@@ -104,6 +129,7 @@ public:
      * frequency can be changed using set_frequency()
      */
     void set_frequency(double frequency);
+    double get_frequency(){ return timer.get_frequency(); };
 
     /*
      * asynchronously stops the timed thread
@@ -115,6 +141,11 @@ public:
      * CALLING THIS FROM ANOTHER TIMED THREAD WILL RESULT IN DEADLOCK
      */
     virtual void kill();
+
+    /*
+     * the effective calling freauency of the timed thread
+     */
+    double measured_frequency;
 
 protected:
 
@@ -128,5 +159,8 @@ protected:
 TickTimer timer;
 
 };
+
+class RepeatedLightweightTask : public TimedThread {};
+class RepeatedTask : public SlowTimedThread {};
 
 #endif /* TIMED_THREAD_HPP_ */

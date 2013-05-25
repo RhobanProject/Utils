@@ -156,6 +156,7 @@ class TickMachine : public Rhoban::Thread
     /*! The players to time */
     list<TickTimer *> players;
 
+    /* The player to kill */
     TickTimer * to_kill;
 
     /*! sets time granularity */

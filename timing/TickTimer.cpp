@@ -28,11 +28,11 @@ TickTimer::~TickTimer()
 }
 
 TickTimer::TickTimer(double hertz) :
-    		ticks_elapsed(0),
-    		use_locks(true),
-    		tm_kill_me(false),
-    		tick_counter(0),
-    		frequency(hertz)
+    				ticks_elapsed(0),
+    				use_locks(true),
+    				tm_kill_me(false),
+    				tick_counter(0),
+    				frequency(hertz)
 {
 	TickMachine::register_timer(this, hertz);
 }
@@ -49,14 +49,33 @@ void TickTimer::set_relative()
 {
 	TickMachine * machine = TickMachine::get_tick_machine();
 	double gran = machine->granularity.tv_sec + machine->granularity.tv_usec/1000000.0;
-	relative = (uint) floor( 1.0 / (gran * frequency) );
-	if(relative<=0) relative=1;
-	tick_counter = relative;
+	ui32 newrelative = (uint) floor( 1.0 / (gran * frequency) );
+	if(newrelative<=0) newrelative=1;
+	if( frequency < 0.0001)
+		newrelative = 0;
+
+	if(relative != newrelative)
+	{
+		relative = newrelative;
+		tick_counter = relative;
+
+		//for win32
+		timeval now;
+		gettimeofday(&now, NULL);
+
+		int new_ticks_elapsed = (int) (1 + (to_secs(now ) - to_secs(start_time) ) * frequency);
+		if(ticks_elapsed %2 == new_ticks_elapsed%2)
+			ticks_elapsed = new_ticks_elapsed;
+		else
+			ticks_elapsed = new_ticks_elapsed + 1;
+	}
+	//	if(tick_counter > relative)tick_counter = relative;
+
 }
 
 bool TickTimer::is_tickable(timeval now)
 {
-	return (to_secs(now ) - to_secs(start_time) ) * frequency - ticks_elapsed >= 0;
+	return (relative > 0) && ( (to_secs(now ) - to_secs(start_time) ) * frequency - ticks_elapsed >= 0);
 }
 
 
@@ -64,6 +83,7 @@ bool TickTimer::is_tickable(timeval now)
  * to be called by the tick machine */
 void TickTimer::tick()
 {
+	TM_DEBUG_MSG("Ticking " << (long long int) this);
 	//reinitializes the counter
 	tick_counter = relative;
 
@@ -94,6 +114,7 @@ void TickTimer::tick()
 	}
 	//next_tick_date = now;
 	//increase(next_tick_date, tick_interval);
+	TM_DEBUG_MSG("Ticking done " << (long long int) this);
 }
 
 
@@ -106,15 +127,25 @@ void TickTimer::wait_next_tick()
 	if(!use_locks)
 		throw string("Wait_next_tick is not available for this player");
 
-	if(ticks_elapsed%2)
+	if(relative == 0)
 	{
 		odd.lock();
 		odd.unlock();
+		even.lock();
+		even.unlock();
 	}
 	else
 	{
-		even.lock();
-		even.unlock();
+		if(ticks_elapsed%2)
+		{
+			odd.lock();
+			odd.unlock();
+		}
+		else
+		{
+			even.lock();
+			even.unlock();
+		}
 	}
 }
 

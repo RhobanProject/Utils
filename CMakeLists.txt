@@ -75,7 +75,7 @@ if (WIN32)
     set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif (WIN32)
 
-# Adding YAML support
+message("-- Adding YAML support")
 option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
 add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
 set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
@@ -83,20 +83,27 @@ set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
 include_directories ("${YAML_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 
+message("-- Adding JSON support")
+add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
+set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
+    CACHE STRING "")
+include_directories ("${JSON_HEADERS}")
+set (EXTRA_LIBS ${EXTRA_LIBS} json)
 
 # Sources
 set(DIRECTORIES
     .
-    logging
-    tests
-    timing
-    threading
-    xml
+    configfile
     graph
+    json
+    logging
     observer
     serial
     sockets
-    configfile
+    tests
+    threading
+    timing
+    xml
     )
 
 if (COMPILE_ZMQ)
@@ -110,9 +117,10 @@ if (COMPILE_ZMQ)
 endif (COMPILE_ZMQ)
 
 if(HAVE_ZMQ)
+    # include_directories ("${ZMQ_HEADERS}")
     if (WIN32)
-		set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
-    		CACHE STRING "Directory where to find the zmq lib")
+        set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
+        CACHE STRING "Directory where to find the zmq lib")
     	link_directories ("${ZMQ_LIB_DIR}")
 	endif (WIN32)
 endif(HAVE_ZMQ)

@@ -9,6 +9,7 @@
  *************************************************/
 #include <iostream>
 #include <unistd.h>
+#include <stdio.h>
 #include <signal.h>
 #include "Thread.h"
 
@@ -64,12 +65,21 @@ Thread::~Thread()
     };
 }
 
+void Thread::detach()
+{
+    pthread_detach(_Thread);
+}
+
 int Thread::start(void * arg)
 {
     thread_state = Starting;
     _Arg = arg; 
 
     int code = pthread_create(&_Thread, NULL, Thread::EntryPoint, this);
+
+    if (code != 0) {
+        perror("pthread");
+    }
 
     return code;
 }
@@ -162,7 +172,7 @@ void Thread::kill(void)
     thread_state = Dead;
 }
 
-int Thread::ThreadId(void)
+int Thread::currentThreadId(void)
 {
 #ifdef WIN32
 	return (int) pthread_self().p;
@@ -171,8 +181,15 @@ int Thread::ThreadId(void)
 #endif
 }
 
+int Thread::threadId()
+{
+    return myId;
+}
+
 void Thread::run(void)
 {
+    myId = Thread::currentThreadId();
+
     try {
         is_started.lock();
         setup();
@@ -183,7 +200,7 @@ void Thread::run(void)
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
     } catch (string exc) {
-        cerr << "Exception in thread " << ThreadId() <<" :"<< exc<< endl;
+        cerr << "Exception in thread " << myId <<" :"<< exc<< endl;
     }
 
     thread_state = Dead;

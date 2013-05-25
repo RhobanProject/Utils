@@ -79,6 +79,11 @@ float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
     }
 }
 
+float XMLTools::get_float_value(TiXmlNode * node)
+{
+   	return strtod(node->FirstChild()->Value(), 0);
+}
+
 int XMLTools::get_int_element(TiXmlNode * node, const char * id) {
     if(!node) throw string("XMLTools getintelement null node");
     TiXmlNode * the_father = node->FirstChild( id );
@@ -178,7 +183,7 @@ Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 
 vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id)
 {
-    if(!node) throw string("XMLTools getstringarray null node");
+    if(!node) throw string("XMLTools getstring array null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<string> result;

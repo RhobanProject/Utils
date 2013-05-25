@@ -16,6 +16,10 @@
 #include <string.h>
 #include <time.h>
 
+#define LOG_LEVEL_ERROR   1
+#define LOG_LEVEL_MESSAGE 2
+#define LOG_LEVEL_DEBUG   3
+
 #ifdef HAVE_COLORS
 #define TEST_HAVE_COLORS 1
 #else
@@ -37,9 +41,9 @@
 
 #define LOG_CPP(level, loglevel, component, message) \
 		{ \
-	ostringstream oss__; \
-	oss__ << message; \
 	if (level <= loglevel) { \
+                ostringstream oss__; \
+                oss__ << message; \
 		struct tm now__; \
 		time_t timestamp__; \
 		\

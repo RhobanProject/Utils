@@ -76,11 +76,21 @@ namespace Rhoban
              */
             void stop();
 
+            /**
+             * Is the connection established ?
+             */
+            virtual bool isConnected();
+
         protected:
             /**
              * Internal socket
              */
             volatile SOCKET clientSocket;
+            
+            /**
+             * State
+             */
+            bool connected;
     };
 }
 

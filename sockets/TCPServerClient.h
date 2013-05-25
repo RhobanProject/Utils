@@ -44,6 +44,11 @@ namespace Rhoban
             virtual bool isDead();
 
             /**
+             * Closes the client socket
+             */
+            void closeSocket();
+
+            /**
              * Sets the socket
              */
             void setSocket(SOCKET socket);
@@ -59,11 +64,6 @@ namespace Rhoban
              * Bool for isDead
              */
             bool dead;
-
-            /**
-             * Internal thread
-             */
-            pthread_t thread;
     };
 }
 

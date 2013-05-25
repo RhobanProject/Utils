@@ -1,0 +1,8 @@
+JSON_TYPE(int, isInt, asInt)
+JSON_TYPE(unsigned int, isInt, asUInt)
+JSON_TYPE(char, isInt, asInt)
+JSON_TYPE(unsigned char, isUInt, asUInt)
+JSON_TYPE(float, isDouble, asDouble)
+JSON_TYPE(double, isDouble, asDouble)
+JSON_TYPE(string, isString, asString)
+JSON_TYPE(bool, isBool, asBool)
