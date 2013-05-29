@@ -20,11 +20,23 @@
 
 #ifndef THREAD_H
 #define THREAD_H
-
+#include <logging/log.h>
 #include <pthread.h>
 
 #include "Mutex.h"
 #include "Condition.h"
+
+/**
+ * MotorPrimitive log level
+ * 1: Caution
+ * 2: Message
+ * 3: Debug
+ */
+#define TH_LOG_LEVEL 2
+
+#define TH_CAUTION(...)     LOG_CPP(1, TH_LOG_LEVEL, "thread:caution", __VA_ARGS__)
+#define TH_MSG(...)         LOG_CPP(2, TH_LOG_LEVEL, "thread", __VA_ARGS__)
+#define TH_DEBUG(...)       LOG_CPP(3, TH_LOG_LEVEL, "thread:debug", __VA_ARGS__)
 
 namespace Rhoban
 {
@@ -57,6 +69,7 @@ public:
   virtual bool is_dead();
   virtual bool is_alive();
 
+  std::string thread_name;
 
   /**
    * @brief kill the thread
@@ -85,60 +98,75 @@ public:
 #define BEGIN_THREAD_SAFE			\
   try						\
     {						\
-  lock();
+	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " entering critical section") \
+  lock(); \
+  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has entered critical section");
 
 
   #define BEGIN_SAFE(l)				\
   try						\
     {						\
-  l.lock();
+	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " entering critical section") \
+  l.lock(); \
+  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has entered critical section")
 
 #define BEGIN_PSAFE(l)				\
 try						\
   {						\
-l->lock();
+	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " entering critical section") \
+l->lock(); \
+TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has entered critical section")
 
   //	  cout << "Locking " << #l << endl;
 
 #define END_THREAD_SAFE					\
   unlock();						\
+  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 }							\
      catch(string & str)				\
        {						\
 	 unlock();					\
+	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
      catch(...)						\
        {						\
 	 unlock();					\
+	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 	 throw string("Unknown exception in thread");	\
        }
 
 #define END_SAFE(l)					\
   l.unlock();						\
+  TH_DEBUG("Thread " << Thread::currentThreadId() << " has left critical section") \
 }							\
        catch(string & str)				\
 	 {						\
 	   l.unlock();					\
+	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
        catch(...)					\
 	 {						\
 	   l.unlock();					\
+	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 	   throw string("Unknown exception in thread");	\
 	 }
 
 #define END_PSAFE(l)					\
   l->unlock();						\
+  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 }							\
        catch(string & str)				\
 	 {						\
 	   l->unlock();					\
+	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
        catch(...)					\
 	 {						\
 	   l->unlock();					\
+	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
 	   throw string("Unknown exception in thread");	\
 	 }
 
@@ -149,7 +177,16 @@ l->lock();
    */
   static int currentThreadId(void);
 
+  /*
+   * The id of the thread executing this object
+   */
+  int threadId(void){ return myId; }
+
+
+
 protected:
+
+  int myId;
 
   /*!
    * The state of the thread
@@ -171,11 +208,6 @@ protected:
   */
   void run(void);
 
-
-  /**
-   * The Id of the target thread
-   */
-  int threadId();
 
   /**
    * starting point of the thread
@@ -223,7 +255,6 @@ protected:
 
   Condition is_started;
 
-  int myId;
 
 };
 

@@ -12,7 +12,7 @@
 
 #include <pthread.h>
 
-//#define DEBUG_MUTEXES
+#undef DEBUG_MUTEXES
 
 namespace Rhoban
 {

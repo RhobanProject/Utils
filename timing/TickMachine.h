@@ -24,6 +24,7 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <queue>
 #include <threading/Thread.h>
 #include <threading/Mutex.h>
 #ifdef _WIN32
@@ -83,8 +84,8 @@ class TickMachine : public Rhoban::Thread
     /*************************************************************************/
 
     protected:
-
-    void execute();
+	int thread_id;
+	void execute();
 
     /*************************************************************************/
     /*! singleton stuff */
@@ -107,6 +108,12 @@ class TickMachine : public Rhoban::Thread
     /*! \brief internally register/unregister a timer*/
     void internal_register_timer(TickTimer * timer);
     void internal_unregister_timer(TickTimer * timer);
+
+    Rhoban::Mutex to_register_mutex;
+    queue<TickTimer *> timers_to_register;
+
+    Rhoban::Mutex to_unregister_mutex;
+    queue<TickTimer *> timers_to_unregister;
 
     /*! \brief see change_frequency for doc. */
     void internal_change_frequency(TickTimer *, double hertz);
@@ -173,6 +180,7 @@ class TickMachine : public Rhoban::Thread
     /*! performs ticks on players that needs it
      *  and updates time_to_wait fields in players */
     void tick_players();
+    bool ticking_players;
 
 };
 
