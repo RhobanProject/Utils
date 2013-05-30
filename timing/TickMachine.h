@@ -115,9 +115,6 @@ class TickMachine : public Rhoban::Thread
     Rhoban::Mutex to_unregister_mutex;
     queue<TickTimer *> timers_to_unregister;
 
-    /*! \brief see change_frequency for doc. */
-    void internal_change_frequency(TickTimer *, double hertz);
-
     /*! \brief Halts the tick machine for one tick */
     virtual void wait_next_tick();
 
@@ -136,9 +133,6 @@ class TickMachine : public Rhoban::Thread
     /*! \brief to clean up when a timed mutex is no longer used */
     static void unregister_timer(TickTimer *);
 
-    /*! \brief changes the frequency to be called by a timed thread
-     *  the tick machine will create two mutexes that it will lock alternatively */
-    static void change_frequency(TickTimer *, double hertz);
     /*************************************************************************/
 
 
@@ -150,6 +144,9 @@ class TickMachine : public Rhoban::Thread
 
     /*! \brief flag telling the tick machine to update timer parameters */
     bool timer_should_be_updated;
+
+    /*! \brief flag telling the tick machine to update granularity */
+    bool granularity_should_be_updated;
 
     /*! \brief to be called by the tick machine thread
      *  on arm-linux it is mandatory to do so because threads have different process ids

@@ -65,7 +65,8 @@ TickMachine * TickMachine::createTickMachine()
 TickMachine::TickMachine() : to_kill(0), thread_id(0), ticking_players(false)
 {
 	BEGIN_SAFE(safe)
-    						timer_should_be_updated = false;
+	timer_should_be_updated = false;
+	granularity_should_be_updated  = false;
 	granularity.tv_sec = 0;
 	granularity.tv_usec = (int) (1000000 / min_frequency);
 	END_SAFE(safe)
@@ -96,7 +97,7 @@ void TickMachine::internal_register_timer(TickTimer * timer)
 	//section critique
 	TM_DEBUG_MSG("registering timer " << (long long int) timer << " with frequency " << timer->get_frequency() << "Hz ...")
 
-					to_register_mutex.lock();
+							to_register_mutex.lock();
 	timers_to_register.push(timer);
 	to_register_mutex.unlock();
 
@@ -124,33 +125,6 @@ void TickMachine::internal_unregister_timer(TickTimer * timer)
 	to_unregister_mutex.unlock();
 }
 
-void TickMachine::change_frequency(TickTimer * timer, double hertz) {
-	TickMachine::get_tick_machine()->internal_change_frequency(timer, hertz);
-}
-
-void TickMachine::internal_change_frequency(TickTimer * timer, double hertz)
-{
-	if(!timer) {
-		TM_CAUTION_MSG ("Tryng to change frequency of null timer");
-		return;
-	}
-	else {
-		TM_DEBUG_MSG("Changing frequency of timer " << (long long int) timer << " to " << hertz);
-	}
-
-
-	/* Awaits for the tick machine to be ready */
-	wait_started();
-
-	TM_DEBUG_MSG("Internal change frequency changed to " << hertz);
-
-	BEGIN_SAFE(safe)
-	update_granularity_and_players();
-	END_SAFE(safe)
-
-	TM_DEBUG_MSG("Frequency changed " << hertz);
-
-}
 
 TickMachine::~TickMachine()
 {
@@ -223,8 +197,10 @@ void TickMachine::execute()
 	while(true)
 	{
 		BEGIN_SAFE(safe)
-        						if(timer_should_be_updated)
-        							update_timer();
+		if(granularity_should_be_updated)
+					update_granularity_and_players();
+        if(timer_should_be_updated)
+        		update_timer();
 		tick_players();
 		END_SAFE(safe)
 

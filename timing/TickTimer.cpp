@@ -159,6 +159,6 @@ void TickTimer::wait_n_ticks(ui32 ticks_nb)
 void TickTimer::set_frequency(double frequency_)
 {
 	frequency = frequency_;
-	TickMachine::get_tick_machine()->change_frequency(this, frequency);
+	TickMachine::get_tick_machine()->granularity_should_be_updated = true;
 }
 
