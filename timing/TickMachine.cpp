@@ -62,68 +62,62 @@ TickMachine * TickMachine::createTickMachine()
 	return new_tick_machine;
 }
 
-TickMachine::TickMachine() : to_kill(0), thread_id(0), ticking_players(false)
+TickMachine::TickMachine()
 {
-	BEGIN_SAFE(safe)
-	timer_should_be_updated = false;
+	BEGIN_SAFE(players_list_mutex)
+															timer_should_be_updated = false;
 	granularity_should_be_updated  = false;
 	granularity.tv_sec = 0;
 	granularity.tv_usec = (int) (1000000 / min_frequency);
-	END_SAFE(safe)
-}
-
-/*****************************************************************************/
-/*! \brief To be called by a timed thread. the tick machine creates a mutex timer that
- * will tick at the given frequency. Use timer->wait_next_tick() to wait between two ticks*/
-void TickMachine::register_timer(TickTimer * timer, double hertz)
-{
-	if(!timer || !hertz)
-	{
-		TM_DEBUG_MSG("Null timer!");
-		return;
-	}
-	TickMachine::get_tick_machine()->internal_register_timer(timer);
-}
-
-/*! \brief to clean up when a timed mutex is no longer used */
-void TickMachine::unregister_timer(TickTimer * timer)
-{
-	TickMachine::get_tick_machine()->internal_unregister_timer(timer);
+	END_SAFE(players_list_mutex)
 }
 
 
-void TickMachine::internal_register_timer(TickTimer * timer)
+void TickMachine::register_timer(TickTimer * timer)
 {
 	//section critique
 	TM_DEBUG_MSG("registering timer " << (long long int) timer << " with frequency " << timer->get_frequency() << "Hz ...")
 
-							to_register_mutex.lock();
-	timers_to_register.push(timer);
-	to_register_mutex.unlock();
+					if(!timer)
+					{
+						TM_DEBUG_MSG("Null timer!");
+						return;
+					}
 
-	/*
-       timeval now;
-       gettimeofday(&now,0);
-       decrease(now,timer->start_time);
-       TM_DEBUG_MSG("... timer registered in "<< to_secs(now)<< "secs");
-    //fin sectiion critique
-	 */
+	BEGIN_SAFE(timers_to_register_list_mutex)
+	timers_to_register.push_back(timer);
+	END_SAFE(timers_to_register_list_mutex)
 }
 
-void TickMachine::internal_unregister_timer(TickTimer * timer)
+void TickMachine::unregister_timer(TickTimer * timer)
 {
-
-	if(!timer) {
-		TM_CAUTION_MSG ("Tryng to destroy timer NULL");
-		throw string("Trying to destroy timer NULL");
+	TM_DEBUG_MSG("Unregistering timer");
+	if(currentThreadId() != threadId())
+	{
+		timers_to_unregister_list_mutex.lock();
+		timers_to_unregister.push_back(timer);
+		timers_to_unregister_list_mutex.unlock();
 	}
 	else
-		TM_DEBUG_MSG("Unregistering timer");
+		timers_to_unregister.push_back(timer);
 
-	to_unregister_mutex.lock();
-	timers_to_unregister.push(timer);
-	to_unregister_mutex.unlock();
 }
+
+
+/*! \brief to delete when the timer is no longer used */
+void TickMachine::dispose_timer(TickTimer * timer)
+{
+	TM_DEBUG_MSG("Disposing timer");
+	if(currentThreadId() != threadId())
+	{
+		timers_to_delete_list_mutex.lock();
+		timers_to_delete.push_back(timer);
+		timers_to_delete_list_mutex.unlock();
+	}
+	else
+		timers_to_delete.push_back(timer);
+}
+
 
 
 TickMachine::~TickMachine()
@@ -136,7 +130,7 @@ void TickMachine::set_granularity(struct timeval musec)
 	TM_DEBUG_MSG("set_granularity");
 	granularity = musec;
 	for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
-		(*timer_)->set_relative();
+		(*timer_)->set_relative(granularity);
 	timer_should_be_updated = true;
 	TM_DEBUG_MSG("TickMachine time grain is "<< to_secs(musec) << " secs");
 }
@@ -175,17 +169,6 @@ void TickMachine::update_timer()
 }
 
 
-//return the time actually elapsed
-void TickMachine::wait_next_tick()
-{
-#ifdef WIN32
-	Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
-#else
-	wait_signal(SIGALRM);
-#endif
-}
-
-
 /*!
  * main loop of the tick machine
  */
@@ -196,72 +179,104 @@ void TickMachine::execute()
 	TM_DEBUG_MSG("Starting Loop !");
 	while(true)
 	{
-		BEGIN_SAFE(safe)
-		if(granularity_should_be_updated)
-					update_granularity_and_players();
-        if(timer_should_be_updated)
-        		update_timer();
-		tick_players();
-		END_SAFE(safe)
 
-		//we do not want to kill the timer while scanning the list of timers
-		if(to_kill)
+		TM_DEBUG_MSG("Checking timers to delete");
+		BEGIN_SAFE(timers_to_delete_list_mutex)
+		while(timers_to_delete.size() > 0)
 		{
-			TM_DEBUG_MSG("Killing timer...");
-			cout << "Killing timer..." << endl;
-			if(to_kill->use_locks && to_kill->ticks_elapsed % 2)
-				to_kill->odd.unlock();
-			else
-				to_kill->even.unlock();
-			delete to_kill;
-			to_kill = 0;
-			TM_DEBUG_MSG("timer killed...");
-		}
+			TickTimer * timer = timers_to_delete.front();
+			timers_to_delete.pop_front();
 
-		TickTimer * timer = NULL;
-		BEGIN_SAFE(to_register_mutex)
+			try
+			{
+				TM_DEBUG_MSG("Unregistering timer " << (long long int) timer);
+				BEGIN_SAFE(players_list_mutex)
+				players.remove(timer);
+				END_SAFE(players_list_mutex)
+				granularity_should_be_updated = true;
+				delete timer;
+			}
+			catch(string & exc)
+			{
+				TM_CAUTION_MSG("Failed to delete timer: exc")
+			}
+		}
+		END_SAFE(timers_to_delete_list_mutex)
+
 		TM_DEBUG_MSG("Checking timers to register");
-		if(timers_to_register.size() > 0)
+		BEGIN_SAFE(timers_to_register_list_mutex)
+		while(timers_to_register.size() > 0)
 		{
-			timer = timers_to_register.front();
-			timers_to_register.pop();
-		}
-		END_SAFE(to_register_mutex)
+			TickTimer * timer = timers_to_register.front();
+			timers_to_register.pop_front();
 
-		if(timer != NULL)
-		{
-			TM_DEBUG_MSG("Registering new timer " << (long long int) timer);
-			players.push_back(timer);
-			update_granularity_and_players();
-			timer->set_relative();
-			gettimeofday(&timer->start_time,0);
-			timer->tick();
-			TM_DEBUG_MSG("Registered timer with frequency " << timer->get_frequency() << "Hz ...")
-		}
+			if(timer != NULL)
+			{
+				TM_DEBUG_MSG("Registering new timer " << (long long int) timer);
 
-		timer = NULL;
-		BEGIN_SAFE(to_unregister_mutex)
+				BEGIN_SAFE(players_list_mutex)
+				players.push_back(timer);
+				END_SAFE(players_list_mutex)
+
+				try
+				{
+					granularity_should_be_updated = true;
+					gettimeofday(&timer->start_time,0);
+					timer->tick();
+					TM_DEBUG_MSG("Registered timer with frequency " << timer->get_frequency() << "Hz ...")
+				}
+				catch(string & exc)
+				{
+					TM_CAUTION_MSG("Failed to register timer: exc")
+				}
+
+			}
+		}
+		END_SAFE(timers_to_register_list_mutex)
+
 		TM_DEBUG_MSG("Checking timers to unregister");
-		if(timers_to_unregister.size() > 0)
+		BEGIN_SAFE(timers_to_unregister_list_mutex)
+		while(timers_to_unregister.size() > 0)
 		{
-			timer = timers_to_unregister.front();
-			timers_to_unregister.pop();
-		}
-		END_SAFE(to_unregister_mutex)
-		if(timer != NULL)
-		{
-			TM_DEBUG_MSG("Unregistering timer " << (long long int) timer);
-			players.remove(timer);
-			update_granularity_and_players();
-		}
+			TickTimer * timer = timers_to_unregister.front();
+			timers_to_unregister.pop_front();
 
-		wait_next_tick();
+			try
+			{
+				TM_DEBUG_MSG("Unregistering timer " << (long long int) timer);
+				BEGIN_SAFE(players_list_mutex)
+				players.remove(timer);
+				END_SAFE(players_list_mutex)
+				granularity_should_be_updated = true;
+			}
+			catch(string & exc)
+			{
+				TM_CAUTION_MSG("Failed to unregister timer: exc")
+			}
+
+		}
+		END_SAFE(timers_to_unregister_list_mutex)
+
+		BEGIN_SAFE(players_list_mutex)
+		if(granularity_should_be_updated)
+			update_granularity_and_players();
+		if(timer_should_be_updated)
+			update_timer();
+
+		tick_players();
+
+		END_SAFE(players_list_mutex)
+
+#ifdef WIN32
+		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
+#else
+		wait_signal(SIGALRM);
+#endif
 	}
 }
 
 void TickMachine::tick_players()
 {
-	ticking_players = true;
 	timeval now;
 	gettimeofday(&now,0);
 
@@ -269,37 +284,35 @@ void TickMachine::tick_players()
 	for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
 	{
 		TickTimer * timer = *timer_;
-		if(timer->tm_kill_me)
+		BEGIN_SAFE(timers_to_unregister_list_mutex)
+		/* Tricky case: a timer has been unregistered (hence probably deleted) by a timer before in the same tm round
+		 * In this case it should be skipped
+		 */
+		for(list<TickTimer *>::iterator tt = timers_to_unregister.begin(); tt != timers_to_unregister.end(); tt++)
+			if(*tt == timer)
+				continue;
+
+#ifndef WIN32
+		if(timer->relative > 0)
+			if(--(timer->tick_counter) <= 0)
+				timer->tick();
+#else
+		//We cannot trust tick counter because we dont have a precise timing signal like SIGALARM is (to be checked)
+		TM_DEBUG_MSG("Cheking whether timer " << (long long int) timer << " is tickable");
+		if(timer->is_tickable(now))
 		{
-			//we do not want to kill the timer while scanning the list of timers,
-			//so postpone it to after the loop
-			TM_DEBUG_MSG("Marking timer to be killed");
-			to_kill = timer;
+			TM_DEBUG_MSG("Ticking timer " << (long long int) timer << " at " << timer->frequency);
+			timer->tick();
 		}
 		else
 		{
-#ifndef WIN32
-			if(timer->relative > 0)
-				if(--(timer->tick_counter) <= 0)
-					timer->tick();
-#else
-			//We cannot trust tick counter because we dont have a precise timing signal like SIGALARM is (to be checked)
-			TM_DEBUG_MSG("Cheking whether timer " << (long long int) timer << " is tickable");
-			if(timer->is_tickable(now))
-			{
-				TM_DEBUG_MSG("Ticking timer " << (long long int) timer << " at " << timer->frequency);
-				timer->tick();
-			}
-			else
-			{
-				timeval now;
-				gettimeofday(&now, NULL);
-				TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
-			}
-#endif
+			timeval now;
+			gettimeofday(&now, NULL);
+			TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
 		}
+#endif
+		END_SAFE(timers_to_unregister_list_mutex)
 	}
-	ticking_players = false;
 
 	/* old version, more precise but too heavy and useless
        if(is_after(now, (*player_)->next_tick_date))
@@ -336,6 +349,8 @@ void TickMachine::update_granularity_and_players(double max_relative_error)
 	//sets the new values for the timer
 	set_granularity(new_gran);
 	TM_DEBUG_MSG("Done update_granularity_and_players");
+
+	granularity_should_be_updated = false;
 
 }
 

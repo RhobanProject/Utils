@@ -32,7 +32,7 @@
  * 2: Message
  * 3: Debug
  */
-#define TH_LOG_LEVEL 2
+#define TH_LOG_LEVEL 3
 
 #define TH_CAUTION(...)     LOG_CPP(1, TH_LOG_LEVEL, "thread:caution", __VA_ARGS__)
 #define TH_MSG(...)         LOG_CPP(2, TH_LOG_LEVEL, "thread", __VA_ARGS__)

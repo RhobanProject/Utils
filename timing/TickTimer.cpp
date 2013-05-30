@@ -12,7 +12,6 @@
 TickTimer::TickTimer() :
 ticks_elapsed(0),
 use_locks(true),
-tm_kill_me(false),
 tick_counter(0),
 frequency(0)
 {
@@ -23,18 +22,18 @@ frequency(0)
 TickTimer::~TickTimer()
 {
 	TM_DEBUG_MSG("TickTimer destructor: unregistering...");
-	TickMachine::unregister_timer(this);
+	TickMachine::get_tick_machine()->unregister_timer(this);
 	TM_DEBUG_MSG("TickTimer destructor: unregistered");
 }
 
 TickTimer::TickTimer(double hertz) :
     				ticks_elapsed(0),
     				use_locks(true),
-    				tm_kill_me(false),
     				tick_counter(0),
-    				frequency(hertz)
+    				frequency(hertz),
+    				relative(0)
 {
-	TickMachine::register_timer(this, hertz);
+	TickMachine::get_tick_machine()->register_timer(this);
 }
 
 
@@ -45,10 +44,16 @@ void TickTimer::prepare_play(bool forever, timeval durations)
 	Playable::prepare_play(forever, durations);
 }
 
-void TickTimer::set_relative()
+
+
+void TickTimer::dispose()
 {
-	TickMachine * machine = TickMachine::get_tick_machine();
-	double gran = machine->granularity.tv_sec + machine->granularity.tv_usec/1000000.0;
+	TickMachine::get_tick_machine()->dispose_timer(this);
+}
+
+void TickTimer::set_relative(struct timeval granularity)
+{
+	double gran = granularity.tv_sec + granularity.tv_usec/1000000.0;
 	ui32 newrelative = (uint) floor( 1.0 / (gran * frequency) );
 	if(newrelative<=0) newrelative=1;
 	if( frequency < 0.0001)
@@ -72,6 +77,7 @@ void TickTimer::set_relative()
 	//	if(tick_counter > relative)tick_counter = relative;
 
 }
+
 
 bool TickTimer::is_tickable(timeval now)
 {
