@@ -51,7 +51,6 @@ class TickTimer : public Playable
 
     TickTimer(double hertz);
     TickTimer(double hertz, string name);
-    virtual ~TickTimer();
 
     /*! \brief wait for the next tick of the MutexTimer
      *  to be called by the timed thread */
@@ -66,13 +65,21 @@ class TickTimer : public Playable
 
     string timer_name;
 
+    virtual ~TickTimer();
+
 protected:
 
     /*! \brief Initializes the the variables before play. */
     virtual void prepare_play(bool forever, timeval durations);
 
+
     /*! tells the tick machine to destroy this object at net tick */
     void dispose();
+
+    /*! tells the tick machine to unregister this object at net tick */
+    void unregister();
+
+
 
     /*! 
      **************************************

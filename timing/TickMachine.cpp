@@ -89,7 +89,7 @@ void TickMachine::register_timer(TickTimer * timer)
 	if(currentThreadId() != threadId())
 	{
 		BEGIN_SAFE(timers_to_register_list_mutex)
-				timers_to_register.push_back(timer);
+								timers_to_register.push_back(timer);
 		END_SAFE(timers_to_register_list_mutex)
 	}
 	else
@@ -99,32 +99,22 @@ void TickMachine::register_timer(TickTimer * timer)
 
 void TickMachine::unregister_timer(TickTimer * timer)
 {
-	TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
+	TM_DEBUG_MSG("Unregistering timer '" << timer_name << "'" << (long long int) timer);
 
 	if(currentThreadId() != threadId())
-	{
-		BEGIN_SAFE(timers_to_register_list_mutex)
-					for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
-						if(*it == timer)
-							timers_to_register.erase(it);
-		END_SAFE(timers_to_register_list_mutex)
-	}
-	else
-	{
-		for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
-			if(*it == timer)
-				timers_to_register.erase(it);
-	}
+		timers_to_register_list_mutex.lock();
+
+	for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
+		if(*it == timer)
+		{
+			timers_to_register.erase(it);
+			break;
+		}
 
 	if(currentThreadId() != threadId())
-	{
+		timers_to_register_list_mutex.unlock();
 
-		BEGIN_SAFE(timers_to_unregister_list_mutex)
-				timers_to_unregister.push_back(timer);
-		END_SAFE(timers_to_unregister_list_mutex)
-	}
-	else
-		timers_to_unregister.push_back(timer);
+	timers_to_unregister.push_back(timer);
 	timer_to_unregister = true;
 
 }
@@ -137,28 +127,25 @@ void TickMachine::dispose_timer(TickTimer * timer)
 
 	if(currentThreadId() != threadId())
 	{
-		BEGIN_SAFE(timers_to_register_list_mutex)
-					for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
-						if(*it == timer)
-							timers_to_register.erase(it);
-		END_SAFE(timers_to_register_list_mutex)
+		timers_to_register_list_mutex.lock();
+		timers_to_delete_list_mutex.lock();
 	}
-	else
-	{
-		for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
-			if(*it == timer)
-				timers_to_register.erase(it);
-	}
+
+	for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
+		if(*it == timer)
+		{
+			timers_to_register.erase(it);
+			break;
+		}
+
+	timers_to_delete.push_back(timer);
+	timer_to_dispose = true;
 
 	if(currentThreadId() != threadId())
 	{
-		BEGIN_SAFE(timers_to_delete_list_mutex)
-				timers_to_delete.push_back(timer);
-		END_SAFE(timers_to_delete_list_mutex)
+		timers_to_register_list_mutex.unlock();
+		timers_to_delete_list_mutex.unlock();
 	}
-	else
-		timers_to_delete.push_back(timer);
-	timer_to_dispose = true;
 }
 
 
@@ -247,6 +234,9 @@ void TickMachine::execute()
 			END_SAFE(timers_to_delete_list_mutex)
 		}
 
+		/* Timers are typically unregistered then destroyed thus no external thread should unregister a timer while step a timer */
+		BEGIN_SAFE(timers_to_unregister_list_mutex)
+
 		if(timer_to_register)
 		{
 			timer_to_register = false;
@@ -277,24 +267,21 @@ void TickMachine::execute()
 		if(timer_to_unregister)
 		{
 			timer_to_unregister = false;
-			BEGIN_SAFE(timers_to_unregister_list_mutex)
 			TM_CAUTION_MSG("Asynchronously unregistering " << timers_to_register.size() << " timers");
 			for(list<TickTimer *>::iterator pt = timers_to_unregister.begin(); pt!= timers_to_unregister.end(); pt++)
 			{
 				TickTimer * timer = *pt;
 				try
 				{
-					TM_CAUTION_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 					players.remove(timer);
 					granularity_should_be_updated = true;
 				}
 				catch(string & exc)
 				{
-					TM_CAUTION_MSG("Failed to unregister timer: exc")
+					TM_CAUTION_MSG("Failed to unregister timer: " << exc)
 				}
 			}
 			timers_to_unregister.clear();
-			END_SAFE(timers_to_unregister_list_mutex)
 		}
 
 		if(granularity_should_be_updated)
@@ -303,6 +290,7 @@ void TickMachine::execute()
 			update_timer();
 
 		tick_players();
+		END_SAFE(timers_to_unregister_list_mutex)
 
 #ifdef WIN32
 		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);

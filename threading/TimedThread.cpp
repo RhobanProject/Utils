@@ -48,7 +48,10 @@ SlowTimedThread::~SlowTimedThread()
 	thread_state = Dead;
 }
 
-SlowTimedThread::SlowTimedThread(double frequency): timer(frequency,"SlowTimedThread"){init(frequency);};
+SlowTimedThread::SlowTimedThread(double frequency): timer(frequency)
+{
+	init(frequency);
+}
 
 void SlowTimedThread::init(double hertz)
 {

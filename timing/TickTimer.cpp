@@ -21,9 +21,7 @@ frequency(0)
 
 TickTimer::~TickTimer()
 {
-	TM_DEBUG_MSG("TickTimer destructor: unregistering...");
-	TickMachine::get_tick_machine()->unregister_timer(this);
-	TM_DEBUG_MSG("TickTimer destructor: unregistered");
+	unregister();
 }
 
 TickTimer::TickTimer(double hertz) :
@@ -60,6 +58,11 @@ void TickTimer::prepare_play(bool forever, timeval durations)
 void TickTimer::dispose()
 {
 	TickMachine::get_tick_machine()->dispose_timer(this);
+}
+
+void TickTimer::unregister()
+{
+	TickMachine::get_tick_machine()->unregister_timer(this);
 }
 
 void TickTimer::set_relative(struct timeval granularity)
