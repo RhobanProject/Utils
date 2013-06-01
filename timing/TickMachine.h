@@ -80,7 +80,11 @@ class TickMachine : public Rhoban::Thread
     /*! \brief flag telling execute() to update timer parameters */
     bool timer_should_be_updated;
 
+    /*! \brief alert the tick machien to change granularity */
+	static void FrequencyChanged();
+
     /*! \brief flag telling execute() to update granularity */
+	Rhoban::Mutex granularity_mutex;
     bool granularity_should_be_updated;
 
     /*! callled by execute: performs ticks on players that needs it

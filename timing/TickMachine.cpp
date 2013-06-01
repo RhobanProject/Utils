@@ -73,10 +73,12 @@ TickMachine::TickMachine() : timer_to_dispose(false), timer_to_register(false), 
 
 void TickMachine::register_timer(TickTimer * timer)
 {
+	/*
 	if(timer->timer_name == "")
 	{
 		int i = 0;
 	}
+	*/
 	//section critique
 	TM_CAUTION_MSG("Registering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
 
@@ -232,6 +234,7 @@ void TickMachine::execute()
 			}
 			timers_to_delete.clear();
 			END_SAFE(timers_to_delete_list_mutex)
+			granularity_should_be_updated = true;
 		}
 
 		/* Timers are typically unregistered then destroyed thus no external thread should unregister a timer while step a timer */
@@ -262,6 +265,7 @@ void TickMachine::execute()
 			}
 			timers_to_register.clear();
 			END_SAFE(timers_to_register_list_mutex)
+			granularity_should_be_updated = true;
 		}
 
 		if(timer_to_unregister)
@@ -274,7 +278,6 @@ void TickMachine::execute()
 				try
 				{
 					players.remove(timer);
-					granularity_should_be_updated = true;
 				}
 				catch(string & exc)
 				{
@@ -282,10 +285,15 @@ void TickMachine::execute()
 				}
 			}
 			timers_to_unregister.clear();
+			granularity_should_be_updated = true;
 		}
 
+		granularity_mutex.lock();
 		if(granularity_should_be_updated)
 			update_granularity_and_players();
+		granularity_should_be_updated = false;
+		granularity_mutex.unlock();
+
 		if(timer_should_be_updated)
 			update_timer();
 
@@ -298,6 +306,16 @@ void TickMachine::execute()
 		wait_signal(SIGALRM);
 #endif
 	}
+}
+
+
+/*! \brief alert the tick machien to change granularity */
+void TickMachine::FrequencyChanged()
+{
+	TickMachine * the = TickMachine::get_tick_machine();
+	the->granularity_mutex.lock();
+	the->granularity_should_be_updated = true;
+	the->granularity_mutex.unlock();
 }
 
 void TickMachine::tick_players()
@@ -356,7 +374,6 @@ void TickMachine::tick_players()
  */
 void TickMachine::update_granularity_and_players(double max_relative_error)
 {
-	granularity_should_be_updated = false;
 	TM_DEBUG_MSG("update_granularity_and_players");
 
 	//default granularity is min frequency
