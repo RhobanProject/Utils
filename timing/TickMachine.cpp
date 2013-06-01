@@ -214,9 +214,6 @@ void TickMachine::execute()
 			{
 				TM_DEBUG_MSG("Registering new timer " << (long long int) timer);
 
-				BEGIN_SAFE(players_list_mutex)
-				players.push_back(timer);
-				END_SAFE(players_list_mutex)
 
 				try
 				{
@@ -229,6 +226,10 @@ void TickMachine::execute()
 				{
 					TM_CAUTION_MSG("Failed to register timer: exc")
 				}
+
+				BEGIN_SAFE(players_list_mutex)
+				players.push_back(timer);
+				END_SAFE(players_list_mutex)
 
 			}
 		}
