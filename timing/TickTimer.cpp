@@ -36,6 +36,17 @@ TickTimer::TickTimer(double hertz) :
 	TickMachine::get_tick_machine()->register_timer(this);
 }
 
+TickTimer::TickTimer(double hertz, string name) :
+    				ticks_elapsed(0),
+    				use_locks(true),
+    				tick_counter(0),
+    				frequency(hertz),
+    				relative(0),
+    				timer_name(name)
+{
+	TickMachine::get_tick_machine()->register_timer(this);
+}
+
 
 /*! \brief Initializes the the variables before play. */
 void TickTimer::prepare_play(bool forever, timeval durations)

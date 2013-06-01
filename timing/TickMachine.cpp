@@ -62,44 +62,70 @@ TickMachine * TickMachine::createTickMachine()
 	return new_tick_machine;
 }
 
-TickMachine::TickMachine()
+TickMachine::TickMachine() : timer_to_dispose(false), timer_to_register(false), timer_to_unregister(false)
 {
-	BEGIN_SAFE(players_list_mutex)
-															timer_should_be_updated = false;
+	timer_should_be_updated = false;
 	granularity_should_be_updated  = false;
 	granularity.tv_sec = 0;
 	granularity.tv_usec = (int) (1000000 / min_frequency);
-	END_SAFE(players_list_mutex)
 }
 
 
 void TickMachine::register_timer(TickTimer * timer)
 {
+	if(timer->timer_name == "")
+	{
+		int i = 0;
+	}
 	//section critique
-	TM_DEBUG_MSG("registering timer " << (long long int) timer << " with frequency " << timer->get_frequency() << "Hz ...")
+	TM_CAUTION_MSG("Registering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
 
-					if(!timer)
-					{
-						TM_DEBUG_MSG("Null timer!");
-						return;
-					}
+	if(!timer)
+	{
+		TM_DEBUG_MSG("Null timer!");
+		return;
+	}
 
-	BEGIN_SAFE(timers_to_register_list_mutex)
-	timers_to_register.push_back(timer);
-	END_SAFE(timers_to_register_list_mutex)
+	if(currentThreadId() != threadId())
+	{
+		BEGIN_SAFE(timers_to_register_list_mutex)
+				timers_to_register.push_back(timer);
+		END_SAFE(timers_to_register_list_mutex)
+	}
+	else
+		timers_to_register.push_back(timer);
+	timer_to_register = true;
 }
 
 void TickMachine::unregister_timer(TickTimer * timer)
 {
-	TM_DEBUG_MSG("Unregistering timer");
+	TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
+
 	if(currentThreadId() != threadId())
 	{
-		timers_to_unregister_list_mutex.lock();
-		timers_to_unregister.push_back(timer);
-		timers_to_unregister_list_mutex.unlock();
+		BEGIN_SAFE(timers_to_register_list_mutex)
+					for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
+						if(*it == timer)
+							timers_to_register.erase(it);
+		END_SAFE(timers_to_register_list_mutex)
+	}
+	else
+	{
+		for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
+			if(*it == timer)
+				timers_to_register.erase(it);
+	}
+
+	if(currentThreadId() != threadId())
+	{
+
+		BEGIN_SAFE(timers_to_unregister_list_mutex)
+				timers_to_unregister.push_back(timer);
+		END_SAFE(timers_to_unregister_list_mutex)
 	}
 	else
 		timers_to_unregister.push_back(timer);
+	timer_to_unregister = true;
 
 }
 
@@ -107,15 +133,32 @@ void TickMachine::unregister_timer(TickTimer * timer)
 /*! \brief to delete when the timer is no longer used */
 void TickMachine::dispose_timer(TickTimer * timer)
 {
-	TM_DEBUG_MSG("Disposing timer");
+	TM_CAUTION_MSG("Disposing timer " << timer->timer_name);
+
 	if(currentThreadId() != threadId())
 	{
-		timers_to_delete_list_mutex.lock();
-		timers_to_delete.push_back(timer);
-		timers_to_delete_list_mutex.unlock();
+		BEGIN_SAFE(timers_to_register_list_mutex)
+					for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
+						if(*it == timer)
+							timers_to_register.erase(it);
+		END_SAFE(timers_to_register_list_mutex)
+	}
+	else
+	{
+		for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
+			if(*it == timer)
+				timers_to_register.erase(it);
+	}
+
+	if(currentThreadId() != threadId())
+	{
+		BEGIN_SAFE(timers_to_delete_list_mutex)
+				timers_to_delete.push_back(timer);
+		END_SAFE(timers_to_delete_list_mutex)
 	}
 	else
 		timers_to_delete.push_back(timer);
+	timer_to_dispose = true;
 }
 
 
@@ -180,41 +223,39 @@ void TickMachine::execute()
 	while(true)
 	{
 
-		TM_DEBUG_MSG("Checking timers to delete");
-		BEGIN_SAFE(timers_to_delete_list_mutex)
-		while(timers_to_delete.size() > 0)
+		if(timer_to_dispose)
 		{
-			TickTimer * timer = timers_to_delete.front();
-			timers_to_delete.pop_front();
-
-			try
+			timer_to_dispose = false;
+			BEGIN_SAFE(timers_to_delete_list_mutex)
+			TM_CAUTION_MSG("Asynchronously deleting " << timers_to_register.size() << "timers");
+			for(list<TickTimer *>::iterator pt = timers_to_delete.begin(); pt!= timers_to_delete.end(); pt++)
 			{
-				TM_DEBUG_MSG("Unregistering timer " << (long long int) timer);
-				BEGIN_SAFE(players_list_mutex)
-				players.remove(timer);
-				END_SAFE(players_list_mutex)
-				granularity_should_be_updated = true;
-				delete timer;
+				TickTimer * timer = *pt;
+				try
+				{
+					TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
+					players.remove(timer);
+					granularity_should_be_updated = true;
+					delete timer;
+				}
+				catch(string & exc)
+				{
+					TM_CAUTION_MSG("Failed to delete timer: exc")
+				}
 			}
-			catch(string & exc)
-			{
-				TM_CAUTION_MSG("Failed to delete timer: exc")
-			}
+			timers_to_delete.clear();
+			END_SAFE(timers_to_delete_list_mutex)
 		}
-		END_SAFE(timers_to_delete_list_mutex)
 
-		TM_DEBUG_MSG("Checking timers to register");
-		BEGIN_SAFE(timers_to_register_list_mutex)
-		while(timers_to_register.size() > 0)
+		if(timer_to_register)
 		{
-			TickTimer * timer = timers_to_register.front();
-			timers_to_register.pop_front();
-
-			if(timer != NULL)
+			timer_to_register = false;
+			BEGIN_SAFE(timers_to_register_list_mutex)
+			TM_CAUTION_MSG("Asynchronously registering " << timers_to_register.size() << " timers");
+			for(list<TickTimer *>::iterator pt = timers_to_register.begin(); pt!= timers_to_register.end(); pt++)
 			{
-				TM_DEBUG_MSG("Registering new timer " << (long long int) timer);
-
-
+				TickTimer * timer = *pt;
+				TM_CAUTION_MSG("Registering new timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 				try
 				{
 					granularity_should_be_updated = true;
@@ -227,46 +268,41 @@ void TickMachine::execute()
 					TM_CAUTION_MSG("Failed to register timer: exc")
 				}
 
-				BEGIN_SAFE(players_list_mutex)
 				players.push_back(timer);
-				END_SAFE(players_list_mutex)
-
 			}
+			timers_to_register.clear();
+			END_SAFE(timers_to_register_list_mutex)
 		}
-		END_SAFE(timers_to_register_list_mutex)
 
-		TM_DEBUG_MSG("Checking timers to unregister");
-		BEGIN_SAFE(timers_to_unregister_list_mutex)
-		while(timers_to_unregister.size() > 0)
+		if(timer_to_unregister)
 		{
-			TickTimer * timer = timers_to_unregister.front();
-			timers_to_unregister.pop_front();
-
-			try
+			timer_to_unregister = false;
+			BEGIN_SAFE(timers_to_unregister_list_mutex)
+			TM_CAUTION_MSG("Asynchronously unregistering " << timers_to_register.size() << " timers");
+			for(list<TickTimer *>::iterator pt = timers_to_unregister.begin(); pt!= timers_to_unregister.end(); pt++)
 			{
-				TM_DEBUG_MSG("Unregistering timer " << (long long int) timer);
-				BEGIN_SAFE(players_list_mutex)
-				players.remove(timer);
-				END_SAFE(players_list_mutex)
-				granularity_should_be_updated = true;
+				TickTimer * timer = *pt;
+				try
+				{
+					TM_CAUTION_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
+					players.remove(timer);
+					granularity_should_be_updated = true;
+				}
+				catch(string & exc)
+				{
+					TM_CAUTION_MSG("Failed to unregister timer: exc")
+				}
 			}
-			catch(string & exc)
-			{
-				TM_CAUTION_MSG("Failed to unregister timer: exc")
-			}
-
+			timers_to_unregister.clear();
+			END_SAFE(timers_to_unregister_list_mutex)
 		}
-		END_SAFE(timers_to_unregister_list_mutex)
 
-		BEGIN_SAFE(players_list_mutex)
 		if(granularity_should_be_updated)
 			update_granularity_and_players();
 		if(timer_should_be_updated)
 			update_timer();
 
 		tick_players();
-
-		END_SAFE(players_list_mutex)
 
 #ifdef WIN32
 		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
@@ -332,6 +368,7 @@ void TickMachine::tick_players()
  */
 void TickMachine::update_granularity_and_players(double max_relative_error)
 {
+	granularity_should_be_updated = false;
 	TM_DEBUG_MSG("update_granularity_and_players");
 
 	//default granularity is min frequency
@@ -351,7 +388,6 @@ void TickMachine::update_granularity_and_players(double max_relative_error)
 	set_granularity(new_gran);
 	TM_DEBUG_MSG("Done update_granularity_and_players");
 
-	granularity_should_be_updated = false;
 
 }
 

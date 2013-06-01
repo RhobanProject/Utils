@@ -50,6 +50,7 @@ class TickTimer : public Playable
      *****************************************/
 
     TickTimer(double hertz);
+    TickTimer(double hertz, string name);
     virtual ~TickTimer();
 
     /*! \brief wait for the next tick of the MutexTimer
@@ -63,6 +64,7 @@ class TickTimer : public Playable
     /* get the real frequency of the timer */
     double get_frequency() const {return frequency;}
 
+    string timer_name;
 
 protected:
 

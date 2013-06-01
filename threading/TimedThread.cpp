@@ -39,14 +39,16 @@ void TimedThread::dispose()
 
 TimedThread::TimedThread(double frequency){init(frequency);};
 
-SlowTimedThread::SlowTimedThread(): timer(1), measured_frequency(1){};
+SlowTimedThread::SlowTimedThread(): timer(1,"SlowTimedThread"), measured_frequency(1)
+{
+};
 
 SlowTimedThread::~SlowTimedThread()
 {
 	thread_state = Dead;
 }
 
-SlowTimedThread::SlowTimedThread(double frequency): timer(frequency){init(frequency);};
+SlowTimedThread::SlowTimedThread(double frequency): timer(frequency,"SlowTimedThread"){init(frequency);};
 
 void SlowTimedThread::init(double hertz)
 {

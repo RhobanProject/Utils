@@ -110,23 +110,21 @@ class TickMachine : public Rhoban::Thread
      */
     Rhoban::Mutex timers_to_register_list_mutex;
     list<TickTimer *> timers_to_register;
+    bool timer_to_register;
 
     /* The list of pending timers to be unregistered by execute()
      * We use a list because iterators remain valid when inserting/deleting elements
      */
     Rhoban::Mutex timers_to_unregister_list_mutex;
     list<TickTimer *> timers_to_unregister;
+    bool timer_to_unregister;
 
     /* The list of pending timers to be unregistered by execute()
      * We use a list because iterators remain valid when inserting/deleting elements
      */
     Rhoban::Mutex timers_to_delete_list_mutex;
     list<TickTimer *> timers_to_delete;
-
-
-    /*! This mutex is used to restrict access to public methods
-     *  to the moments where the TickMachine is idle. */
-    Rhoban::Mutex players_list_mutex;
+    bool timer_to_dispose;
 
     /*************************************************************************/
     // used by constructors and destructors of timers
