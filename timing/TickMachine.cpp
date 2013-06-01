@@ -78,7 +78,7 @@ void TickMachine::register_timer(TickTimer * timer)
 	{
 		int i = 0;
 	}
-	*/
+	 */
 	//section critique
 	TM_CAUTION_MSG("Registering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
 
@@ -90,13 +90,20 @@ void TickMachine::register_timer(TickTimer * timer)
 
 	if(currentThreadId() != threadId())
 	{
-		BEGIN_SAFE(timers_to_register_list_mutex)
-								timers_to_register.push_back(timer);
-		END_SAFE(timers_to_register_list_mutex)
+		timer->started.lock();
+		timers_to_register_list_mutex.lock();
 	}
-	else
-		timers_to_register.push_back(timer);
+
+	timers_to_register.push_back(timer);
 	timer_to_register = true;
+
+	if(currentThreadId() != threadId())
+	{
+		timers_to_register_list_mutex.unlock();
+		timer->started.wait(5000);
+		timer->started.unlock();
+	}
+
 }
 
 void TickMachine::unregister_timer(TickTimer * timer)
@@ -254,14 +261,14 @@ void TickMachine::execute()
 					granularity_should_be_updated = true;
 					gettimeofday(&timer->start_time,0);
 					timer->tick();
+					players.push_back(timer);
+					timer->started.broadcast();
 					TM_DEBUG_MSG("Registered timer with frequency " << timer->get_frequency() << "Hz ...")
 				}
 				catch(string & exc)
 				{
 					TM_CAUTION_MSG("Failed to register timer: exc")
 				}
-
-				players.push_back(timer);
 			}
 			timers_to_register.clear();
 			END_SAFE(timers_to_register_list_mutex)
@@ -290,8 +297,11 @@ void TickMachine::execute()
 
 		granularity_mutex.lock();
 		if(granularity_should_be_updated)
+		{
 			update_granularity_and_players();
-		granularity_should_be_updated = false;
+			granularity_should_be_updated = false;
+		}
+
 		granularity_mutex.unlock();
 
 		if(timer_should_be_updated)
@@ -313,9 +323,13 @@ void TickMachine::execute()
 void TickMachine::FrequencyChanged()
 {
 	TickMachine * the = TickMachine::get_tick_machine();
-	the->granularity_mutex.lock();
+
+	if(the->threadId() != Thread::currentThreadId())
+		the->granularity_mutex.lock();
+	TM_CAUTION_MSG("TM Freq shoud be updated ");
 	the->granularity_should_be_updated = true;
-	the->granularity_mutex.unlock();
+	if(the->threadId() != Thread::currentThreadId())
+		the->granularity_mutex.unlock();
 }
 
 void TickMachine::tick_players()
@@ -327,7 +341,6 @@ void TickMachine::tick_players()
 	for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
 	{
 		TickTimer * timer = *timer_;
-		BEGIN_SAFE(timers_to_unregister_list_mutex)
 		/* Tricky case: a timer has been unregistered (hence probably deleted) by a timer before in the same tm round
 		 * In this case it should be skipped
 		 */
@@ -354,7 +367,6 @@ void TickMachine::tick_players()
 			TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
 		}
 #endif
-		END_SAFE(timers_to_unregister_list_mutex)
 	}
 
 	/* old version, more precise but too heavy and useless

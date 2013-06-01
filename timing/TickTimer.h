@@ -117,6 +117,8 @@ protected:
 
     /*! \brief the frequency of the task */
     double frequency;
+
+    Rhoban::Condition started;
 };
 
 #endif // TICKTIMER_H_
