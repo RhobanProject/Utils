@@ -61,3 +61,20 @@ string file_to_string(string path)
 
   return contents;
 }
+
+bool file_exists(string path)
+{
+    ifstream ifile(path.c_str());
+    return ifile;
+}
+
+void file_put_contents(string path, string contents)
+{
+    ofstream ofile(path.c_str());
+
+    if (ofile) {
+        ofile << contents;
+        ofile.close();
+    }
+}
+
