@@ -51,8 +51,6 @@ class Player : public TickTimer
          *  */
         virtual void init(double hertz, bool animated_by_tick_machine);
 
-        bool is_running();
-
         /*! \brief the function to perform at each tick. */
         virtual void step() =0;
 
