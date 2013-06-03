@@ -181,14 +181,13 @@ int Thread::currentThreadId(void)
 #endif
 }
 
-int Thread::threadId()
-{
-    return myId;
-}
-
 void Thread::run(void)
 {
-    myId = Thread::currentThreadId();
+    stringstream ss;
+    ss << currentThreadId();
+    thread_name = ss.str();
+
+    myId = currentThreadId();
 
     try {
         is_started.lock();
@@ -200,7 +199,7 @@ void Thread::run(void)
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
     } catch (string exc) {
-        cerr << "Exception in thread " << myId <<" :"<< exc<< endl;
+        cerr << "Exception in thread " << thread_name <<" :"<< exc<< endl;
     }
 
     thread_state = Dead;

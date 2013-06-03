@@ -55,6 +55,8 @@ using namespace std;
 */
 namespace XMLTools
 {
+	float get_float_value(TiXmlNode * node);
+	
     string get_string_element(TiXmlNode * node, const char * id);
 
     vector<string> get_string_array(TiXmlNode * node, const char * id);

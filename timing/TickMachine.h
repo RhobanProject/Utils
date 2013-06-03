@@ -24,6 +24,7 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <queue>
 #include <threading/Thread.h>
 #include <threading/Mutex.h>
 #ifdef _WIN32
@@ -59,14 +60,6 @@ class TickMachine : public Rhoban::Thread
     static const double min_frequency = 100.0;
     static const double max_frequency = 150.0;
 
-    /*! \brief the time granularity of the TickMachine */
-    struct timeval granularity;
-
-    /*************************************************************************/
-    // As the TickMachine is a singleton, the API is mainly static.
-    /*************************************************************************/
-    public:
-
     /*! \brief Start the tick machine. It is not mandatory to use this function
      *  however depending on the time the init procedure takes, it can be used
      *  at the beginning of operations. */
@@ -75,22 +68,31 @@ class TickMachine : public Rhoban::Thread
     /*! \brief Retrieve (and create if needed) the unique instance of the tick machine */
     static TickMachine * get_tick_machine();
 
-    //for debug
-    static timeval start_time;
+
+    protected:
 
     /*************************************************************************/
     /*! main loop of the tick machine */
     /*************************************************************************/
 
-    protected:
-
     void execute();
 
-    /*************************************************************************/
-    /*! singleton stuff */
-    /*************************************************************************/
+    /*! \brief flag telling execute() to update timer parameters */
+    bool timer_should_be_updated;
 
-    private:
+    /*! \brief alert the tick machien to change granularity */
+	static void FrequencyChanged();
+
+    /*! \brief flag telling execute() to update granularity */
+	Rhoban::Mutex granularity_mutex;
+    bool granularity_should_be_updated;
+
+    /*! callled by execute: performs ticks on players that needs it
+     *  and updates time_to_wait fields in players */
+    void tick_players();
+
+
+
 
     /*! The constructor is protected
      *  use create tick machine instead. */
@@ -104,19 +106,29 @@ class TickMachine : public Rhoban::Thread
     /*! \brief The procedure of starting the tick machine */
     static TickMachine * createTickMachine();
 
-    /*! \brief internally register/unregister a timer*/
-    void internal_register_timer(TickTimer * timer);
-    void internal_unregister_timer(TickTimer * timer);
+    /*! \brief the time granularity of the TickMachine */
+    struct timeval granularity;
 
-    /*! \brief see change_frequency for doc. */
-    void internal_change_frequency(TickTimer *, double hertz);
+    /* The list of pending timers to be registered by execute()
+     * We use a list because iterators remain valid when inserting/deleting elements
+     */
+    Rhoban::Mutex timers_to_register_list_mutex;
+    list<TickTimer *> timers_to_register;
+    bool timer_to_register;
 
-    /*! \brief Halts the tick machine for one tick */
-    virtual void wait_next_tick();
+    /* The list of pending timers to be unregistered by execute()
+     * We use a list because iterators remain valid when inserting/deleting elements
+     */
+    Rhoban::Mutex timers_to_unregister_list_mutex;
+    list<TickTimer *> timers_to_unregister;
+    bool timer_to_unregister;
 
-    /*! This mutex is used to restrict access to public methods
-     *  to the moments where the TickMachine is idle. */
-    Rhoban::Mutex safe;
+    /* The list of pending timers to be unregistered by execute()
+     * We use a list because iterators remain valid when inserting/deleting elements
+     */
+    Rhoban::Mutex timers_to_delete_list_mutex;
+    list<TickTimer *> timers_to_delete;
+    bool timer_to_dispose;
 
     /*************************************************************************/
     // used by constructors and destructors of timers
@@ -124,25 +136,21 @@ class TickMachine : public Rhoban::Thread
 
     /*! \brief the tick machine creates a mutex timer that
      * will tick at the given frequency. Use timer->wait_next_tick() to wait between two ticks*/
-    static void register_timer(TickTimer *, double hertz);
+    void register_timer(TickTimer *);
 
-    /*! \brief to clean up when a timed mutex is no longer used */
-    static void unregister_timer(TickTimer *);
+    /*! \brief to clean up when the timer no longer used */
+    void unregister_timer(TickTimer *);
 
-    /*! \brief changes the frequency to be called by a timed thread
-     *  the tick machine will create two mutexes that it will lock alternatively */
-    static void change_frequency(TickTimer *, double hertz);
-    /*************************************************************************/
+    /*! \brief to delete when the timer is no longer used */
+    void dispose_timer(TickTimer *);
 
-
+    //for debug
+    static timeval start_time;
 
 #ifndef WIN32
     sigset_t block_set;
 #endif
 
-
-    /*! \brief flag telling the tick machine to update timer parameters */
-    bool timer_should_be_updated;
 
     /*! \brief to be called by the tick machine thread
      *  on arm-linux it is mandatory to do so because threads have different process ids
@@ -156,23 +164,17 @@ class TickMachine : public Rhoban::Thread
     /*! The players to time */
     list<TickTimer *> players;
 
-    /* The player to kill */
-    TickTimer * to_kill;
-
-    /*! sets time granularity */
-    void set_granularity(struct timeval interval);
-
     /*! \brief the setup of the underlying thread object */
     void setup(void) { set_granularity(granularity); };
+
+    /*! sets time granularity
+     * called at setup and by update_granularity_and_players() */
+    void set_granularity(struct timeval interval);
 
     /*! updates time granularity of the machine,
      *  according to the frequencies of players
      *  also update intervals of players */
     void update_granularity_and_players(double pourcentage_erreur_relative = 10.0);
-
-    /*! performs ticks on players that needs it
-     *  and updates time_to_wait fields in players */
-    void tick_players();
 
 };
 
