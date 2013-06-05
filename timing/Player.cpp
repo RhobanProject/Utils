@@ -9,14 +9,6 @@
  *************************************************/
 #include "Player.h"
 
-bool Player::is_running()
-{
-    if(tm_kill_me)
-        return false;
-    else
-        return Playable::is_running();
-}
-
 Player::Player() : animated_by_tick_machine(false)
 {
 };
@@ -26,7 +18,7 @@ void Player::init(double hertz, bool animated_by_tick_machine_)
     frequency = hertz;
     animated_by_tick_machine = animated_by_tick_machine_;
     use_locks = !animated_by_tick_machine;
-    TickMachine::register_timer(this, hertz);
+    TickMachine::get_tick_machine()->register_timer(this);
 }
 
 void Player::tick()

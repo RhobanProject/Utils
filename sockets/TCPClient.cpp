@@ -38,7 +38,7 @@ namespace Rhoban
 
         SOCKADDR_IN sin = { 0 };
         struct hostent *hostinfo;
-#ifndef WIN32
+#ifdef LINUX
         clientSocket = socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, 0);
 #else
         clientSocket = socket(AF_INET, SOCK_STREAM, 0);

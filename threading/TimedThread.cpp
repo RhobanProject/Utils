@@ -30,14 +30,28 @@ void TimedThread::init(double hertz)
 }
 
 TimedThread::TimedThread() { frequency = 1;};
+
+/* dont delete this, object, use dispose() to dispose it */
+void TimedThread::dispose()
+{
+	TickTimer::dispose();
+}
+
 TimedThread::TimedThread(double frequency){init(frequency);};
-SlowTimedThread::SlowTimedThread(): timer(1), measured_frequency(1){};
+
+SlowTimedThread::SlowTimedThread(): timer(1,"SlowTimedThread"), measured_frequency(1)
+{
+};
+
 SlowTimedThread::~SlowTimedThread()
 {
 	thread_state = Dead;
 }
 
-SlowTimedThread::SlowTimedThread(double frequency): timer(frequency){init(frequency);};
+SlowTimedThread::SlowTimedThread(double frequency): timer(frequency)
+{
+	init(frequency);
+}
 
 void SlowTimedThread::init(double hertz)
 {
@@ -116,9 +130,5 @@ void TimedThread::init_suspended(double hertz)
     play_state = suspended;
 }
 
-void TimedThread::kill_and_delete_me()
-{
-    tm_kill_me = true; 
-}
 
 

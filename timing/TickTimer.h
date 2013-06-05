@@ -50,7 +50,7 @@ class TickTimer : public Playable
      *****************************************/
 
     TickTimer(double hertz);
-    virtual ~TickTimer();
+    TickTimer(double hertz, string name);
 
     /*! \brief wait for the next tick of the MutexTimer
      *  to be called by the timed thread */
@@ -63,12 +63,22 @@ class TickTimer : public Playable
     /* get the real frequency of the timer */
     double get_frequency() const {return frequency;}
 
-    bool is_tickable(timeval now);
+    string timer_name;
+
+    virtual ~TickTimer();
 
 protected:
 
     /*! \brief Initializes the the variables before play. */
     virtual void prepare_play(bool forever, timeval durations);
+
+
+    /*! tells the tick machine to destroy this object at net tick */
+    void dispose();
+
+    /*! tells the tick machine to unregister this object at net tick */
+    void unregister();
+
 
 
     /*! 
@@ -79,7 +89,7 @@ protected:
      *****************************************/
 
     /*! \brief computes the relative frequency */
-    void set_relative();
+    void set_relative(struct timeval granularity);
 
     /*! \briefticks elapsed since the timer was started */
     int ticks_elapsed;
@@ -92,12 +102,12 @@ protected:
      */
     bool use_locks;
 
+    Rhoban::Mutex even;
+    Rhoban::Mutex odd;
+
     /*! \brief performs one tick to be called by the tick machine */
     virtual void tick();
-
-    /*! ask the tick machine to kill and delete the timer
-    */
-    bool tm_kill_me;
+    bool is_tickable(timeval now);
 
     /*! \brief the internal tick counter */
     int tick_counter;
@@ -108,8 +118,7 @@ protected:
     /*! \brief the frequency of the task */
     double frequency;
 
-    Rhoban::Mutex even;
-    Rhoban::Mutex odd;
+    Rhoban::Condition started;
 };
 
 #endif // TICKTIMER_H_

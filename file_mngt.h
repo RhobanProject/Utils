@@ -20,6 +20,9 @@ int read_file(char * name, ui8 * dest, int size);
 
 string file_to_string(string path);
 
+void file_put_contents(string path, string contents);
+
+bool file_exists(string path);
 
 #endif /* FILE_MNGT_H */
 

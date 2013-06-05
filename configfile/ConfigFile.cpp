@@ -22,7 +22,6 @@ ConfigFile::ConfigFile(string filename) : argv(NULL)
     {
         throw string("Failed to parse configuration file " + filename + ":\n\t" + string(exception.what()));
     }
-
 }
 
 ConfigFile::~ConfigFile()

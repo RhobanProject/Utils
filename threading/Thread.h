@@ -98,75 +98,75 @@ public:
 #define BEGIN_THREAD_SAFE			\
   try						\
     {						\
-	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " entering critical section") \
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
   lock(); \
-  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has entered critical section");
+  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section");
 
 
   #define BEGIN_SAFE(l)				\
   try						\
     {						\
-	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " entering critical section") \
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
   l.lock(); \
-  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has entered critical section")
+  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
 
 #define BEGIN_PSAFE(l)				\
 try						\
   {						\
-	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " entering critical section") \
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
 l->lock(); \
-TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has entered critical section")
+TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
 
   //	  cout << "Locking " << #l << endl;
 
 #define END_THREAD_SAFE					\
   unlock();						\
-  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
      catch(string & str)				\
        {						\
 	 unlock();					\
-	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
      catch(...)						\
        {						\
 	 unlock();					\
-	  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw string("Unknown exception in thread");	\
        }
 
 #define END_SAFE(l)					\
   l.unlock();						\
-  TH_DEBUG("Thread " << Thread::currentThreadId() << " has left critical section") \
+  TH_DEBUG("Thread " << Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
        catch(string & str)				\
 	 {						\
 	   l.unlock();					\
-	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
        catch(...)					\
 	 {						\
 	   l.unlock();					\
-	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw string("Unknown exception in thread");	\
 	 }
 
 #define END_PSAFE(l)					\
   l->unlock();						\
-  TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
        catch(string & str)				\
 	 {						\
 	   l->unlock();					\
-	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
        catch(...)					\
 	 {						\
 	   l->unlock();					\
-	   TH_DEBUG("Thread " <<  Thread::currentThreadId() << " has left critical section") \
+	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw string("Unknown exception in thread");	\
 	 }
 
