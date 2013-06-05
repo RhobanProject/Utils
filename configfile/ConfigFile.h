@@ -43,6 +43,8 @@ class ConfigFile
 
         string readStringIfExists(string node, string name);
 
+        string helpText;
+        void addHelpLine(string help);
         void help();
 
     protected:
