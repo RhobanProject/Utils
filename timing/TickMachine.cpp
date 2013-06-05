@@ -31,6 +31,7 @@ TickMachine * TickMachine::the_tick_machine = NULL;
 timeval TickMachine::start_time;
 
 TickMachine * TickMachine::get_tick_machine() {
+	//todo: return only when tick machine is started
 	if (TickMachine::the_tick_machine != NULL) return TickMachine::the_tick_machine;
 	TickMachine::the_tick_machine = TickMachine::createTickMachine();
 	return TickMachine::the_tick_machine;
@@ -111,7 +112,11 @@ void TickMachine::unregister_timer(TickTimer * timer)
 	TM_DEBUG_MSG("Unregistering timer '" << timer_name << "'" << (long long int) timer);
 
 	if(currentThreadId() != threadId())
+	{
+		timer->unregistered.lock();
 		timers_to_register_list_mutex.lock();
+		timers_to_unregister_list_mutex.lock();
+	}
 
 	for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
 		if(*it == timer)
@@ -120,19 +125,23 @@ void TickMachine::unregister_timer(TickTimer * timer)
 			break;
 		}
 
-	if(currentThreadId() != threadId())
-		timers_to_register_list_mutex.unlock();
-
 	timers_to_unregister.push_back(timer);
 	timer_to_unregister = true;
 
+	if(currentThreadId() != threadId())
+	{
+		timers_to_unregister_list_mutex.unlock();
+		timers_to_register_list_mutex.unlock();
+		timer->unregistered.wait(5000);
+		timer->unregistered.unlock();
+	}
 }
 
 
 /*! \brief to delete when the timer is no longer used */
-void TickMachine::dispose_timer(TickTimer * timer)
+void TickMachine::dispose_timer(TickTimer ** timer)
 {
-	TM_CAUTION_MSG("Disposing timer " << timer->timer_name);
+	TM_CAUTION_MSG("Disposing timer " << (*timer)->timer_name);
 
 	if(currentThreadId() != threadId())
 	{
@@ -141,13 +150,13 @@ void TickMachine::dispose_timer(TickTimer * timer)
 	}
 
 	for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
-		if(*it == timer)
+		if(*it == *timer)
 		{
 			timers_to_register.erase(it);
 			break;
 		}
 
-	timers_to_delete.push_back(timer);
+	timers_to_delete.push_back(*timer);
 	timer_to_dispose = true;
 
 	if(currentThreadId() != threadId())
@@ -155,6 +164,7 @@ void TickMachine::dispose_timer(TickTimer * timer)
 		timers_to_register_list_mutex.unlock();
 		timers_to_delete_list_mutex.unlock();
 	}
+	timer = 0;
 }
 
 
@@ -231,8 +241,8 @@ void TickMachine::execute()
 				{
 					TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 					players.remove(timer);
-					granularity_should_be_updated = true;
 					delete timer;
+					timer->disposed.broadcast();
 				}
 				catch(string & exc)
 				{
@@ -258,7 +268,6 @@ void TickMachine::execute()
 				TM_CAUTION_MSG("Registering new timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 				try
 				{
-					granularity_should_be_updated = true;
 					gettimeofday(&timer->start_time,0);
 					timer->tick();
 					players.push_back(timer);
@@ -285,6 +294,7 @@ void TickMachine::execute()
 				try
 				{
 					players.remove(timer);
+					timer->unregistered.broadcast();
 				}
 				catch(string & exc)
 				{

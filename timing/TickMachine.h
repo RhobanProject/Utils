@@ -142,7 +142,7 @@ class TickMachine : public Rhoban::Thread
     void unregister_timer(TickTimer *);
 
     /*! \brief to delete when the timer is no longer used */
-    void dispose_timer(TickTimer *);
+    void dispose_timer(TickTimer **);
 
     //for debug
     static timeval start_time;

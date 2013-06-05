@@ -89,8 +89,11 @@ public:
    */
   void wait_started();
 
+protected:
   void lock();
   void unlock();
+
+public:
 
   /* Attention, il ne faut pas imbriquer les sections critiques
    * l'utilisation de mutex récursifs résoudrait le problème mais ils sont buggués sur la mmnet

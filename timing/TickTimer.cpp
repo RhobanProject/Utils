@@ -57,7 +57,8 @@ void TickTimer::prepare_play(bool forever, timeval durations)
 
 void TickTimer::dispose()
 {
-	TickMachine::get_tick_machine()->dispose_timer(this);
+	TickTimer * me = this;
+	TickMachine::get_tick_machine()->dispose_timer(&me);
 }
 
 void TickTimer::unregister()

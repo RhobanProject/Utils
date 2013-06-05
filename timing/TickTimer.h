@@ -119,6 +119,8 @@ protected:
     double frequency;
 
     Rhoban::Condition started;
+    Rhoban::Condition unregistered;
+    Rhoban::Condition disposed;
 };
 
 #endif // TICKTIMER_H_
