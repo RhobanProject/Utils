@@ -34,6 +34,8 @@ using namespace std;
             throw string("Array excepted");                        \
         }                                                          \
                                                                    \
+        value.resize(json.size());                                 \
+                                                                   \
         for (int i=0; i<json.size(); i++) {                        \
             JsonUtil::read(json[i], value[i]);                     \
         }                                                          \
