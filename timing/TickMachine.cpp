@@ -106,7 +106,7 @@ void TickMachine::register_timer(TickTimer * timer)
 		timer->started.wait(5000);
 		timer->started.unlock();
 	}
-	TM_CAUTION_MSG("Done: registered timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
+	TM_CAUTION_MSG("Done: registered timer '" << timer->timer_name << "' (" << (long long int) timer );
 
 }
 
@@ -146,7 +146,7 @@ void TickMachine::unregister_timer(TickTimer * timer)
 /*! \brief to delete when the timer is no longer used */
 void TickMachine::dispose_timer(TickTimer ** timer)
 {
-	TM_CAUTION_MSG("Disposing timer " << (*timer)->timer_name);
+	TM_CAUTION_MSG("Disposing timer " << (*timer)->timer_name << " " << (long long int) timer);
 
 	if(currentThreadId() != threadId())
 	{
