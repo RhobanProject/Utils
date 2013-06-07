@@ -13,6 +13,8 @@
  *  Created on: 19 juil. 2011
  *      Author: hugo
  *****************************************************************************/
+#include <list>
+
 #include <sys/time.h>
 #include <iostream>
 #include <math.h>
@@ -152,6 +154,7 @@ void TickMachine::dispose_timer(TickTimer ** timer)
 		timers_to_delete_list_mutex.lock();
 	}
 
+	//case where a timer is disposed right after its creation
 	for(list<TickTimer *>::iterator it = timers_to_register.begin(); it != timers_to_register.end(); it++)
 		if(*it == *timer)
 		{
@@ -168,7 +171,7 @@ void TickMachine::dispose_timer(TickTimer ** timer)
 		timers_to_delete_list_mutex.unlock();
 	}
 	timer = 0;
-	TM_CAUTION_MSG("Done: disposed timer " << (*timer)->timer_name);
+	TM_CAUTION_MSG("Done: disposed timer ");
 }
 
 
@@ -246,7 +249,6 @@ void TickMachine::execute()
 					TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 					players.remove(timer);
 					delete timer;
-					timer->disposed.broadcast();
 				}
 				catch(string & exc)
 				{
@@ -296,8 +298,16 @@ void TickMachine::execute()
 				TickTimer * timer = *pt;
 				try
 				{
-					players.remove(timer);
-					timer->unregistered.broadcast();
+					TM_CAUTION_MSG("Asynchronously unregistering timer " << (long long int) timer);
+					for(list<TickTimer *>::iterator ptimer = players.begin(); ptimer != players.end(); ptimer ++)
+					{
+						if(*ptimer == timer)
+						{
+							timer->unregistered.broadcast();
+							players.remove(timer);
+							break;
+						}
+					}
 				}
 				catch(string & exc)
 				{
