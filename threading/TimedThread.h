@@ -126,7 +126,7 @@ public:
 	 * frequency can be changed using set_frequency()
 	 */
 	void set_frequency(double frequency);
-	double get_frequency(){ return timer.get_frequency(); };
+	double get_frequency();
 
 	/*
 	 * asynchronously stops the timed thread
@@ -142,6 +142,7 @@ public:
 	 * the effective calling freauency of the timed thread
 	 */
 	double measured_frequency;
+	double max_frequency;
 
 protected:
 
@@ -152,7 +153,8 @@ protected:
 	virtual void step()=0;
 	void execute();
 
-	TickTimer timer;
+
+	//TickTimer timer;
 
 };
 

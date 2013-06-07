@@ -39,23 +39,37 @@ void TimedThread::dispose()
 
 TimedThread::TimedThread(double frequency){init(frequency);};
 
+/*
 SlowTimedThread::SlowTimedThread(): timer(1,"SlowTimedThread"), measured_frequency(1)
 {
 };
+*/
+SlowTimedThread::SlowTimedThread(): measured_frequency(1)
+{
+};
+
 
 SlowTimedThread::~SlowTimedThread()
 {
 	thread_state = Dead;
 }
 
+/*
 SlowTimedThread::SlowTimedThread(double frequency): timer(frequency)
 {
+	init(frequency);
+}
+*/
+
+SlowTimedThread::SlowTimedThread(double frequency)
+{
+	max_frequency = frequency;
 	init(frequency);
 }
 
 void SlowTimedThread::init(double hertz)
 {
-	timer.set_frequency(hertz);
+	//timer.set_frequency(hertz);
 	if(!is_alive())
 		start(0);
 }
@@ -71,7 +85,13 @@ void SlowTimedThread::init_suspended(double hertz)
  */
 void SlowTimedThread::set_frequency(double frequency)
 {
-	timer.set_frequency(frequency);
+	max_frequency = frequency;
+	//timer.set_frequency(frequency);
+}
+
+double SlowTimedThread::get_frequency()
+{
+	return max_frequency;
 }
 
 /*
@@ -104,10 +124,17 @@ void SlowTimedThread::execute()
 
 	while(thread_state != Dying && thread_state != Dead)
 	{
-		if(timer.get_frequency() < 0.00001)
-			measured_frequency = 0;
+	//	if(timer.get_frequency() < 0.00001)
+		//	measured_frequency = 0;
 
-		timer.wait_next_tick();
+		while(max_frequency < 0.00001)
+		{
+			measured_frequency = 0;
+			syst_wait_ms(100);
+		}
+
+		syst_wait_ms(1.0 / max_frequency);
+		//timer.wait_next_tick();
 
 		step();
 
