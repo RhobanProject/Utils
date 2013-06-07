@@ -6,8 +6,7 @@
 using namespace std;
 
 ConfigFile::ConfigFile() : argv(NULL), doc(NULL)
-{
-}
+{}
 
 ConfigFile::ConfigFile(string filename) : argv(NULL)
 {
@@ -18,9 +17,9 @@ ConfigFile::ConfigFile(string filename) : argv(NULL)
         doc = new YAML::Node();
         parser.GetNextDocument(*doc);
     }
-    catch(YAML::ParserException exception)
+    catch(YAML::ParserException e)
     {
-        throw string("Failed to parse configuration file " + filename + ":\n\t" + string(exception.what()));
+        throw string("Failed to parse configuration file " + filename + ":\n\t" + string(e.what()));
     }
 }
 

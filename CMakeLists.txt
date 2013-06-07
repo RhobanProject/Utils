@@ -54,7 +54,7 @@ ENDIF(DEFINED WIN32)
 
 # Options
 option (RHOBANMATH
-    "Enables RhobanMath support" OFF)
+    "Enables RhobanMath support" ON)
 
 set (RHOBAN_UTILS_DIRECTORY "${PROJECT_SOURCE_DIR}")
 

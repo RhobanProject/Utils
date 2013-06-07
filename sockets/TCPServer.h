@@ -85,7 +85,7 @@ namespace Rhoban
                     sinserv.sin_addr.s_addr = localhostOnly ? inet_addr("127.0.0.1") : INADDR_ANY;
                     sinserv.sin_port = htons(port);
 
-#ifndef WIN32
+#ifdef LINUX
                     socketDescriptor = socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, 0); 
 #else
                     socketDescriptor = socket(AF_INET, SOCK_STREAM, 0);
