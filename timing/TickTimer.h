@@ -48,7 +48,6 @@ class TickTimer : public Playable
      **************************************
      PUBLIC INTERFACE
      *****************************************/
-
     TickTimer(double hertz);
     TickTimer(double hertz, string name);
 
@@ -74,6 +73,7 @@ protected:
 
 
     /*! tells the tick machine to destroy this object at net tick */
+    bool disposed;
     void dispose();
 
     /*! tells the tick machine to unregister this object at net tick */

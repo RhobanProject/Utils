@@ -13,7 +13,8 @@ TickTimer::TickTimer() :
 ticks_elapsed(0),
 use_locks(true),
 tick_counter(0),
-frequency(0)
+frequency(0),
+disposed(false)
 {
 }
 
@@ -21,7 +22,8 @@ frequency(0)
 
 TickTimer::~TickTimer()
 {
-	unregister();
+	if(!disposed)
+		unregister();
 }
 
 TickTimer::TickTimer(double hertz) :
@@ -57,6 +59,7 @@ void TickTimer::prepare_play(bool forever, timeval durations)
 
 void TickTimer::dispose()
 {
+	disposed = true;
 	TickTimer * me = this;
 	TickMachine::get_tick_machine()->dispose_timer(&me);
 }
