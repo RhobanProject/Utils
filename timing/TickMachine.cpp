@@ -93,7 +93,7 @@ void TickMachine::register_timer(TickTimer * timer)
 
 	if(currentThreadId() != threadId())
 	{
-		timer->started.lock();
+		//timer->started.lock();
 		timers_to_register_list_mutex.lock();
 	}
 
@@ -103,8 +103,8 @@ void TickMachine::register_timer(TickTimer * timer)
 	if(currentThreadId() != threadId())
 	{
 		timers_to_register_list_mutex.unlock();
-		timer->started.wait(5000);
-		timer->started.unlock();
+		//timer->started.wait(5000);
+		//timer->started.unlock();
 	}
 	TM_CAUTION_MSG("Done: registered timer '" << timer->timer_name << "' (" << (long long int) timer );
 
@@ -116,7 +116,7 @@ void TickMachine::unregister_timer(TickTimer * timer)
 
 	if(currentThreadId() != threadId())
 	{
-		timer->unregistered.lock();
+		//timer->unregistered.lock();
 		timers_to_register_list_mutex.lock();
 		timers_to_unregister_list_mutex.lock();
 	}
@@ -135,8 +135,8 @@ void TickMachine::unregister_timer(TickTimer * timer)
 	{
 		timers_to_unregister_list_mutex.unlock();
 		timers_to_register_list_mutex.unlock();
-		timer->unregistered.wait(5000);
-		timer->unregistered.unlock();
+		//timer->unregistered.wait(5000);
+		//timer->unregistered.unlock();
 	}
 	TM_CAUTION_MSG("Done: unregistered timer " << (long long int) timer);
 
