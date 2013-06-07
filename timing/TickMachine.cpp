@@ -91,7 +91,7 @@ void TickMachine::register_timer(TickTimer * timer)
 
 	if(currentThreadId() != threadId())
 	{
-//		timer->started.lock();
+		timer->started.lock();
 		timers_to_register_list_mutex.lock();
 	}
 
@@ -101,8 +101,8 @@ void TickMachine::register_timer(TickTimer * timer)
 	if(currentThreadId() != threadId())
 	{
 		timers_to_register_list_mutex.unlock();
-//		timer->started.wait(5000);
-//		timer->started.unlock();
+		timer->started.wait(5000);
+		timer->started.unlock();
 	}
 	TM_CAUTION_MSG("Done: registered timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
 
