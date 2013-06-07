@@ -240,13 +240,13 @@ void TickMachine::execute()
 		{
 			timer_to_dispose = false;
 			BEGIN_SAFE(timers_to_delete_list_mutex)
-			TM_CAUTION_MSG("Asynchronously deleting " << timers_to_register.size() << "timers");
+			TM_CAUTION_MSG("Asynchronously deleting " << timers_to_delete.size() << "timers");
 			for(list<TickTimer *>::iterator pt = timers_to_delete.begin(); pt!= timers_to_delete.end(); pt++)
 			{
 				TickTimer * timer = *pt;
 				try
 				{
-					TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
+					TM_DEBUG_MSG("Asynchronously deleting timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 					players.remove(timer);
 					delete timer;
 				}
