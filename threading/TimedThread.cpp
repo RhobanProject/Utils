@@ -130,10 +130,10 @@ void SlowTimedThread::execute()
 		while(max_frequency < 0.00001)
 		{
 			measured_frequency = 0;
-			syst_wait_ms(100);
+			syst_wait_ms(1000);
 		}
 
-		syst_wait_ms(1.0 / max_frequency);
+		syst_wait_ms(1000.0 / max_frequency);
 		//timer.wait_next_tick();
 
 		step();
