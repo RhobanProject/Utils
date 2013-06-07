@@ -22,7 +22,6 @@ disposed(false)
 
 TickTimer::~TickTimer()
 {
-	if(!disposed)
 		unregister();
 }
 
@@ -66,7 +65,14 @@ void TickTimer::dispose()
 
 void TickTimer::unregister()
 {
+	if(!disposed)
+	{
 	TickMachine::get_tick_machine()->unregister_timer(this);
+	}
+	else
+	{
+		cout << "Skipping timer unregistration, cause timer is already deleted" << endl;
+	}
 }
 
 void TickTimer::set_relative(struct timeval granularity)
