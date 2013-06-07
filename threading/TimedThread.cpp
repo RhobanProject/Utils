@@ -46,6 +46,7 @@ SlowTimedThread::SlowTimedThread(): timer(1,"SlowTimedThread"), measured_frequen
 */
 SlowTimedThread::SlowTimedThread(): measured_frequency(1)
 {
+	max_frequency = 0;
 };
 
 
@@ -70,6 +71,7 @@ SlowTimedThread::SlowTimedThread(double frequency)
 void SlowTimedThread::init(double hertz)
 {
 	//timer.set_frequency(hertz);
+	max_frequency = hertz;
 	if(!is_alive())
 		start(0);
 }
