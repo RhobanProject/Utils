@@ -52,7 +52,7 @@ SlowTimedThread::SlowTimedThread(): measured_frequency(1)
 
 SlowTimedThread::~SlowTimedThread()
 {
-	thread_state = Dead;
+	kill();
 }
 
 /*
@@ -135,7 +135,6 @@ void SlowTimedThread::execute()
 			syst_wait_ms(1000);
 		}
 
-		syst_wait_ms(1000.0 / max_frequency);
 		//timer.wait_next_tick();
 
 		step();
@@ -143,6 +142,9 @@ void SlowTimedThread::execute()
 		struct timeval before = now;
 		gettimeofday(&now,NULL);
 		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now.tv_sec - before.tv_sec + (now.tv_usec - before.tv_usec) /1000000.0 ));
+
+		int to_wait = 1000.0 / max_frequency - 1000 * (now.tv_sec - before.tv_sec) + (now.tv_usec - before.tv_usec) /1000.0;
+		syst_wait_ms(max(0,to_wait));
 
 		//cout << /*TM_CAUTION_MSG*/ "Waiting nexttick in Timedthread " << this->ThreadId() << endl;
 		//cout << /*TM_CAUTION_MSG*/ "Done Stepping Timedthread " << this->ThreadId() << endl;

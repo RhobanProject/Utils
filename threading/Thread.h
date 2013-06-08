@@ -87,7 +87,9 @@ public:
    * Wait for the thread to be started
    * returns from the moment the thread is setup and starts executing
    */
+  Condition started;
   void wait_started();
+
 
 protected:
   void lock();
