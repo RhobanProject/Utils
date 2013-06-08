@@ -122,6 +122,8 @@ void SlowTimedThread::kill()
 void SlowTimedThread::execute()
 {
 	struct timeval now;
+	struct timeval last;
+	struct timeval before;
 	gettimeofday(&now,NULL);
 
 	while(thread_state != Dying && thread_state != Dead)
@@ -136,15 +138,19 @@ void SlowTimedThread::execute()
 		}
 
 		//timer.wait_next_tick();
-
+		gettimeofday(&before,NULL);
 		step();
 
-		struct timeval before = now;
+		last = now;
 		gettimeofday(&now,NULL);
-		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now.tv_sec - before.tv_sec + (now.tv_usec - before.tv_usec) /1000000.0 ));
+		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now.tv_sec - last.tv_sec + (now.tv_usec - last.tv_usec) /1000000.0 ));
 
-		int to_wait = 1000.0 / max_frequency - 1000 * (now.tv_sec - before.tv_sec) - (now.tv_usec - before.tv_usec) /1000.0;
-		syst_wait_ms(max(0,to_wait));
+		double step_ms = 1000 * (now.tv_sec - before.tv_sec) + (now.tv_usec - before.tv_usec) /1000.0;
+		int to_wait = 1000.0 / max_frequency - step_ms;
+
+		cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
+
+		syst_wait_ms(max(1,to_wait));
 
 		//cout << /*TM_CAUTION_MSG*/ "Waiting nexttick in Timedthread " << this->ThreadId() << endl;
 		//cout << /*TM_CAUTION_MSG*/ "Done Stepping Timedthread " << this->ThreadId() << endl;
