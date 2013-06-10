@@ -148,7 +148,7 @@ void SlowTimedThread::execute()
 		double step_ms = 1000 * (now.tv_sec - before.tv_sec) + (now.tv_usec - before.tv_usec) /1000.0;
 		int to_wait = 1000.0 / max_frequency - step_ms;
 
-		cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
+		//cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
 
 		syst_wait_ms(max(1,to_wait));
 

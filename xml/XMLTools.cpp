@@ -232,6 +232,29 @@ vector<int> XMLTools::get_int_array(TiXmlNode* node, const char * array_id)
     }
 }
 
+vector<double> XMLTools::get_double_array(TiXmlNode* node, const char * array_id)
+{
+    if(!node) throw string("XMLTools getstringarray null node");
+    TiXmlNode* the_values = node->FirstChild( array_id );
+    if(the_values){
+        vector<double> result;
+        for ( TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
+        {
+            if(!child->FirstChild())
+            {
+                xml_parse_error( string("Xml parsing: Error while reading element int array with label ") +array_id + " in node " + string(node->Value()));
+            }
+            else
+                result.push_back(atof(child->FirstChild()->Value()));
+        }
+        return result;
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: Could not find (int array) node with label  ") +array_id + " in node " + string(node->Value()));
+    }
+}
+
 TiXmlDocument * XMLTools::stream_to_node(const string xml_stream)
 {
     TiXmlDocument * doc = new TiXmlDocument();
