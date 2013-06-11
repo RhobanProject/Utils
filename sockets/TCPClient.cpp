@@ -20,6 +20,7 @@ namespace Rhoban
     TCPClient::TCPClient()
     {
         clientSocket = 0;
+        connected = false;
     }
 
     TCPClient::~TCPClient()
