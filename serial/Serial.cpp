@@ -210,6 +210,8 @@ int Serial::connect(bool blocking)
 		if (fd == -1) {
 			goto USART_INIT_ERROR;
 		}
+                
+                setSpeed(deviceBaudrate);
 
 		fdClose();
 
@@ -239,7 +241,7 @@ int Serial::connect(bool blocking)
 		tcsetattr(fd, TCSANOW, &newtio);
                 
                 setSpeed(deviceBaudrate);
-
+                
 		return 0;
 
 		USART_INIT_ERROR:
@@ -308,6 +310,7 @@ void Serial::setSpeed(int baudrate)
             serinfo.custom_divisor = serinfo.baud_base / baudrate;
 
             ioctl(fd, TIOCSSERIAL, &serinfo);
+	    tcflush(fd, TCIFLUSH);
         } else { 	
             struct termios newtio;
             tcgetattr(fd, &newtio);
