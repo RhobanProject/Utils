@@ -24,6 +24,8 @@ class ConfigFile
 
         void useCommandArgs(int argc, char **argv);
 
+        const YAML::Node *getNode(string node, string name);
+
         void read(string node, string name, int value, int &output);
         void read(string node, string name, double value, double &output);
         void read(string node, string name, double value, float &output);
@@ -42,6 +44,7 @@ class ConfigFile
         void save(string filename);
 
         string readStringIfExists(string node, string name);
+        string readStringIfExists(string node);
 
         string helpText;
         void addHelpLine(string help);
