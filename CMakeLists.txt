@@ -1,6 +1,9 @@
 option (ROBOARD
     "Compile for Roboard" OFF)
 
+# The root supposed for all rhoban clones
+set (BASE "../")
+
 if (ROBOARD)
     set (CMAKE_CXX_FLAGS "-m32 -mtune=i586 -march=i586"
         CACHE STRING "")
