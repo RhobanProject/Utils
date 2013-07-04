@@ -22,17 +22,14 @@ if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)
 
-option (COMPILE_ZMQ
-    "Do we need to compile ZMQ" OFF)
+option (ENABLE_ZMQ
+    "Compile and use ZMQ?" OFF)
 
-option (HAVE_ZMQ
-    "Do we have ZMQ" OFF)
-
-if (HAVE_ZMQ)
+if (ENABLE_ZMQ)
     add_definitions (-DHAVE_ZMQ)
     set(ZMQ_HEADERS "${BASE}/Utils/zmq/include"
         CACHE STRING "ZMQ headers directory")
-endif (HAVE_ZMQ)
+endif (ENABLE_ZMQ)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -109,7 +106,7 @@ set(DIRECTORIES
     xml
     )
 
-if (COMPILE_ZMQ)
+if (ENABLE_ZMQ)
     add_subdirectory(zmq)
     include_directories ("${ZMQ_HEADERS}")
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
@@ -117,16 +114,7 @@ if (COMPILE_ZMQ)
     if(UNIX AND NOT APPLE)
         set (EXTRA_LIBS ${EXTRA_LIBS} rt)
     endif(UNIX AND NOT APPLE)
-endif (COMPILE_ZMQ)
-
-if(HAVE_ZMQ)
-    # include_directories ("${ZMQ_HEADERS}")
-    if (WIN32)
-        set (ZMQ_LIB_DIR "${PROJECT_SOURCE_DIR}/zmq/builds/win32"
-        CACHE STRING "Directory where to find the zmq lib")
-    	link_directories ("${ZMQ_LIB_DIR}")
-	endif (WIN32)
-endif(HAVE_ZMQ)
+endif (ENABLE_ZMQ)
 
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")

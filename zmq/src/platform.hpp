@@ -189,22 +189,22 @@
 #undef ZMQ_HAVE_IFADDRS
 
 /* Have Linux OS */
-#undef ZMQ_HAVE_LINUX
+// #undef ZMQ_HAVE_LINUX
 
 /* Have MinGW32 */
-#define ZMQ_HAVE_MINGW32
+// #define ZMQ_HAVE_MINGW32
 
 /* Have NetBSD OS */
-#undef ZMQ_HAVE_NETBSD
+// #undef ZMQ_HAVE_NETBSD
 
 /* Have OpenBSD OS */
-#undef ZMQ_HAVE_OPENBSD
+// #undef ZMQ_HAVE_OPENBSD
 
 /* Have OpenPGM extension */
 #undef ZMQ_HAVE_OPENPGM
 
 /* Have DarwinOSX OS */
-#undef ZMQ_HAVE_OSX
+// #undef ZMQ_HAVE_OSX
 
 /* Have QNX Neutrino OS */
 #undef ZMQ_HAVE_QNXNTO
@@ -231,10 +231,10 @@
 #undef ZMQ_HAVE_TCP_KEEPINTVL
 
 /* Have uio.h header. */
-#undef ZMQ_HAVE_UIO
+// #undef ZMQ_HAVE_UIO
 
 /* Have Windows OS */
-#define ZMQ_HAVE_WINDOWS
+// #define ZMQ_HAVE_WINDOWS
 
 /* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
