@@ -28,3 +28,7 @@ set (ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/include/"
     CACHE STRING "")
 
 add_library (ZeroMQ ${ALL_SOURCES})
+
+if (DEFINED WIN32)
+	target_link_libraries (ZeroMQ wsock32 ws2_32)
+endif (DEFINED WIN32)
