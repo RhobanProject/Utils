@@ -28,10 +28,16 @@
 # define randof(num) (int) ((float) (num) * random () / (RAND_MAX + 1.0))
 #endif
 
+#ifdef __GNUC__
+#define HIDE_UNUSED __attribute__((unused))
+#else
+#define HIDE_UNUSED
+#endif
 
 // Receive 0MQ string from socket and convert into C string
 // Caller must free returned string. Returns NULL if the context
 // is being terminated.
+HIDE_UNUSED
 static char *
 s_recv (void *socket) {
     zmq_msg_t message;
@@ -47,8 +53,10 @@ s_recv (void *socket) {
 }
 
 // Convert C string to 0MQ string and send to socket
+HIDE_UNUSED
 static int
-s_send (void *socket, const char *string) {
+s_send (void *socket, const char *string)
+{
     zmq_msg_t message;
     zmq_msg_init_size (&message, strlen (string));
     memcpy (zmq_msg_data (&message), string, strlen (string));
@@ -58,6 +66,7 @@ s_send (void *socket, const char *string) {
 }
 
 // Sends string as 0MQ string, as multipart non-terminal
+HIDE_UNUSED
 static int
 s_sendmore (void *socket, const char *string) {
     zmq_msg_t message;
@@ -70,6 +79,7 @@ s_sendmore (void *socket, const char *string) {
 
 // Receives all message parts from socket, prints neatly
 //
+HIDE_UNUSED
 static void
 s_dump (void *socket)
 {
@@ -109,6 +119,7 @@ s_dump (void *socket)
 
 // Set simple random printable identity on socket
 //
+HIDE_UNUSED
 static void
 s_set_id (void *socket)
 {
@@ -119,6 +130,7 @@ s_set_id (void *socket)
 
 
 // Sleep for a number of milliseconds
+HIDE_UNUSED
 static void
 s_sleep (int msecs)
 {
@@ -133,6 +145,7 @@ s_sleep (int msecs)
 }
 
 // Return current system clock as milliseconds
+HIDE_UNUSED
 static int64_t
 s_clock (void)
 {
@@ -150,6 +163,7 @@ s_clock (void)
 // Print formatted string to stdout, prefixed by date/time and
 // terminated with a newline.
 
+HIDE_UNUSED
 static void
 s_console (const char *format, ...)
 {
