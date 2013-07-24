@@ -98,6 +98,7 @@ set(DIRECTORIES
     json
     logging
     observer
+    scoring
     serial
     sockets
     tests
