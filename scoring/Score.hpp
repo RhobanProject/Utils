@@ -15,6 +15,7 @@ private:
   std::vector<Mark *> marks;
   double total_weight;
 
+  using Mark::showScore;
   void showScore(std::string name, int detailLevel) const;
 
 public:

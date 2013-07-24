@@ -21,9 +21,13 @@ void Score::updateName(string newName){
 }
 
 void Score::showScore(std::string name, int detailLevel) const{
+  if (detailLevel == 0){
+    showScore(name);
+    return;
+  }
   for (unsigned int i = 0; i < marks.size(); i++){
     marks[i]->showScore(markName);
-    if (detailLevel > 0 && dynamic_cast<Score *>(marks[i]) != 0) {
+    if (dynamic_cast<Score *>(marks[i]) != 0) {
       marks[i]->showScore(markName, detailLevel - 1);
     }
   }
