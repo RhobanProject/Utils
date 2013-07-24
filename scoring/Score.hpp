@@ -18,15 +18,13 @@ private:
   void showScore(std::string name, int detailLevel) const;
 
 public:
-  bool null_score;
   std::string name;
 
   Score(std::string name,
         double weight = 1.0,
         double value = 0.0) : Mark(name, "Computed", weight, value),
-                              name(name),
                               total_weight(0.0),
-                              null_score(false) {};
+                              name(name) {};
 
   virtual ~Score(){
     for (unsigned int i = 0; i < marks.size(); i++){

@@ -11,7 +11,7 @@ void Score::addMark(Mark * m){
   total_weight += m->getWeight();
   score = total_score / total_weight;
   if (m->isFailed())
-    null_score = true;
+    criticalFail = true;
   marks.push_back(m);
 }
 
@@ -34,7 +34,7 @@ void Score::showMarks(int detailLevel) const{
 }
 
 double Score::getScore() const{
-  if (null_score) return 0.0;
+  if (isFailed()) return 0.0;
   if (total_weight == 0) return 1.0;
   return score;
 };
