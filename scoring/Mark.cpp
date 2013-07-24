@@ -63,18 +63,21 @@ string Mark::formattedAnnotation() const{
   return tmp;
 }
 
-void Mark::showScore(string callerName) const{
+void Mark::showScore(string callerName, string prefix) const{
+  double usedMarkNameSize = markNameSize - prefix.length();
   string formattedCallerName = callerName;
   bool fillNoteSpace = true;
   formattedCallerName.resize(nameSize, ' ');
   string formattedMarkName = markName;
   if (callerName.length() == 0){
     // totalSize + " :".length()
-    formattedMarkName.resize(markNameSize + nameSize + 2, ' ');
+    formattedMarkName.resize(usedMarkNameSize + nameSize + 2, ' ');
   }
   else{
-    formattedMarkName.resize(markNameSize, ' ');
+    formattedMarkName.resize(usedMarkNameSize, ' ');
   }
+
+  cout << prefix;
   
   if (criticalFail){
     TERM_COLOR(FAILURE_COLOR);

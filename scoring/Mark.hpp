@@ -49,9 +49,13 @@ public:
   double isFailed() const{ return criticalFail;};
 
   // Show score
-  void showScore(std::string callerName) const;
-  virtual void showScore(std::string callerName, int detailLevel) const {
-    showScore(callerName);
+  void showScore(std::string callerName,
+                 std::string prefix = "") const;
+
+  virtual void showScore(std::string callerName,
+                         int detailLevel,
+                         std::string prefix = "") const {
+    showScore(callerName, prefix);
   };
 
   // Show val and Score if score is < WANTED_SCORE

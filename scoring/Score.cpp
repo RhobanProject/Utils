@@ -20,15 +20,20 @@ void Score::updateName(string newName){
   markName = newName;
 }
 
-void Score::showScore(std::string name, int detailLevel) const{
+void Score::showScore(string name,
+                      int detailLevel,
+                      string prefix) const{
+  showScore(name, prefix);
   if (detailLevel == 0){
-    showScore(name);
     return;
   }
+  string nextPrefix = prefix + "    ";
   for (unsigned int i = 0; i < marks.size(); i++){
-    marks[i]->showScore(markName);
     if (dynamic_cast<Score *>(marks[i]) != 0) {
-      marks[i]->showScore(markName, detailLevel - 1);
+      marks[i]->showScore("", detailLevel - 1, nextPrefix);
+    }
+    else{
+      marks[i]->showScore("", nextPrefix);
     }
   }
 }

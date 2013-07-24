@@ -16,7 +16,9 @@ private:
   double total_weight;
 
   using Mark::showScore;
-  void showScore(std::string name, int detailLevel) const;
+  void showScore(std::string name,
+                 int detailLevel,
+                 std::string prefix = "") const;
 
 public:
   std::string name;
