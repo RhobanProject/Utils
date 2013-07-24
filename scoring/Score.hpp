@@ -23,7 +23,7 @@ public:
 
   Score(std::string name,
         double weight = 1.0,
-        double value = 0.0) : Mark(name, "Computed", weight, value),
+        double value = 0.0) : Mark(name, "", weight, value),
                               total_weight(0.0),
                               name(name) {};
 

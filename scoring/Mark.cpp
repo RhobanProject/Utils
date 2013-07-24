@@ -64,16 +64,35 @@ string Mark::formattedAnnotation() const{
 }
 
 void Mark::showScore(string callerName) const{
-  string formattedMarkName = markName;
-  formattedMarkName.resize(markNameSize, ' ');
   string formattedCallerName = callerName;
+  bool fillNoteSpace = true;
   formattedCallerName.resize(nameSize, ' ');
-  
+  string formattedMarkName = markName;
+  if (callerName.length() == 0){
+    // totalSize + " :".length()
+    formattedMarkName.resize(markNameSize + nameSize + 2, ' ');
+  }
+  else{
+    formattedMarkName.resize(markNameSize, ' ');
+  }
   
   if (criticalFail){
     TERM_COLOR(FAILURE_COLOR);
-    cout << "[" << formattedMarkName << " makes " << formattedCallerName
-         << " null";
+    if (callerName.length() != 0){
+      cout << "[" << formattedMarkName << " makes " << formattedCallerName
+           << " null";
+    }
+    else {
+      string errorMsg("CriticalFail");
+      if (getAnnotation().length() == 0){
+        formattedMarkName.resize(78 - errorMsg.length(), ' ');
+        fillNoteSpace = false;
+      }
+      else{
+        formattedMarkName.resize(75 - errorMsg.length() - noteSize, ' ');
+      }
+      cout << '[' << formattedMarkName << errorMsg;
+    }
   }
   else{
     if (getScore() < WANTED_SCORE){
@@ -83,11 +102,20 @@ void Mark::showScore(string callerName) const{
       TERM_COLOR(SUCCESS_COLOR);
     }
 
-    cout << '[' << formattedCallerName << ": " << formattedMarkName << ": "
+    cout << '[';
+    if (callerName.length() != 0){
+      cout << formattedCallerName << ": ";
+    }
+    cout << formattedMarkName << ": "
          << formattedScore() << "% (weight = " << formattedWeight() << ")";
   }
   if (getAnnotation().length() != 0){
     cout << " '" << formattedAnnotation() << "'";
+  }
+  else if (fillNoteSpace){
+    string empty("");
+    empty.resize(noteSize + 3, ' ');
+    cout << empty;
   }
   cout << ']' << endl;
   TERM_COLOR(TC_DEFAULT);
