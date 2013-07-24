@@ -220,6 +220,7 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
     try {
         output = readStringIfExists(node, name);
     } catch(...) {
+    	cout << "Using default value '" << defaultValue << "' for parameter '" << node << "' '" << name << "'" << endl;
         output = defaultValue;
     }
 

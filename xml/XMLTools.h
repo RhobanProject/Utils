@@ -47,6 +47,7 @@
 #define	XML_READ_CHAR(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_DOUBLE(node, truc){ truc = XMLTools::get_double_element(node, # truc); }
 #define	XML_READ_DOUBLE_ARRAY(node, truc){ truc = XMLTools::get_double_array(node, # truc); }
+#define	XML_READ_FLOAT_ARRAY(node, truc){ truc = XMLTools::get_float_array(node, # truc); }
 #define	XML_READ_STRING(node, truc){ truc = XMLTools::get_string_element(node, # truc); }
 #define	XML_READ_STRING_ARRAY(node, truc){ truc = XMLTools::get_string_array(node, # truc); }
 
@@ -64,6 +65,8 @@ namespace XMLTools
 
 
     vector<double> get_double_array(TiXmlNode * node, const char * id);
+
+    vector<float> get_float_array(TiXmlNode * node, const char * id);
 
     bool has_child(TiXmlNode *node, const char *name);
 
