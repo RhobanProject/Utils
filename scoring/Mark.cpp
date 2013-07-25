@@ -87,12 +87,13 @@ void Mark::showScore(string callerName, string prefix) const{
     }
     else {
       string errorMsg("CriticalFail");
+      int spaceAllowed = 78 - prefix.length();
       if (getAnnotation().length() == 0){
-        formattedMarkName.resize(78 - errorMsg.length(), ' ');
+        formattedMarkName.resize(spaceAllowed - errorMsg.length(), ' ');
         fillNoteSpace = false;
       }
       else{
-        formattedMarkName.resize(75 - errorMsg.length() - noteSize, ' ');
+        formattedMarkName.resize(spaceAllowed - 3 - errorMsg.length() - noteSize, ' ');
       }
       cout << '[' << formattedMarkName << errorMsg;
     }
