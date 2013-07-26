@@ -55,6 +55,7 @@ double Score::getScore() const{
     sumScore += marks[i]->getScore() * tmpWeight;
     sumWeight += tmpWeight;
   }
+  if (sumWeight == 0.0) return 1;
   return sumScore / sumWeight;
 };
 
