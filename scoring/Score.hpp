@@ -13,7 +13,6 @@
 class Score : public Mark {//TODO pass Mark to private and handle conflicts
 private:
   std::vector<Mark *> marks;
-  double total_weight;
 
   using Mark::showScore;
   void showScore(std::string name,
@@ -21,13 +20,10 @@ private:
                  std::string prefix = "") const;
 
 public:
-  std::string name;
 
   Score(std::string name,
         double weight = 1.0,
-        double value = 0.0) : Mark(name, "", weight, value),
-                              total_weight(0.0),
-                              name(name) {};
+        double value = 0.0) : Mark(name, "", weight, value) {};
 
   virtual ~Score(){
     for (unsigned int i = 0; i < marks.size(); i++){
@@ -38,6 +34,8 @@ public:
   void updateName(std::string newName);
 
   double getScore() const;
+
+  virtual bool isFailed() const;
 
   // Score shouldn't be touched once this method has been called
   void addMark(Mark * m);

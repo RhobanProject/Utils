@@ -6,17 +6,10 @@
 using namespace std;
 
 void Score::addMark(Mark * m){
-  double total_score = total_weight * score
-    + m->getWeight() * m->getScore();
-  total_weight += m->getWeight();
-  score = total_score / total_weight;
-  if (m->isFailed())
-    criticalFail = true;
   marks.push_back(m);
 }
 
 void Score::updateName(string newName){
-  name = newName;
   markName = newName;
 }
 
@@ -42,10 +35,27 @@ void Score::showMarks(int detailLevel) const{
   showScore("", detailLevel);
 }
 
+bool Score::isFailed() const{
+  for (unsigned int i = 0; i < marks.size(); i++){
+    if (marks[i]->isFailed()){
+      return true;
+    }
+  }
+  return false;
+}
+
 double Score::getScore() const{
+  // Since members might be modified at any time, score must be recomputed
+  // when asked
   if (isFailed()) return 0.0;
-  if (total_weight == 0) return 1.0;
-  return score;
+  double sumScore = 0.0;
+  double sumWeight = 0.0;
+  for (unsigned int i = 0; i < marks.size(); i++){
+    double tmpWeight = marks[i]->getWeight();
+    sumScore += marks[i]->getScore() * tmpWeight;
+    sumWeight += tmpWeight;
+  }
+  return sumScore / sumWeight;
 };
 
 void Score::mark(string mark_name,
@@ -53,9 +63,7 @@ void Score::mark(string mark_name,
                  double weight,
                  double value,
                  double min_value) {
-  Mark * m = new Mark(mark_name, note, weight, value, min_value);
-  m->show(name);
-  addMark(m);
+  addMark(new Mark(mark_name, note, weight, value, min_value));
 }
 
 void Score::mark_from_comparison(string mark_name,

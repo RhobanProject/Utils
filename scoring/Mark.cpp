@@ -16,13 +16,18 @@ Mark::Mark(string name,
            double w,
            double value,
            double minValue){
-  if (value > 1.0) value = 1.0;
-  if (value < 0.0) value = 0.0;
-  criticalFail = value <= minValue;
+  criticalValue = minValue;
+  value = boundedScore(value);
+  criticalFail = value <= criticalValue;
   annotation = note;
   weight = w;
   markName = name;
   score = value;
+}
+
+void Mark::updateScore(double newScore){
+  score = boundedScore(newScore);
+  criticalFail = score <= criticalValue;
 }
 
 string Mark::formattedScore() const{
