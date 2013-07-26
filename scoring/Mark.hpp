@@ -44,6 +44,7 @@ public:
 
   double getWeight() const{ return weight;};
   virtual double getScore() const{ return score;};
+  std::string getName() const{ return markName;};
   std::string getAnnotation() const{ return annotation;};
 
   double isFailed() const{ return criticalFail;};
