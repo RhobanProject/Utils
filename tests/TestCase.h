@@ -72,6 +72,7 @@ class TestCase
         _assertEqualsDelta(exp1, exp2, delta);
 
         void _assertEqualsDelta(float f1, float f2, float delta);
+        void _assertEqualsDelta(double f1, double f2, double delta);
 
         void error(string error);
         void pass();

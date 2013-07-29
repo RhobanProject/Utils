@@ -154,3 +154,15 @@ void TestCase::_assertEqualsDelta(float f1, float f2, float delta)
         pass();
     }
 }
+
+void TestCase::_assertEqualsDelta(double f1, double f2, double delta)
+{
+    if (abs(f1-f2) > delta) {
+        ostringstream oss;
+
+        oss << "Numbers differs (" << f1 << ", " << f2 << ")";
+        error(oss.str());
+    } else {
+        pass();
+    }
+}

@@ -28,8 +28,6 @@ protected:
     return s;
   }
 
-  virtual void updateScore(double newScore);
-
 public:
 
   static const unsigned int nameSize = 8;
@@ -63,6 +61,8 @@ public:
   std::string getAnnotation() const{ return annotation;};
 
   virtual bool isFailed() const{ return criticalFail;};
+
+  virtual void updateScore(double newScore);
 
   // Show score
   void showScore(std::string callerName,

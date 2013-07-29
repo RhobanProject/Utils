@@ -25,6 +25,9 @@ endif (HAVE_COLORS)
 option (ENABLE_ZMQ
     "Compile and use ZMQ?" OFF)
 
+option (COMPILE_UTILS_TESTS
+    "Compile utils tests?" OFF)
+
 if (ENABLE_ZMQ)
     add_definitions (-DHAVE_ZMQ)
     set(ZMQ_HEADERS "${BASE}/Utils/zmq/include"
@@ -107,6 +110,10 @@ set(DIRECTORIES
     xml
     )
 
+if (COMPILE_UTILS_TESTS)
+  include_directories ("test")
+endif (COMPILE_UTILS_TESTS)
+
 if (ENABLE_ZMQ)
     add_subdirectory(zmq)
     include_directories ("${ZMQ_HEADERS}")
@@ -129,6 +136,10 @@ foreach (DIRECTORY ${DIRECTORIES})
 
     set (ALL_SOURCES ${ALL_SOURCES} ${PREFIXED_SOURCES})
 endforeach (DIRECTORY)
+
+if (COMPILE_UTILS_TESTS)
+  add_executable (scoringTest test/ScoringTest.cpp scoring/Score.cpp scoring/Mark.cpp tests/TestCase.cpp)
+endif (COMPILE_UTILS_TESTS)
 
 # Adding TinyXml
 add_subdirectory (xml/TinyXml)
