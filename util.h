@@ -103,5 +103,7 @@ std::list<T> vector_to_list(std::vector<T> & V) {
 
 vector<string> &split(const string &s, char delim, vector<string> &elems);
 
+string system_time();
+
 /*@}*/
 #endif
