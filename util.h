@@ -31,6 +31,19 @@ bool is_in(vector<T> lst, T x) {
   return false;
 }
 
+/* extract the subvector of lst regarding indexes [i0,i1] included */
+template <typename T>
+vector<T> v_extract_subvector(vector<T> & lst, int i0, int i1) {
+  vector<T> result;
+  if (i0 < 0 || i1 < 0 || 
+      i0 > ((int) lst.size()-1) ||
+      i1 > ((int) lst.size()-1) ||
+      i0 > i1) return result;
+  for (int i=0; i < i1-i0+1; i++)
+    result.push_back(lst[i0+i]);
+  return result;
+}
+
 inline string my_itoa(int i)
 {
 	ostringstream os;
