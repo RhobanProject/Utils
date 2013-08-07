@@ -23,6 +23,7 @@ class TestCase
         TestCase();
 
         void run();
+        static double deltaDouble;
 
     protected:
         string place;

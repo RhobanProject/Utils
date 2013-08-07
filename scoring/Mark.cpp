@@ -84,7 +84,7 @@ void Mark::showScore(string callerName, string prefix) const{
 
   cout << prefix;
   
-  if (criticalFail){
+  if (isFailed()){
     TERM_COLOR(FAILURE_COLOR);
     if (callerName.length() != 0){
       cout << "[" << formattedMarkName << " makes " << formattedCallerName

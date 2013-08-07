@@ -17,6 +17,8 @@
 
 using namespace std;
 
+double TestCase::deltaDouble = 0.000001;
+
 TestCase::TestCase() : assertions(0), assertionsPassed(0)
 {
 }
