@@ -40,7 +40,7 @@ class TickMachine;
 using namespace std;
 
 /*****************************************************************************/
-#define TM_CAUTION_MSG(msg) { cout << "TM CAUTION: " << msg << endl << flush; }
+#define TM_CAUTION_MSG(msg) { cerr << "TM CAUTION: " << msg << endl << flush; }
 #define TM_DEBUG 0
 #if TM_DEBUG==1
 #define TM_DEBUG_MSG(msg) { timeval now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
