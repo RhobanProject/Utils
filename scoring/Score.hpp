@@ -11,7 +11,7 @@
 /* multi criterion score computation */
 // Using heritage of mark since a score can be used as a Mark of a score
 class Score : public Mark {//TODO pass Mark to private and handle conflicts
-private:
+protected:
   std::vector<Mark *> marks;
 
   using Mark::showScore;
