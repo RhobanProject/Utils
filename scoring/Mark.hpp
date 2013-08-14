@@ -5,8 +5,8 @@
 
 #define WANTED_SCORE 0.7
 
-#define SUCCESS_COLOR TC_YELLOW//TODO yellow looks green, is this normal?
-#define MITIGATED_COLOR TC_MAGENTA
+#define SUCCESS_COLOR TC_GREEN//TODO yellow looks green, is this normal?
+#define MITIGATED_COLOR TC_LIGHT_CYAN
 #define FAILURE_COLOR TC_RED
 
 class Mark{

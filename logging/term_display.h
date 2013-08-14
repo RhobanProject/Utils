@@ -1,6 +1,8 @@
 #ifndef TERM_DISPLAY_H
 #define TERM_DISPLAY_H
 
+//TODO handle the case where TERM functions are not supported (for redirections to file etc)
+
 #define TERM_CLEAR printf ("%c[H%c[J",27,27)
 #define TERM_CLEAR_LINE printf ("%c[J",27)
 #define TERM_CURSOR_HOME printf ("%c[H",27)
@@ -17,14 +19,29 @@
 #define TC_HIGHLIGHT "1"
 #define TC_BLINK "5"
 #define TC_INVERSE "7"
-#define TC_BLACK "30"
-#define TC_RED "31"
-#define TC_YELLOW "32"
-#define TC_GREEN "33"
-#define TC_BLUE "34"
-#define TC_MAGENTA "35"
-#define TC_CYAN "36"
-#define TC_BLANC "37"
+
+/* Color codes have been updated according to :
+ * - http://misc.flogisoft.com/bash/tip_colors_and_formatting
+ * and
+ * - http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+ */
+#define TC_BLACK         "30"
+#define TC_RED           "31"
+#define TC_GREEN         "32"
+#define TC_YELLOW        "33"
+#define TC_BLUE          "34"
+#define TC_MAGENTA       "35"
+#define TC_CYAN          "36"
+#define TC_LIGHT_GRAY    "37"
+#define TC_DARK_GRAY     "90"
+#define TC_LIGHT_RED     "91"
+#define TC_LIGHT_GREEN   "92"
+#define TC_LIGHT_YELLOW  "93"
+#define TC_LIGHT_BLUE    "94"
+#define TC_LIGHT_MAGENTA "95"
+#define TC_LIGHT_CYAN    "96"
+#define TC_WHITE         "97"
+#define TC_BLANC         "97"// Kept for compatibility, deprecated (french name)
 #define TERM_COLOR(c) printf("\033[%sm", c);
 
 void term_separator();
