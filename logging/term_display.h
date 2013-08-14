@@ -1,8 +1,6 @@
 #ifndef TERM_DISPLAY_H
 #define TERM_DISPLAY_H
 
-//TODO handle the case where TERM functions are not supported (for redirections to file etc)
-
 #define TERM_CLEAR printf ("%c[H%c[J",27,27)
 #define TERM_CLEAR_LINE printf ("%c[J",27)
 #define TERM_CURSOR_HOME printf ("%c[H",27)
@@ -42,8 +40,9 @@
 #define TC_LIGHT_CYAN    "96"
 #define TC_WHITE         "97"
 #define TC_BLANC         "97"// Kept for compatibility, deprecated (french name)
-#define TERM_COLOR(c) printf("\033[%sm", c);
+#define TERM_COLOR(c) {term_set_color(c);}
 
+void term_set_color(const char * c);
 void term_separator();
 void print_n_times(int n, char c);
 void term_title(char * title);
