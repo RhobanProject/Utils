@@ -65,7 +65,7 @@ TickMachine * TickMachine::createTickMachine()
 	return new_tick_machine;
 }
 
-TickMachine::TickMachine() : timer_to_dispose(false), timer_to_register(false), timer_to_unregister(false)
+TickMachine::TickMachine() : timer_to_register(false), timer_to_unregister(false), timer_to_dispose(false)
 {
 	timer_should_be_updated = false;
 	granularity_should_be_updated  = false;

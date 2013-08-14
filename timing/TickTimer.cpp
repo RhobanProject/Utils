@@ -10,11 +10,11 @@
 #include "TickTimer.h"
 
 TickTimer::TickTimer() :
+disposed(false),
 ticks_elapsed(0),
 use_locks(true),
 tick_counter(0),
-frequency(0),
-disposed(false)
+frequency(0)
 {
 }
 
@@ -27,21 +27,21 @@ TickTimer::~TickTimer()
 
 TickTimer::TickTimer(double hertz) :
     				ticks_elapsed(0),
+    				relative(0),
     				use_locks(true),
     				tick_counter(0),
-    				frequency(hertz),
-    				relative(0)
+    				frequency(hertz)
 {
 	TickMachine::get_tick_machine()->register_timer(this);
 }
 
 TickTimer::TickTimer(double hertz, string name) :
+    				timer_name(name),
     				ticks_elapsed(0),
+    				relative(0),
     				use_locks(true),
     				tick_counter(0),
-    				frequency(hertz),
-    				relative(0),
-    				timer_name(name)
+    				frequency(hertz)
 {
 	TickMachine::get_tick_machine()->register_timer(this);
 }
