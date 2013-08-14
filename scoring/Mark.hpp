@@ -68,6 +68,8 @@ public:
   void showScore(std::string callerName,
                  std::string prefix = "") const;
 
+  //This definition is only a binding to showScore without detailLevel
+  #pragma unused detailLevel
   virtual void showScore(std::string callerName,
                          int detailLevel,
                          std::string prefix = "") const {

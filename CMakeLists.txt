@@ -11,6 +11,8 @@ if (ROBOARD)
         CACHE STRING "")
 endif (ROBOARD)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+
 cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-ConfigFile::ConfigFile() : argv(NULL), doc(NULL)
+ConfigFile::ConfigFile() : doc(NULL), argv(NULL)
 {}
 
 ConfigFile::ConfigFile(string filename) : argv(NULL)

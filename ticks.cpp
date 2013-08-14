@@ -59,7 +59,7 @@ ui32 get_ticks_frequency(){
 
 int launch_tick_machine(ui32 frequency){
 
-	if ((frequency > MAX_TICKS_FREQUENCY)||(frequency< 0)){
+	if ((frequency > MAX_TICKS_FREQUENCY)){
 		fprintf(stderr,
 				"ticks.c: launche_tick_machine: tried to launch tick machine with frequency % d while max frequency is %d\n",
 					frequency, MAX_TICKS_FREQUENCY);

@@ -19,7 +19,7 @@ using namespace std;
 
 bool is_in_vector_string(vector<string> vector, string testval)
 {
-    for(int i=0; i<vector.size(); ++i)
+    for(unsigned int i=0; i<vector.size(); ++i)
     {
         if(vector[i].compare(testval) == 0)
             return 1;

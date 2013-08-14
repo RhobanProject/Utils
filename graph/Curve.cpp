@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Curve::Curve(string name_, struct timeval *start_) : count(0), start(start_), name(name_)
+Curve::Curve(string name_, struct timeval *start_) : start(start_), count(0), name(name_)
 {
     values = new deque<CurveEntry*>();
 }
@@ -56,7 +56,6 @@ vector<pair<double, double> > Curve::getValues(double time)
         
 void Curve::garbageCollect(double expiration)
 {
-    int toDelete = 0;
     double nowTime = elapsed();
 
     for (deque<CurveEntry*>::iterator it = values->begin(); it != values->end(); it++) {
