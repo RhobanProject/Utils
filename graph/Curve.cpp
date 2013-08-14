@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Curve::Curve(string name_, struct timeval *start_) : start(start_), count(0), name(name_)
+Curve::Curve(string name_, struct timeval *start_) : name(name_), start(start_), count(0)
 {
     values = new deque<CurveEntry*>();
 }

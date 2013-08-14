@@ -36,7 +36,7 @@ using namespace std;
                                                                    \
         value.resize(json.size());                                 \
                                                                    \
-        for (int i=0; i<json.size(); i++) {                        \
+        for (unsigned int i=0; i<json.size(); i++) {               \
             JsonUtil::read(json[i], value[i]);                     \
         }                                                          \
     }                                                              \

@@ -22,8 +22,9 @@ void Score::showScore(string name,
   }
   string nextPrefix = prefix + "    ";
   for (unsigned int i = 0; i < marks.size(); i++){
-    if (dynamic_cast<Score *>(marks[i]) != 0) {
-      marks[i]->showScore("", detailLevel - 1, nextPrefix);
+    Score * subScore = dynamic_cast<Score *>(marks[i]);
+    if (subScore != 0) {
+      subScore->showScore("", detailLevel - 1, nextPrefix);
     }
     else{
       marks[i]->showScore("", nextPrefix);
