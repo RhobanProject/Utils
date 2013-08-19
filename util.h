@@ -19,6 +19,7 @@ typedef unsigned int uint;
 #include <string>
 #include <vector>
 #include <list>
+#include <list>
 
 using namespace std;
 
@@ -115,6 +116,7 @@ std::list<T> vector_to_list(std::vector<T> & V) {
 }
 
 vector<string> &split(const string &s, char delim, vector<string> &elems);
+list<string> &split_list(const string &s, char delim, list<string> &elems);
 
 string system_time();
 

@@ -148,6 +148,15 @@ bool get_int_int_int_parameter(string param_name, int * arg1, int * arg2, int * 
     }
 }
 
+list<string> &split_list(const string &s, char delim, list<string> &elems) {
+    stringstream ss(s);
+    string item;
+    while(getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
 vector<string> &split(const string &s, char delim, vector<string> &elems) {
     stringstream ss(s);
     string item;
