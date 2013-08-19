@@ -39,17 +39,29 @@
 // is being terminated.
 HIDE_UNUSED
 static char *
-s_recv (void *socket) {
+s_recv_options (void *socket, int flags, char *more) {
     zmq_msg_t message;
     zmq_msg_init (&message);
-    int size = zmq_msg_recv (&message, socket, 0);
+    int size = zmq_msg_recv (&message, socket, flags);
     if (size == -1)
         return NULL;
     char *string = (char *)malloc (size + 1);
     memcpy (string, zmq_msg_data (&message), size);
+    if (more != NULL) {
+        int64_t multi;
+        size_t more_size = sizeof (multi);
+        zmq_getsockopt (socket, ZMQ_RCVMORE, &multi, &more_size);
+        *more = multi;
+    }
     zmq_msg_close (&message);
     string [size] = 0;
     return (string);
+}
+
+HIDE_UNUSED
+static char *
+s_recv (void *socket) {
+    return s_recv_options(socket, 0, NULL);
 }
 
 // Convert C string to 0MQ string and send to socket
