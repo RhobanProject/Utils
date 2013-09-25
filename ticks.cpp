@@ -13,17 +13,23 @@
  *  Created on: 23 f�vr. 2010
  *      Author: hugo
  */
+#ifdef _WIN32
+#include <winsock2.h>
+#include <windows.h>
+#endif
 
+#ifndef MSVC
 #include <sys/time.h>
-#include <signal.h>
 #include <unistd.h>
+#include <signal.h>
+#endif
+
+#include <timing/chrono.h>
+
 #include <stdio.h>
 #include <time.h>
 #include <errno.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include "ticks.h"
 #include "util.h"
@@ -112,8 +118,8 @@ void wait_n_ticks(ui32 tick_nb){
 	}
 
 #ifdef _WIN32
-	int tick_duration = 1000000/ticks_frequency;
-   	for (;tick_nb>0; tick_nb--) usleep(tick_duration);
+	int tick_duration = 1000/ticks_frequency;
+   	for (;tick_nb>0; tick_nb--) Sleep(tick_duration);
 #else
 	sigset_t block_set;
     sigfillset( &block_set );
@@ -126,7 +132,7 @@ void wait_n_ticks(ui32 tick_nb){
 #endif
 }
 
-void sleep_ticks(struct timeval duration)
+void sleep_ticks(chrono duration)
 {
 	sleep_ms_ticks(duration.tv_sec*1000 + duration.tv_usec/1000);
 }
@@ -165,7 +171,7 @@ ui32 get_msec()
 #endif
 }
 
-void get_tick_machine_time(struct timeval * clock)
+void get_tick_machine_time(chrono * clock)
 {
 #ifdef _WIN32
 #else
@@ -186,36 +192,36 @@ void wait_ms(int ms)
   sleep_ms_ticks(ms);
 }
 
-void sleep_ms(struct timeval duration)
+void sleep_ms(chrono duration)
 {
   sleep_ticks(duration);
 }
 
-void decrease(struct timeval & chrono, struct timeval & duration)
+void decrease(chrono & chronoo, chrono & duration)
 {
-  chrono.tv_sec -= duration.tv_sec;
-  chrono.tv_usec -= duration.tv_usec;
+  chronoo.tv_sec -= duration.tv_sec;
+  chronoo.tv_usec -= duration.tv_usec;
 }
 
-void increase(struct timeval & chrono, struct timeval & duration)
+void increase(chrono & chronoo, chrono & duration)
 {
-  chrono.tv_usec += duration.tv_usec;
-  chrono.tv_sec += duration.tv_sec + chrono.tv_usec/1000000;
-  chrono.tv_usec %= 1000000;
+  chronoo.tv_usec += duration.tv_usec;
+  chronoo.tv_sec += duration.tv_sec + chronoo.tv_usec/1000000;
+  chronoo.tv_usec %= 1000000;
 }
 
-bool is_after(struct timeval & time_to_check, struct timeval & reference)
+bool is_after(chrono & time_to_check, chrono & reference)
 {
   long diff =       ((time_to_check.tv_sec - reference.tv_sec)*1000000 + (time_to_check.tv_usec - reference.tv_usec));
   return (diff>=0);
 }
 
-double to_secs(struct timeval & duration)
+double to_secs(chrono & duration)
 {
   return duration.tv_usec/1000000.0 +duration.tv_sec;
 }
 
-string timevalToString(const struct timeval & time)
+string chronoToString(const chrono & time)
 {
   return std::string(my_itoa(time.tv_sec)+" secs "+my_itoa(time.tv_usec)+ " musecs");
 }

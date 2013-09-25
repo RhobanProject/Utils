@@ -4,8 +4,8 @@
 #include <deque>
 #include <vector>
 #include <string>
-#include <time.h>
-#include <sys/time.h>
+
+#include <timing/chrono.h>
 
 #include "CurveEntry.h"
 
@@ -17,7 +17,7 @@ using namespace std;
 class Curve
 {
     public:
-        Curve(string name_, struct timeval *start_);
+        Curve(string name_, chrono *start_);
         ~Curve();
         void push(double value);
         vector<pair<double, double> > getValues(double time);
@@ -27,7 +27,7 @@ class Curve
         string name;
 
     protected:
-        struct timeval *start;
+        chrono *start;
         deque<CurveEntry*> *values;
         int count;
 };

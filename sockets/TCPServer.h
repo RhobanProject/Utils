@@ -14,8 +14,10 @@
 #include <io.h>
 #endif
 
+#ifndef MSVC
 #include <unistd.h>
 #include <signal.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -126,7 +128,7 @@ namespace Rhoban
                 virtual void shutdown()
                 {
                     if (socketDescriptor) {
-                        close(socketDescriptor);
+						closesocket(socketDescriptor);
                     }
 
                     socketDescriptor = 0;

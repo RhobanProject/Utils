@@ -16,6 +16,7 @@
 
 class Playable;
 
+#include <timing/chrono.h>
 #include "ticks.h"
 
 using namespace std;
@@ -33,7 +34,7 @@ class Playable
         virtual ~Playable();
 
         virtual void play();
-        virtual void play(timeval duration);
+        virtual void play(chrono duration);
         virtual void play(ui32 msecs);
         virtual void play(double secs);
         virtual void suspend();
@@ -88,26 +89,26 @@ class Playable
 
     protected:
         /*! \brief Initializes the the variables before play. */
-        virtual void prepare_play(bool forever, timeval durations);
+        virtual void prepare_play(bool forever, chrono durations);
 
         /*! \brief Should the play be played forever? */
         bool forever;
 
 
         /*! \brief Start time. */
-        struct timeval start_time;
+        chrono start_time;
 
         /*! last time update was performed. */
-        struct timeval last_step_time;
+        chrono last_step_time;
 
         /*! \brief Stop time. */
-        struct timeval stop_time;
+        chrono stop_time;
 
         /*! last time update was performed. */
-        struct timeval suspend_start;
+        chrono suspend_start;
 
         /*! \brief Last reset time. */
-        struct timeval reset_time;
+        chrono reset_time;
 
 };
 

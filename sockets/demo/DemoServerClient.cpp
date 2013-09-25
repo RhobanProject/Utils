@@ -15,7 +15,7 @@ using namespace std;
 
 namespace Rhoban
 {
-    DemoServerClient::DemoServerClient(int socket) : TCPServerClient(socket)
+    DemoServerClient::DemoServerClient(SOCKET socket) : TCPServerClient(socket)
     {
     }
 

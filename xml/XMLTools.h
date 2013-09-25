@@ -27,8 +27,8 @@
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
 
-#define xml_parse_error(str...)   { throw string(str); }
-#define interpretor_error(str...) { throw string(str); }
+#define xml_parse_error(str,...)   { throw string(str); }
+#define interpretor_error(str,...) { throw string(str); }
 
 #define XML_WRITE(result, truc ){ result << "<" << # truc << ">" << truc << "</" <<  # truc << ">"; }
 #define XML_WRITE_INT(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }

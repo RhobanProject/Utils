@@ -13,15 +13,17 @@
  *  Created on: 19 juil. 2011
  *      Author: hugo
  *****************************************************************************/
-#include <list>
-
-#include <sys/time.h>
-#include <iostream>
-#include <math.h>
-#include <stdio.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#include <list>
+
+#include <timing/chrono.h>
+
+#include <iostream>
+#include <math.h>
+#include <stdio.h>
 #include "util.h"
 #include "ticks.h"
 #include "TickMachine.h"
@@ -30,7 +32,7 @@ using namespace std;
 
 TickMachine * TickMachine::the_tick_machine = NULL;
 
-timeval TickMachine::start_time;
+chrono TickMachine::start_time;
 
 TickMachine * TickMachine::get_tick_machine() {
 	//todo: return only when tick machine is started
@@ -43,9 +45,13 @@ void TickMachine::init_tick_machine() {
 	TickMachine::get_tick_machine();
 }
 
+double TickMachine::min_frequency = 100.0;
+double TickMachine::max_frequency = 150.0;
+
 TickMachine * TickMachine::createTickMachine()
 {
 	TickMachine * new_tick_machine;
+
 	gettimeofday(&start_time,0);
 
 #ifndef WIN32
@@ -181,7 +187,7 @@ TickMachine::~TickMachine()
 
 }
 
-void TickMachine::set_granularity(struct timeval musec)
+void TickMachine::set_granularity(chrono musec)
 {
 	TM_DEBUG_MSG("set_granularity");
 	granularity = musec;
@@ -357,7 +363,7 @@ void TickMachine::FrequencyChanged()
 
 void TickMachine::tick_players()
 {
-	timeval now;
+	chrono now;
 	gettimeofday(&now,0);
 
 	TM_DEBUG_MSG(players.size()<<" players to tick");
@@ -385,7 +391,7 @@ void TickMachine::tick_players()
 		}
 		else
 		{
-			timeval now;
+			chrono now;
 			gettimeofday(&now, NULL);
 			TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
 		}
@@ -420,7 +426,7 @@ void TickMachine::update_granularity_and_players(double max_relative_error)
 		gran = min(gran, 1.0 / (*timer_)->get_frequency());
 	}
 
-	struct timeval new_gran;
+	chrono new_gran;
 	new_gran.tv_sec = static_cast<int>(floor(gran));
 	new_gran.tv_usec = static_cast<int>(1000000*(gran-new_gran.tv_sec));
 

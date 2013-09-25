@@ -17,9 +17,8 @@
 #define TICK_MACHINE_H_
 
 #include <time.h>
-#ifndef WIN32
-#include <sys/time.h>
-#endif
+#include <timing/chrono.h>
+
 #include <signal.h>
 #include <vector>
 #include <list>
@@ -28,12 +27,15 @@
 #include <threading/Thread.h>
 #include <threading/Mutex.h>
 #ifdef _WIN32
+#include <winsock2.h>
 #include <windows.h>
 #endif
 
 class TickTimer;
 class Player;
 class TickMachine;
+
+#include <timing/chrono.h>
 
 #include "TickTimer.h"
 
@@ -43,7 +45,7 @@ using namespace std;
 #define TM_CAUTION_MSG(msg) { cerr << "TM CAUTION: " << msg << endl << flush; }
 #define TM_DEBUG 0
 #if TM_DEBUG==1
-#define TM_DEBUG_MSG(msg) { timeval now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
+#define TM_DEBUG_MSG(msg) { chrono now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
 #else
 #define TM_DEBUG_MSG(msg) {}
 #endif
@@ -57,9 +59,9 @@ class TickMachine : public Rhoban::Thread
     public:
 
     /*! The maximal possible schedule frequency in Hz */
-    static const double min_frequency = 100.0;
-    static const double max_frequency = 150.0;
-
+    static double min_frequency;
+	static double max_frequency;
+	
     /*! \brief Start the tick machine. It is not mandatory to use this function
      *  however depending on the time the init procedure takes, it can be used
      *  at the beginning of operations. */
@@ -107,7 +109,7 @@ class TickMachine : public Rhoban::Thread
     static TickMachine * createTickMachine();
 
     /*! \brief the time granularity of the TickMachine */
-    struct timeval granularity;
+    chrono granularity;
 
     /* The list of pending timers to be registered by execute()
      * We use a list because iterators remain valid when inserting/deleting elements
@@ -145,7 +147,7 @@ class TickMachine : public Rhoban::Thread
     void dispose_timer(TickTimer **);
 
     //for debug
-    static timeval start_time;
+    static chrono start_time;
 
 #ifndef WIN32
     sigset_t block_set;
@@ -169,7 +171,7 @@ class TickMachine : public Rhoban::Thread
 
     /*! sets time granularity
      * called at setup and by update_granularity_and_players() */
-    void set_granularity(struct timeval interval);
+    void set_granularity(chrono interval);
 
     /*! updates time granularity of the machine,
      *  according to the frequencies of players

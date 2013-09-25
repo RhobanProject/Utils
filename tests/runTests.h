@@ -11,6 +11,7 @@
 #define _RUNTESTS_H
 
 #include <iostream>
+#include <string>
 
 using namespace std;
 

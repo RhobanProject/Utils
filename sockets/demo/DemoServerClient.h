@@ -11,13 +11,14 @@
 #define _DEMOSERVERCLIENT_H
 
 #include <sockets/TCPServerClient.h>
+#include <sockets/common.h>
 
 namespace Rhoban
 {
     class DemoServerClient : public TCPServerClient
     {
         public:
-            DemoServerClient(int socket);
+            DemoServerClient(SOCKET socket);
 
             void loop();
     };

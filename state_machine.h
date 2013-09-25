@@ -81,8 +81,8 @@ public:
   bool eat_request( requesttyp r ) { return RequestChannel<requesttyp, char>::eat_request(r,NULL); };
 };
 
-#define VOID_REQUEST_CHANNEL_BY_ENUM(chan_id, lst...)      \
-  typedef enum { lst } chan_id ## _ENUM;                   \
+#define VOID_REQUEST_CHANNEL_BY_ENUM(chan_id, lst,...)      \
+  typedef enum { lst, ... } chan_id ## _ENUM;                   \
   typedef VoidRequestChannel<chan_id ## _ENUM> chan_id;               
 
 /*****************************************************************************/

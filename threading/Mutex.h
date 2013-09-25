@@ -10,7 +10,12 @@
 #ifndef MUTEX_H
 #define MUTEX_H
 
+#ifndef MSVC
 #include <pthread.h>
+#else
+#include <winsock2.h>
+#include <stdio.h>
+#endif
 
 //#define DEBUG_MUTEXES
 
@@ -28,7 +33,11 @@ public:
   virtual void unlock(void);
 
 protected:
+#ifndef MSVC
   pthread_mutex_t _mutex;
+#else
+	CRITICAL_SECTION _mutex;
+#endif
 };
 }
 #endif

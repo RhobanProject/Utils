@@ -11,9 +11,14 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
+
+#include <timing/chrono.h>
+
+#ifndef MSVC
 #include <pthread.h>
+#endif
+
 #include <cerrno>
-#include <sys/time.h>
 #include <iostream>
 
 #include "Condition.h"
@@ -23,26 +28,33 @@ using namespace Rhoban;
 
 Condition::Condition()
 {
-    int ret = pthread_cond_init(&condition, 0 );
+#ifndef MSVC
+	int ret = pthread_cond_init(&condition, 0 );
+    if(ret==-1) {
+        throw string("Failed to init condition");
+    }
+#else
+	InitializeConditionVariable(&condition);
+#endif
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " initialized condition " << (int) this << endl;
 #endif
 
-    if(ret==-1) {
-        throw string("Failed to init condition");
-    }
 }
 
 Condition::~Condition()
 {
+#ifndef MSVC
 	pthread_cond_destroy(&condition);
+#endif
 }
 
 int Condition::wait(Mutex * mutex, unsigned int timeout)
 {
     int ret;
+#ifndef MSVC
     struct timespec time;
-    struct timeval tv;
+    chrono tv;
 
     gettimeofday(&tv, NULL);
 
@@ -63,7 +75,9 @@ int Condition::wait(Mutex * mutex, unsigned int timeout)
     if (ret == ETIMEDOUT) {
         throw string("Timeout while waiting for condition");
     }
-
+#else
+	SleepConditionVariableCS(&condition,&(mutex->_mutex),timeout);
+#endif
     if (ret < 0) {
         throw string("Failed to wait condition");
     }
@@ -76,7 +90,7 @@ int Condition::wait(unsigned int timeout)
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " waiting condition " << (int) this << endl;
 #endif
-	wait(this, timeout);
+	return wait(this, timeout);
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " waited condition " << (int) this << endl;
 #endif
@@ -87,12 +101,15 @@ void Condition::broadcast()
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " broadcasting condition " << (int) this << endl;
 #endif
+#ifndef MSVC
     int ret = pthread_cond_broadcast(&condition);
+    if(ret==-1)
+        throw string("Failed to broadcast condition");
+#else
+	WakeConditionVariable(&condition);
+#endif
 #ifdef DEBUG_MUTEXES
 	cout << "Thread " <<  (int) pthread_self().p << " broadcasted condition " << (int) this << endl;
 #endif
-    if(ret==-1) {
-        throw string("Failed to broadcast condition");
-    }
 }
 

@@ -16,13 +16,12 @@
  *****************************************************************************/
 
 #include <stdlib.h>
-#include <sys/time.h>
 #include "chrono.h"
 
 /*!\brief compute tv0-tv1 and put it into dtv */
-void compute_tv_diff(struct timeval *tv0,
-		     struct timeval *tv1,
-		     struct timeval *dtv) {
+void compute_tv_diff(chrono *tv0,
+		     chrono *tv1,
+		     chrono *dtv) {
   if (tv0->tv_sec == tv1->tv_sec) {
     dtv->tv_sec = 0;
     dtv->tv_usec = tv0->tv_usec - tv1->tv_usec;
@@ -40,7 +39,19 @@ void compute_tv_diff(struct timeval *tv0,
   }
 }
 
-chrono * chrono_create() {
+#ifdef MSVC
+			 int gettimeofday (chrono *tp, void *tz)
+{
+struct _timeb timebuffer;
+	_ftime (&timebuffer);
+	tp->tv_sec = timebuffer.time;
+	tp->tv_usec = timebuffer.millitm * 1000;
+return 0;
+}
+
+#endif
+
+			 chrono * chrono_create() {
   chrono * chr = (chrono*) malloc(sizeof(chrono));
   chrono_reset(chr);
   return chr;
@@ -55,21 +66,21 @@ void delete_chrono(chrono * chr) {
 }
 
 long int chrono_sec(chrono * chr) {
-  struct timeval tv, tv_diff;
+  chrono tv, tv_diff;
   gettimeofday(&tv,NULL);
   compute_tv_diff(&tv, chr, &tv_diff);
   return tv_diff.tv_sec;
 }
 
 long int chrono_msec(chrono * chr) {
-  struct timeval tv, tv_diff;
+  chrono tv, tv_diff;
   gettimeofday(&tv,NULL);
   compute_tv_diff(&tv, chr, &tv_diff);
   return tv_diff.tv_sec * 1000 + tv_diff.tv_usec / 1000;
 }
 
 long int chrono_usec(chrono * chr) {
-  struct timeval tv, tv_diff;
+  chrono tv, tv_diff;
   gettimeofday(&tv,NULL);
   compute_tv_diff(&tv, chr, &tv_diff);
   return tv_diff.tv_sec * 1000000 + tv_diff.tv_usec;

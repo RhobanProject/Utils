@@ -1,4 +1,6 @@
+#ifndef MSVC
 #include <unistd.h>
+#endif
 #ifdef WIN32
 #include <windows.h>
 #endif

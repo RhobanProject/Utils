@@ -21,7 +21,10 @@
 #ifndef THREAD_H
 #define THREAD_H
 #include <logging/log.h>
+
+#ifndef MSVC
 #include <pthread.h>
+#endif
 
 #include "Mutex.h"
 #include "Condition.h"
@@ -188,6 +191,10 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
   int threadId(void){ return myId; }
 
 
+    /**
+     @brief the common run of the thread
+  */
+  void run(void);
 
 protected:
 
@@ -208,10 +215,6 @@ protected:
   typedef enum {Unborn,Starting,Running,Suspended,KillMe,Dying,Dead} ThreadState;
   ThreadState thread_state;
 
-  /**
-     @brief the common run of the thread
-  */
-  void run(void);
 
 
   /**
@@ -219,8 +222,11 @@ protected:
    * @param CThread pointer
    * @return NULL
    */
+#ifndef MSVC
   static void * EntryPoint(void* pthis);
-
+#else
+  static DWORD WINAPI EntryPoint(LPVOID pthis);
+#endif
   /**
    * method to setup the thread
    */
@@ -250,7 +256,11 @@ protected:
    */
   void wait_for_resume(bool lock = false);
 
+#ifndef MSVC
   pthread_t _Thread; ///< thread handle
+#else
+  HANDLE _Thread;
+#endif
   void * _Arg; ///< arguments
 
   Mutex pause_mutex;

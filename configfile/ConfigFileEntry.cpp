@@ -1,4 +1,5 @@
 #include "ConfigFileEntry.h"
+#include <string>
 
 using namespace std;
 

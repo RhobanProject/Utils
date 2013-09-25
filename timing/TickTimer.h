@@ -16,6 +16,7 @@
 
 class TickTimer;
 
+
 #include "TickMachine.h"
 #include "Playable.h"
 
@@ -69,7 +70,7 @@ class TickTimer : public Playable
 protected:
 
     /*! \brief Initializes the the variables before play. */
-    virtual void prepare_play(bool forever, timeval durations);
+    virtual void prepare_play(bool forever, chrono durations);
 
 
     /*! tells the tick machine to destroy this object at net tick */
@@ -89,7 +90,7 @@ protected:
      *****************************************/
 
     /*! \brief computes the relative frequency */
-    void set_relative(struct timeval granularity);
+    void set_relative(chrono granularity);
 
     /*! \briefticks elapsed since the timer was started */
     int ticks_elapsed;
@@ -107,7 +108,7 @@ protected:
 
     /*! \brief performs one tick to be called by the tick machine */
     virtual void tick();
-    bool is_tickable(timeval now);
+    bool is_tickable(chrono now);
 
     /*! \brief the internal tick counter */
     int tick_counter;

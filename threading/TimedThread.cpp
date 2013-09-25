@@ -18,6 +18,7 @@
 
 #include "ticks.h"
 #include "TimedThread.h"
+#include <timing\chrono.h>
 
 using namespace std;
 
@@ -121,9 +122,9 @@ void SlowTimedThread::kill()
 
 void SlowTimedThread::execute()
 {
-	struct timeval now;
-	struct timeval last;
-	struct timeval before;
+	chrono now;
+	chrono last;
+	chrono before;
 	gettimeofday(&now,NULL);
 
 	while(thread_state != Dying && thread_state != Dead)

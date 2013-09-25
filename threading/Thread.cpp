@@ -8,7 +8,11 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 #include <iostream>
+#ifndef MSVC
 #include <unistd.h>
+#else
+#include "windows.h"
+#endif
 #include <stdio.h>
 #include <signal.h>
 #include "Thread.h"
@@ -22,7 +26,9 @@ Thread::Thread()
 #ifndef WIN32
     _Thread = 0;
 #else
+#ifndef MSVC
     _Thread.p =0;
+#endif
 #endif
 }
 
@@ -33,20 +39,7 @@ Thread::~Thread()
         if(thread_state != Dead)
         {
             cerr << "Cancelling thread from destructor " << endl;
-#ifndef WIN32
-            if(_Thread)
-#else
-                if(_Thread.p)
-#endif
-                {
-                    pthread_cancel(_Thread);
-                    pthread_join(_Thread, NULL);
-#ifndef WIN32
-                    _Thread=0;
-#else
-                    _Thread.p=0;
-#endif
-                }
+			kill();
             cerr << "Cancelled thread from destructor " << endl;
         }
         thread_state = Dead;
@@ -67,21 +60,34 @@ Thread::~Thread()
 
 void Thread::detach()
 {
+#ifndef MSVC
     pthread_detach(_Thread);
+#endif
 }
 
 int Thread::start(void * arg)
 {
     thread_state = Starting;
     _Arg = arg; 
-
+#ifndef MSVC
     int code = pthread_create(&_Thread, NULL, Thread::EntryPoint, this);
 
     if (code != 0) {
         perror("pthread");
     }
-
     return code;
+#else
+	DWORD id;
+	_Thread = CreateThread( 
+            NULL,                   // default security attributes
+            0,                      // use default stack size  
+			Thread::EntryPoint,          // argument to thread function ,
+			this,
+            0,                      // use default creation flags 
+            &id);   // returns the thread identifier 
+	return 0;
+#endif
+
 }
 
 /*!
@@ -154,6 +160,7 @@ void Thread::kill(void)
     if(!is_alive()) return;
     wait_started();
     thread_state = Dying;
+#ifndef MSVC
 #ifndef WIN32
     if(_Thread)
 #else
@@ -167,7 +174,10 @@ void Thread::kill(void)
 #else
             _Thread.p=0;
 #endif
-        }
+		}
+#else
+	TerminateThread(_Thread,0);
+#endif
 
     thread_state = Dead;
 }
@@ -175,7 +185,11 @@ void Thread::kill(void)
 int Thread::currentThreadId(void)
 {
 #ifdef WIN32
+#ifndef MSVC
 	return (int) pthread_self().p;
+#else
+	return GetCurrentThreadId();
+#endif
 #else
 	return (long int) pthread_self();
 #endif
@@ -205,7 +219,8 @@ void Thread::run(void)
     thread_state = Dead;
 }
 
-void *Thread::EntryPoint(void *pthis)
+#ifndef MSVC
+ void * Thread::EntryPoint(void* pthis)
 {
     Thread *pt = (Thread*)pthis;
     int s = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
@@ -224,10 +239,22 @@ void *Thread::EntryPoint(void *pthis)
         throw err;
     }
 
-    pt->run();
+ #else
+ DWORD Thread::EntryPoint(LPVOID pthis)
+	 {
+
+    Thread *pt = (Thread*)pthis;
+
+#endif
+
+	    pt->run();
+#ifdef MSVC
+		ExitThread(0);
+#endif
 
     return NULL;
 }
+
 
 void Thread::setup(void)
 {
@@ -260,7 +287,11 @@ void Thread::unlock()
 
 void Thread::wait(void)
 {
+#ifndef MSVC
     pthread_join (_Thread, NULL);
+#else
+	TerminateThread(_Thread,0);
+#endif
 }
 
 /*!

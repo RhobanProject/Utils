@@ -21,6 +21,7 @@ namespace Rhoban
     {
         public:
             TCPServerClient();
+			TCPServerClient(SOCKET socket){ setSocket(socket); };
             ~TCPServerClient();
 
             /**
