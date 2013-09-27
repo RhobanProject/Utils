@@ -17,7 +17,7 @@
 
 #ifdef MSVC
 #undef LINUX
-#endif MSVC
+#endif 
 
 #ifdef LINUX
 #include <unistd.h>
