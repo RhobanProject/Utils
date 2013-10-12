@@ -13,7 +13,9 @@
 #include <fcntl.h>
 #endif
 #include <iostream>
+#ifndef MSVC
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -25,6 +27,8 @@
 #include "util.h"
 
 #include "TCPClientBase.h"
+
+#include <timing/chrono.h>
 
 #define FD_ZERO2(p)     memset((p), 0, sizeof(*(p)))
 
@@ -127,7 +131,11 @@ namespace Rhoban
         string str = receiveString(true);
 
         va_start(args, format);
-        vsscanf(str.c_str(), format, args);
+#ifdef MSVC
+		throw string("TCPClientBase::receiveFormat unimplemented");
+#else
+		vsscanf(str.c_str(), format, args);
+#endif
         va_end(args);
     }
 
@@ -160,15 +168,14 @@ namespace Rhoban
 
     void TCPClientBase::transmitString(string str, bool lineTerminates)
     {
-        char buffer[str.length()+1];
-
-        memcpy(buffer, str.c_str(), sizeof(buffer));
+        string buffer = str;
+		buffer.resize(str.length()+1);
 
         if (lineTerminates) {
             buffer[sizeof(buffer)-1] = '\n';
         }
 
-        transmit(buffer, sizeof(buffer));
+		transmit(buffer.c_str(), sizeof(buffer));
     }
 
     void TCPClientBase::transmitFormat(const char *format, ...)
@@ -231,7 +238,11 @@ namespace Rhoban
     void TCPClientBase::stop()
     {
         if (clientSocket) {
+#ifdef WIN32
+            closesocket(clientSocket);
+#else
             close(clientSocket);
+#endif
         }
 
         connected = false;

@@ -20,11 +20,24 @@
 /*****************************************************************************/
 /*!\brief A chrono is just a type value
  *****************************************************************************/
-#ifdef WIN32
+
+#ifdef MSVC
+#include <time.h>
+#include <sys/timeb.h>
+
+struct tttt {
+        long    tv_sec;        
+        long    tv_usec;      
+};
+
+typedef struct tttt chrono;
+int gettimeofday (chrono *tp, void *tz);
+#else
+#include <time.h>
 #include <sys/time.h>
+typedef struct timeval chrono;
 #endif
 
-typedef struct timeval chrono;
 
 /*****************************************************************************/
 /*!\brief Reset the chrono

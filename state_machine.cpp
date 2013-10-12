@@ -22,7 +22,7 @@
 using namespace std;
 
 /*****************************************************************************/
-#define DBUG(msg...) { printf(msg); fflush(stdout); };
+#define DBUG(msg,...) { printf(msg __VA_ARGS__); fflush(stdout); };
 /*****************************************************************************/
 
 int StateMachine::reset() {

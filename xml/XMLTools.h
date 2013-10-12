@@ -27,14 +27,16 @@
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
 
-#define xml_parse_error(str...)   { throw string(str); }
-#define interpretor_error(str...) { throw string(str); }
+#define xml_parse_error(str,...)   { throw string(str); }
+#define interpretor_error(str,...) { throw string(str); }
 
 #define XML_WRITE(result, truc ){ result << "<" << # truc << ">" << truc << "</" <<  # truc << ">"; }
 #define XML_WRITE_INT(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
 #define XML_WRITE_CHAR(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
 #define XML_WRITE_BOOL(result, truc){ result << "<" << # truc << ">" << ( truc ? "true" : "false") << "</" << # truc << ">"; }
 #define XML_WRITE_DOUBLE(result, truc){ result.precision(100); result << "<" << # truc << ">" << truc << "</" << # truc << ">"; }
+#define XML_WRITE_STRING(result, truc){ result << "<" << # truc << ">" << truc << "</" << # truc << ">"; }
+
 #define XML_WRITE_STRING_ARRAY(result, truc){ \
 	result << "<" << # truc << ">"; \
 	for(int i = 0 ; i < truc.size(); i++) \
@@ -42,11 +44,13 @@
 	result << "</" << # truc << ">"; \
 }
 
+
 #define	XML_READ_INT(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_BOOL(node, truc){ truc = XMLTools::get_bool_element(node, # truc); }
 #define	XML_READ_CHAR(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_DOUBLE(node, truc){ truc = XMLTools::get_double_element(node, # truc); }
 #define	XML_READ_DOUBLE_ARRAY(node, truc){ truc = XMLTools::get_double_array(node, # truc); }
+#define	XML_READ_FLOAT(node, truc){ truc = XMLTools::get_float_element(node, # truc); }
 #define	XML_READ_FLOAT_ARRAY(node, truc){ truc = XMLTools::get_float_array(node, # truc); }
 #define	XML_READ_STRING(node, truc){ truc = XMLTools::get_string_element(node, # truc); }
 #define	XML_READ_STRING_ARRAY(node, truc){ truc = XMLTools::get_string_array(node, # truc); }

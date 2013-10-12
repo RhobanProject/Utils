@@ -9,6 +9,7 @@
  *************************************************/
 #include "TickTimer.h"
 
+
 TickTimer::TickTimer() :
 disposed(false),
 ticks_elapsed(0),
@@ -48,7 +49,7 @@ TickTimer::TickTimer(double hertz, string name) :
 
 
 /*! \brief Initializes the the variables before play. */
-void TickTimer::prepare_play(bool forever, timeval durations)
+void TickTimer::prepare_play(bool forever, chrono durations)
 {
 	ticks_elapsed = 0;
 	Playable::prepare_play(forever, durations);
@@ -75,7 +76,7 @@ void TickTimer::unregister()
 	}
 }
 
-void TickTimer::set_relative(struct timeval granularity)
+void TickTimer::set_relative(chrono granularity)
 {
 	double gran = granularity.tv_sec + granularity.tv_usec/1000000.0;
 	ui32 newrelative = (uint) floor( 1.0 / (gran * frequency) );
@@ -89,7 +90,7 @@ void TickTimer::set_relative(struct timeval granularity)
 		tick_counter = relative;
 
 		//for win32
-		timeval now;
+		chrono now;
 		gettimeofday(&now, NULL);
 
 		int new_ticks_elapsed = (int) (1 + (to_secs(now ) - to_secs(start_time) ) * frequency);
@@ -103,7 +104,7 @@ void TickTimer::set_relative(struct timeval granularity)
 }
 
 
-bool TickTimer::is_tickable(timeval now)
+bool TickTimer::is_tickable(chrono now)
 {
 	return (relative > 0) && ( (to_secs(now ) - to_secs(start_time) ) * frequency - ticks_elapsed >= 0);
 }

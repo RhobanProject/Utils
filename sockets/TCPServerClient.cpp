@@ -8,8 +8,13 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 #include <fcntl.h>
+
+#ifndef MSVC
 #include <unistd.h>
+#endif
+
 #include <iostream>
+
 #ifndef WIN32
 #include <signal.h>
 #endif
@@ -40,7 +45,11 @@ namespace Rhoban
     void TCPServerClient::closeSocket()
     {
         if (clientSocket != INVALID_SOCKET) {
+#ifdef MSVC
+			closesocket(clientSocket);
+#else
             close(clientSocket);
+#endif
         }
         clientSocket = INVALID_SOCKET;
     }

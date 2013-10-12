@@ -1,22 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef MSVC
 #include <unistd.h>
+#endif
 #include "term_display.h"
-#include "chrono.h"
+#include <timing/chrono.h>
 
 chrono tt_chr;
 
 bool colorsAllowed = false;
 
+#ifndef MSVC
 void init_term_support() __attribute__ ((constructor));
+#endif
 
 void init_term_support(){
+#ifndef MSVC
   if (isatty(STDOUT_FILENO)){
     // TODO terminal capability should be checked before allowing colors
     // source: http://stackoverflow.com/a/2616912/2104361
     colorsAllowed = true;
   }
+#else
+    colorsAllowed = false;
+#endif
 }
 
 void term_set_color(const char * c){

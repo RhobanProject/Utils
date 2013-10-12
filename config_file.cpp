@@ -54,7 +54,7 @@ void eat_spaces(int lb_idx_max) {
 void eat_lexem(int lb_idx_max) {
 	eat_spaces(lb_idx_max);
 	sscanf(line_buffer+lb_idx, "%s", lexem_buffer);
-	lb_idx += strlen(lexem_buffer);
+	lb_idx += (int) strlen(lexem_buffer);
 }
 
 #define SYNTAX_ERROR(reason) { printf("config file syntax error: %s\n", reason); fclose(fd); return 2; }

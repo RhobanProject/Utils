@@ -20,6 +20,7 @@
 #include <timing/TickMachine.h>
 #include <timing/Player.h>
 
+#include <timing/chrono.h>
 #include "Thread.h"
 
 /*

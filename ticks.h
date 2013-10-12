@@ -19,8 +19,7 @@
 #define TICKS_H_
 
 #include "util.h"
-#include <sys/time.h>
-#include <unistd.h>
+#include <timing/chrono.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -48,7 +47,7 @@ void wait_n_ticks(ui32 tick_nb);
 
 
 void sleep_ms_ticks(ui32 ms);
-void sleep_ticks(struct timeval duration);
+void sleep_ticks(chrono duration);
 
 inline void syst_wait_ms(int ms)
 {
@@ -61,19 +60,19 @@ inline void syst_wait_ms(int ms)
 void sleep_ms(ui32 ms);
 void sleep_ms(int ms); // TODO pas terrible... les 2 sleep_ms...
 void wait_ms(int ms);
-void sleep_ms(struct timeval duration);
-void decrease(struct timeval & chrono, struct timeval & duration);
-void increase(struct timeval & chrono, struct timeval & duration);
-bool is_after(struct timeval & time_to_check, struct timeval & reference);
-double to_secs(struct timeval & duration);
-string timevalToString(const struct timeval & time);
+void sleep_ms(chrono duration);
+void decrease(chrono & chronoo, chrono & duration);
+void increase(chrono & chronoo, chrono & duration);
+bool is_after(chrono & time_to_check, chrono & reference);
+double to_secs(chrono & duration);
+string chronoToString(const chrono & time);
 
 /*!
  * returns the number of millisec or musecs since init of the time machine
  * @return
  */
 ui32 get_msec();
-void get_tick_machine_time(struct timeval * clock);
+void get_tick_machine_time(chrono * clock);
 
 
 #endif /* TICKS_H_ */

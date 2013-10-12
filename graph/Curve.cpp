@@ -1,11 +1,13 @@
 #include <iostream>
-#include <sys/time.h>
+
+#include <timing/chrono.h>
+
 #include "Curve.h"
 #include "ticks.h"
 
 using namespace std;
 
-Curve::Curve(string name_, struct timeval *start_) : name(name_), start(start_), count(0)
+Curve::Curve(string name_, chrono *start_) : name(name_), start(start_), count(0)
 {
     values = new deque<CurveEntry*>();
 }
@@ -23,7 +25,7 @@ void Curve::push(double value)
 
 double Curve::elapsed()
 {
-    struct timeval n;
+    chrono n;
     gettimeofday(&n, NULL);
     decrease(n, *start);
 

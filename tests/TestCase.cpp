@@ -86,7 +86,7 @@ void TestCase::_assertFalse(bool expression)
 
 void TestCase::_assertEquals(string str1, string str2, bool neg)
 {
-    if ((str1 != str2) xor neg) {
+    if ((str1 != str2) ^ neg) {
         if (neg) {
             error("String are equals (" + str1 + " == " + str2 + ")");
         } else {
@@ -113,7 +113,7 @@ void TestCase::_assertEquals(char *char1, char *char2, int size)
 
 void TestCase::_assertEquals(int int1, int int2, bool neg)
 {
-    if ((int1 != int2) xor neg) {
+    if ((int1 != int2) ^ neg) {
         ostringstream oss;
 
         if (neg) {
@@ -130,7 +130,7 @@ void TestCase::_assertEquals(int int1, int int2, bool neg)
 
 void TestCase::_assertEquals(char char1, char char2, bool neg)
 {
-    if ((char1 != char2) xor neg) {
+    if ((char1 != char2) ^ neg) {
         ostringstream oss;
 
         if (neg) {

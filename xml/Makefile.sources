@@ -1,2 +1,0 @@
-XML_TOOLS_SUBDIRS = TinyXml
-XML_TOOLS_SRC = XMLTools.cpp

@@ -15,6 +15,10 @@
 
 #include <ticks.h>
 
+#ifdef MSVC
+#undef LINUX
+#endif 
+
 #ifdef LINUX
 #include <unistd.h>
 #include <fcntl.h>
@@ -33,6 +37,10 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <serial.h>
+#endif
+
+#ifdef WIN32
+#include <timing/chrono.h>
 #endif
 
 #include <logging/log.h>
@@ -381,7 +389,7 @@ bool Serial::waitForData(int timeout_us)
     FD_SET(fd, &read_fds);
 
     // Set timeout 
-    struct timeval timeout;
+    chrono timeout;
     timeout.tv_sec = timeout_us/1000000;
     timeout.tv_usec = timeout_us%1000000;
 
@@ -417,7 +425,7 @@ size_t Serial::readTimeout(char *destination, size_t size, int timeout_us)
     FD_SET(fd, &read_fds);
 
     // Set timeout 
-    struct timeval timeout;
+    chrono timeout;
     timeout.tv_sec = timeout_us/1000000;
     timeout.tv_usec = timeout_us%1000000;
 
@@ -507,9 +515,17 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 
 string Serial::receive(size_t size, bool blocking)
 {
+#ifndef MSVC
 	char result[size];
+#else
+	char * result = (char *) malloc(size);
+#endif
 	int nb = receive(result, size, blocking);
-	return string(result, nb);
+	string res = string(result, nb);
+#ifdef MSVC
+	delete result;
+#endif
+	return res;
 }
 
 char Serial::receiveChar()
@@ -634,7 +650,7 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 	}
 	catch(string exc)
 	{
-		timeval t;
+		chrono t;
 		gettimeofday(&t, 0);
 		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern \n\t" << exc << endl;
 	}

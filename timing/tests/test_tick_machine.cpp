@@ -25,7 +25,7 @@
 #include <windows.h>
 #endif
 
-#include "TickMachine.h"
+#include <timing/TickMachine.h>
 
 using namespace std;
 

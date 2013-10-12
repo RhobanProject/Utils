@@ -66,12 +66,12 @@ int string_to_int(char * argv);
 /*****************************************************************************/
 #define BOT_VERBOSE_MODE 1
 
-#define BOT_VERBOSE(x...) do {                                   \
-	if ( BOT_VERBOSE_MODE ) { printf(x); fflush(stdout); }   \
+#define BOT_VERBOSE(x,...) do {                                   \
+	if ( BOT_VERBOSE_MODE ) { printf(x,...); fflush(stdout); }   \
 } while(0);
 
-#define BOT_ERROR(x...) do {                                     \
-    printf("Bot Error: "); printf(x); fflush(stdout);            \
+#define BOT_ERROR(x,...) do {                                     \
+    printf("Bot Error: "); printf(x,...); fflush(stdout);            \
 } while(0);
 
 /*****************************************************************************/

@@ -12,7 +12,6 @@
 
 #include "Mutex.h"
 
-
 namespace Rhoban
 {
 
@@ -35,7 +34,11 @@ public:
 
 private:
 
-  pthread_cond_t condition;
+#ifndef MSVC
+	pthread_cond_t condition;
+#else
+	CONDITION_VARIABLE condition;
+#endif
 };
 
 }
