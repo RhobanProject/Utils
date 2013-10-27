@@ -23,6 +23,7 @@
 #define SOCKET int
 #define SOCKET_ERROR -1
 #define INVALID_SOCKET -1
+#define closesocket(s) close(s)
 #endif
 
 typedef struct sockaddr_in SOCKADDR_IN;
