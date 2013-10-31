@@ -60,16 +60,13 @@ string ConfigFile::getFullName(string node, string name)
     return fullOpt.str();
 }
 
-AnyOption ConfigFile::processOptions(string node, string name, string fullName)
+void ConfigFile::processOptions(AnyOption options, string node, string name, string fullName)
 {
-    AnyOption options;
     options.setOption(name.c_str());
     options.setOption(fullName.c_str());
     if (argv != NULL) {
         options.processCommandArgs(argc, argv);
     }
-
-    return options;
 }
 
 void ConfigFile::write(string node, string name, ConfigFileWriteable *value)
@@ -165,7 +162,8 @@ void ConfigFile::useCommandArgs(int argc_, char **argv_)
 void ConfigFile::read(string node, string name, int defaultValue, int &output)
 {
     string fullName = getFullName(node, name);
-    AnyOption options = processOptions(node, name, fullName);
+	AnyOption options;
+	processOptions(options, node, name, fullName);
     const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
@@ -188,8 +186,9 @@ void ConfigFile::read(string node, string name, int defaultValue, int &output)
 void ConfigFile::read(string node, string name, double defaultValue, double &output)
 {
     string fullName = getFullName(node, name);
-    AnyOption options = processOptions(node, name, fullName);
-    const YAML::Node *yaml = getYaml(node);;
+	AnyOption options;
+	processOptions(options, node, name, fullName);
+	const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
     if (char *value = options.getValue(name.c_str())) {
@@ -231,8 +230,9 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
 string ConfigFile::readStringIfExists(string node, string name)
 {
     string fullName = getFullName(node, name);
-    AnyOption options = processOptions(node, name, fullName);
-    const YAML::Node *yaml = getYaml(node);
+	AnyOption options;
+	processOptions(options, node, name, fullName);
+	const YAML::Node *yaml = getYaml(node);
     const YAML::Node *nodeY;
 
     string output;

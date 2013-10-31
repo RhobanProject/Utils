@@ -11,12 +11,13 @@ if (ROBOARD)
         CACHE STRING "")
 endif (ROBOARD)
 
-if (not MSVC)
+IF (NOT MSVC)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-endif (not MSVC)
+ENDIF (NOT MSVC)
 
 if (MSVC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
+
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-DMSVC)
 add_definitions(-D_WINSOCKAPI_)

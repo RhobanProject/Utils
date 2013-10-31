@@ -90,12 +90,16 @@ AnyOption::AnyOption(int maxopt, int maxcharopt)
 
 AnyOption::~AnyOption()
 {
+	/*
+	There is a small memory leak here but otherwise it is a mess to cleanup cleanly
+
 	//added by Hugo
 	for(int i = 0 ; i< option_counter; i++)
 	{
-		delete[] options[i];
+		delete options[i];
 		options[i] = NULL;
 	}
+
 	if(values != NULL)
 		for(int i = 0 ; i< g_value_counter; i++)
 		{
@@ -110,6 +114,7 @@ AnyOption::~AnyOption()
 
 	if( mem_allocated )
 		cleanup();
+		*/
 
 }
 
@@ -158,6 +163,16 @@ AnyOption::init(int maxopt, int maxcharopt )
 	once = true;
 	hasoptions = false;
 	autousage = false;
+
+	options = NULL;
+	optiontype = NULL;
+	optionindex = NULL;
+	optionchars = NULL;
+	optchartype = NULL;
+	optcharindex = NULL;
+	usage = NULL;
+	values = NULL;
+	new_argv = NULL;
 
 	strcpy( long_opt_prefix , "--" );
 

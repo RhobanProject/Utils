@@ -59,7 +59,7 @@ class ConfigFile
         char **argv;
 
         string getFullName(string node, string name);
-        AnyOption processOptions(string node, string name, string fullName);
+		void processOptions(AnyOption options, string node, string name, string fullName);
         const YAML::Node *getYaml(string node);
 };
 
