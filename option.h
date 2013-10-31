@@ -49,6 +49,15 @@ public:
       throw OptionNoValueExc();
     return stored;
   }
+
+  /*! \brief Get the address of the value if present, throw a dirty exception
+   *  otherwise */
+  T * getValueAddr()
+  {
+    if (!isSome)
+      throw OptionNoValueExc();
+    return & stored;
+  }
 };
 
 #endif /* OPTION_HH */

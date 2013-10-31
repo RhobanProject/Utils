@@ -18,7 +18,7 @@
 
 #include "ticks.h"
 #include "TimedThread.h"
-#include <timing\chrono.h>
+#include <chrono.h>
 
 using namespace std;
 

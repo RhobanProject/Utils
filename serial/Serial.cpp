@@ -17,7 +17,7 @@
 
 #ifdef MSVC
 #undef LINUX
-#endif MSVC
+#endif 
 
 #ifdef LINUX
 #include <unistd.h>
@@ -232,6 +232,7 @@ int Serial::connect(bool blocking)
 #ifdef LINUX
                 newtio.c_cflag = B38400|CS8|CLOCAL|CREAD;
 #elif MACOSX
+                tcgetattr(fd, &newtio);
                 cfsetispeed(&newtio,B115200);
                 cfsetospeed(&newtio,B115200);                
                 newtio.c_cflag |= CLOCAL | CREAD | CS8; 
