@@ -87,7 +87,7 @@ int Thread::start(void * arg)
             &id);   // returns the thread identifier 
 	return 0;
 #endif
-
+	started.broadcast();
 }
 
 /*!
@@ -160,6 +160,7 @@ void Thread::kill(void)
     if(!is_alive()) return;
     wait_started();
     thread_state = Dying;
+	cleanup();
 #ifndef MSVC
 #ifndef WIN32
     if(_Thread)
@@ -204,11 +205,11 @@ void Thread::run(void)
     myId = currentThreadId();
 
     try {
-        is_started.lock();
+        started.lock();
         setup();
         thread_state = Running;
-        is_started.broadcast();
-        is_started.unlock();
+        started.broadcast();
+        started.unlock();
         execute();
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
@@ -216,7 +217,12 @@ void Thread::run(void)
         cerr << "Exception in thread " << thread_name <<" :"<< exc<< endl;
     }
 
-    thread_state = Dead;
+	cleanup();
+
+	dead.lock();
+	dead.broadcast();
+	thread_state = Dead;
+	dead.unlock();
 }
 
 #ifndef MSVC
@@ -248,6 +254,7 @@ void Thread::run(void)
 #endif
 
 	    pt->run();
+
 #ifdef MSVC
 		ExitThread(0);
 #endif
@@ -266,14 +273,22 @@ void Thread::setup(void)
 void Thread::wait_started()
 {
 	//Hugo: We should use a condion instead
-    while(thread_state == Unborn || thread_state==Starting)
-    {
 #ifdef WIN32
-        Sleep(1);
+	started.lock();
+	if(thread_state == Unborn || thread_state == Starting)
+		started.wait();
+	started.unlock();
 #else
+	while (thread_state == Unborn || thread_state == Starting)
         usleep(1000);
 #endif
-    }
+}
+
+void Thread::wait_dead()
+{
+	dead.lock();
+	dead.wait();
+	dead.unlock();
 }
 
 void Thread::lock()

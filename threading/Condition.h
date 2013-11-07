@@ -24,12 +24,25 @@ public:
 
   // wait for the condition to be brodcasted (optional timeout in ms)
   //the condition should be locked before use
-  virtual int wait(unsigned int timeout = 0);
+  virtual int wait(unsigned int timeout =
+#ifndef MSVC
+	  0
+#else 
+	  INFINITE
+#endif
+	  );
   
   //wait for the condition with a particular Mutex
-  virtual int wait(Mutex * mutex, unsigned int timeout = 0);
+  virtual int wait(Mutex * mutex, unsigned int timeout = 
+#ifndef MSVC
+	  0
+#else 
+	  INFINITE
+#endif
+	  );
 
   // broadcast a condition
+  //typically, the condition is locked by the calling thread before being broadcasted and unlocked afterwards
   virtual void broadcast();
 
 private:

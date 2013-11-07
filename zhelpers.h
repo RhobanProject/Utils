@@ -3,16 +3,22 @@
 
 // Include a bunch of headers that we will need in the examples
 
+#ifndef WIN32
 #include <zmq.h>
+#else
+#include <zmq\include\zmq.h>
+#endif
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#ifndef WIN32
 #include <sys/time.h>
-#include <time.h>
 #include <unistd.h>
+#endif
+#include <time.h>
 #include <assert.h>
 #include <signal.h>
 
