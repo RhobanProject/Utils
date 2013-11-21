@@ -60,7 +60,7 @@ string ConfigFile::getFullName(string node, string name)
     return fullOpt.str();
 }
 
-void ConfigFile::processOptions(AnyOption options, string node, string name, string fullName)
+void ConfigFile::processOptions(AnyOption &options, string node, string name, string fullName)
 {
     options.setOption(name.c_str());
     options.setOption(fullName.c_str());
@@ -162,11 +162,12 @@ void ConfigFile::useCommandArgs(int argc_, char **argv_)
 void ConfigFile::read(string node, string name, int defaultValue, int &output)
 {
     string fullName = getFullName(node, name);
-	AnyOption options;
-	processOptions(options, node, name, fullName);
+    AnyOption options;
+    processOptions(options, node, name, fullName);
     const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
+    cout << "Searching a value for " << fullName << endl;
     if (char *value = options.getValue(name.c_str())) {
         output = atoi(value);
     } else if (char *value = options.getValue(fullName.c_str())) {
