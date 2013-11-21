@@ -167,7 +167,6 @@ void ConfigFile::read(string node, string name, int defaultValue, int &output)
     const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
-    cout << "Searching a value for " << fullName << endl;
     if (char *value = options.getValue(name.c_str())) {
         output = atoi(value);
     } else if (char *value = options.getValue(fullName.c_str())) {
