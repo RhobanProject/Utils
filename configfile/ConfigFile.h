@@ -48,7 +48,16 @@ class ConfigFile
 
         string helpText;
         void addHelpLine(string help);
+
+        /**
+         * Displays the help if the --help or --? is passed
+         */
         void help();
+
+        /**
+         * Displays the usage
+         */
+        void usage();
 
     protected:
         map<string, vector<ConfigFileEntry*> > entries;
