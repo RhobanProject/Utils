@@ -24,13 +24,13 @@ class ConfigFile
 
         void useCommandArgs(int argc, char **argv);
 
-        const YAML::Node *getNode(string node, string name);
+		const YAML::Node *getNode(string node, string name)  const;
 
         void read(string node, string name, int value, int &output);
-        void read(string node, string name, double value, double &output);
-        void read(string node, string name, double value, float &output);
-        void read(string node, string name, string value, string &output);
-        void read(string node, string name, bool value, bool &output);
+		void read(string node, string name, double value, double &output);
+		void read(string node, string name, double value, float &output);
+		void read(string node, string name, string value, string &output);
+		void read(string node, string name, bool value, bool &output);
 
         void write(string node, string name, ConfigFileWriteable *value);
 
@@ -43,8 +43,8 @@ class ConfigFile
 
         void save(string filename);
 
-        string readStringIfExists(string node, string name);
-        string readStringIfExists(string node);
+		string readStringIfExists(string node, string name)  const;
+		string readStringIfExists(string node) const;
 
         string helpText;
         void addHelpLine(string help);
@@ -58,9 +58,9 @@ class ConfigFile
         int argc;
         char **argv;
 
-        string getFullName(string node, string name);
-		void processOptions(AnyOption options, string node, string name, string fullName);
-        const YAML::Node *getYaml(string node);
+		string getFullName(const string node, const string name) const;
+		void processOptions(AnyOption options, const string node, const string name, string fullName)  const;
+		const YAML::Node *getYaml(string node) const;
 };
 
 #endif // _CONFIGFILE_H

@@ -37,13 +37,13 @@ public:
   {};
 
   /*! \brief Check if a value is stored */
-  bool hasValue()
+  bool hasValue() const
   {
     return isSome;
   }
 
   /*! \brief Get the value if present, throw a dirty exception otherwise */
-  T getValue()
+  T getValue() const
   {
     if (!isSome)
       throw OptionNoValueExc();

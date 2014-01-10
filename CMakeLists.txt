@@ -13,13 +13,12 @@ endif (ROBOARD)
 
 if (MSVC)
 	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
-
-add_definitions(-D_USE_MATH_DEFINES)
-add_definitions(-DMSVC)
-add_definitions(-D_WINSOCKAPI_)
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	add_definitions(-D_USE_MATH_DEFINES)
+	add_definitions(-DMSVC)
+	add_definitions(-D_WINSOCKAPI_)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else (MSVC) 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif (MSVC)
 
 cmake_minimum_required (VERSION 2.6)
@@ -39,11 +38,6 @@ option (ENABLE_ZMQ
 option (COMPILE_UTILS_TESTS
     "Compile utils tests?" OFF)
 
-if (ENABLE_ZMQ)
-    add_definitions (-DHAVE_ZMQ)
-    set(ZMQ_HEADERS "${BASE}/Utils/zmq/include"
-        CACHE STRING "ZMQ headers directory")
-endif (ENABLE_ZMQ)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -108,7 +102,6 @@ set (EXTRA_LIBS ${EXTRA_LIBS} json)
 set(DIRECTORIES
     .
     configfile
-    graph
     json
     logging
     observer
@@ -121,12 +114,32 @@ set(DIRECTORIES
     xml
     )
 
+
 if (COMPILE_UTILS_TESTS)
   include_directories ("test")
 endif (COMPILE_UTILS_TESTS)
 
 if (ENABLE_ZMQ)
-    add_subdirectory(zmq)
+	message("-- Adding ZMQ support")
+
+    add_definitions (-DHAVE_ZMQ)
+	set (ZMQ_VERSION "3.0" CACHE STRING  "ZMQ Version")
+
+	if(${ZMQ_VERSION} MATCHES "2.2")
+		message("Using ZMQ version 2.2")
+		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq2.2/include"
+			CACHE STRING "ZMQ headers directory")
+		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq2.2")
+	else()
+		message("Using ZMQ version ${ZMQ_VERSION}")
+		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq/include"
+			CACHE STRING "ZMQ headers directory")
+		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq")
+		message("Adding graph directory")
+		set(DIRECTORIES ${DIRECTORIES} graph)
+	endif()
+
+
     include_directories ("${ZMQ_HEADERS}")
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
 
@@ -148,6 +161,7 @@ foreach (DIRECTORY ${DIRECTORIES})
     set (ALL_SOURCES ${ALL_SOURCES} ${PREFIXED_SOURCES})
 endforeach (DIRECTORY)
 
+
 if (COMPILE_UTILS_TESTS)
   add_executable (scoringTest test/ScoringTest.cpp scoring/Score.cpp scoring/Mark.cpp tests/TestCase.cpp)
 endif (COMPILE_UTILS_TESTS)
@@ -156,6 +170,32 @@ endif (COMPILE_UTILS_TESTS)
 add_subdirectory (xml/TinyXml)
 set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
 
+
+# ADD HEADERS FILES 
+foreach (SOURCE ${ALL_SOURCES})
+	set (FILENAME_PREFIX)
+	set (FILENAME_PATH)
+	GET_FILENAME_COMPONENT(FILENAME_PREFIX ${SOURCE} NAME_WE)
+	GET_FILENAME_COMPONENT(FILENAME_PATH ${SOURCE} PATH)
+	
+	set (FILENAME ${FILENAME_PATH}/${FILENAME_PREFIX})
+
+	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
+#		message("Adding header " ${FILENAME}.h)
+        set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.h")
+	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
+	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
+#		message("Adding header " ${FILENAME}.hpp)
+        set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.hpp")
+	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
+endforeach (SOURCE)
+
+
 # Adding library and dependecy
-add_library (RhobanUtils ${ALL_SOURCES})
+add_library (RhobanUtils ${ALL_SOURCES} ${ALL_HEADERS})
 target_link_libraries (RhobanUtils ${EXTRA_LIBS})
+
+
+
+
+
