@@ -17,6 +17,9 @@
 
 #ifndef WIN32
 #include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #endif
 
 #include "TCPServerClient.h"
@@ -74,5 +77,10 @@ namespace Rhoban
     void TCPServerClient::setSocket(SOCKET socket)
     {
         clientSocket = socket;
+
+#ifndef WIN32
+        int noDelay = 1;
+        setsockopt(clientSocket, IPPROTO_TCP, TCP_NODELAY, (void *)&noDelay, sizeof(noDelay));
+#endif
     }
 }

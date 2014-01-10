@@ -65,11 +65,14 @@ namespace Rhoban
     {
         int n;
 
+        chrono *c = chrono_create();
         while (size > 0) {
             n = receive(buffer, size);
             buffer += n;
             size -= n;
         }
+        cout << "ReceiveAll took " << chrono_msec(c) << endl;
+        delete_chrono(c);
     }
             
     bool TCPClientBase::waitReady(int timeout_ms)
@@ -102,6 +105,29 @@ namespace Rhoban
         }
 
         return true;
+    }
+            
+    string TCPClientBase::receiveStringSize(int size)
+    {
+        int n, total = 0;
+        char c;
+        ostringstream stream;
+
+        while (true) {
+            n = receive(&c, 1);
+
+            if (n == 1) {
+                stream << c;
+                total++;
+                if (total >= size) {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        return stream.str();
     }
 
     string TCPClientBase::receiveString(bool lineTerminates)
@@ -169,13 +195,13 @@ namespace Rhoban
     void TCPClientBase::transmitString(string str, bool lineTerminates)
     {
         string buffer = str;
-		buffer.resize(str.length()+1);
+	buffer.resize(str.size()+1);
 
         if (lineTerminates) {
-            buffer[sizeof(buffer)-1] = '\n';
+            buffer[buffer.size()-1] = '\n';
         }
 
-		transmit(buffer.c_str(), sizeof(buffer));
+	transmitAll(buffer.c_str(), buffer.size());
     }
 
     void TCPClientBase::transmitFormat(const char *format, ...)

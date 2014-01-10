@@ -48,7 +48,16 @@ class ConfigFile
 
         string helpText;
         void addHelpLine(string help);
+
+        /**
+         * Displays the help if the --help or --? is passed
+         */
         void help();
+
+        /**
+         * Displays the usage
+         */
+        void usage();
 
     protected:
         map<string, vector<ConfigFileEntry*> > entries;
@@ -59,7 +68,7 @@ class ConfigFile
         char **argv;
 
 		string getFullName(const string node, const string name) const;
-		void processOptions(AnyOption options, const string node, const string name, string fullName)  const;
+		void processOptions(AnyOption & options, const string node, const string name, string fullName)  const;
 		const YAML::Node *getYaml(string node) const;
 };
 

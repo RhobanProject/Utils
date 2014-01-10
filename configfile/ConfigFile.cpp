@@ -60,7 +60,7 @@ string ConfigFile::getFullName(const string node, const string name)  const
     return fullOpt.str();
 }
 
-void ConfigFile::processOptions(AnyOption options, const string node, const string name, string fullName)  const
+void ConfigFile::processOptions(AnyOption & options, const string node, const string name, string fullName) const
 {
     options.setOption(name.c_str());
     options.setOption(fullName.c_str());
@@ -162,8 +162,8 @@ void ConfigFile::useCommandArgs(int argc_, char **argv_)
 void ConfigFile::read(string node, string name, int defaultValue, int &output)
 {
     string fullName = getFullName(node, name);
-	AnyOption options;
-	processOptions(options, node, name, fullName);
+    AnyOption options;
+    processOptions(options, node, name, fullName);
     const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
@@ -186,9 +186,9 @@ void ConfigFile::read(string node, string name, int defaultValue, int &output)
 void ConfigFile::read(string node, string name, double defaultValue, double &output)
 {
     string fullName = getFullName(node, name);
-	AnyOption options;
-	processOptions(options, node, name, fullName);
-	const YAML::Node *yaml = getYaml(node);;
+    AnyOption options;
+    processOptions(options, node, name, fullName);
+    const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
     if (char *value = options.getValue(name.c_str())) {
@@ -219,7 +219,7 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
     try {
         output = readStringIfExists(node, name);
     } catch(...) {
-    	// cout << "Using default value '" << defaultValue << "' for parameter '" << node << "' '" << name << "'" << endl;
+        // cout << "Using default value '" << defaultValue << "' for parameter '" << node << "' '" << name << "'" << endl;
         output = defaultValue;
     }
 
@@ -230,9 +230,9 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
 string ConfigFile::readStringIfExists(string node, string name) const
 {
     string fullName = getFullName(node, name);
-	AnyOption options;
-	processOptions(options, node, name, fullName);
-	const YAML::Node *yaml = getYaml(node);
+    AnyOption options;
+    processOptions(options, node, name, fullName);
+    const YAML::Node *yaml = getYaml(node);
     const YAML::Node *nodeY;
 
     string output;
@@ -252,13 +252,13 @@ string ConfigFile::readStringIfExists(string node, string name) const
 
 const YAML::Node *ConfigFile::getNode(string node, string name) const
 {
-	const YAML::Node *yaml = getYaml(node);
+    const YAML::Node *yaml = getYaml(node);
 
-	if (yaml) {
-		return yaml->FindValue(name);
-	}
+    if (yaml) {
+        return yaml->FindValue(name);
+    }
 
-	return NULL;
+    return NULL;
 }
 
 void ConfigFile::read(string node, string name, bool defaultValue, bool &output)
@@ -311,21 +311,26 @@ void ConfigFile::help()
     options.processCommandArgs(argc, argv);
 
     if (options.getFlag("help") || options.getFlag("?")) {
-        map<string, vector<ConfigFileEntry*> >::iterator it;
-        vector<ConfigFileEntry*>::iterator vit;
-        vector<ConfigFileEntry*> *vector;
-
-        cout << "Help for configuration:" << endl << endl;
-
-        for (it=entries.begin(); it!=entries.end(); it++) {
-            vector = &(*it).second;
-            cout << (*it).first << ":" << endl;
-            for (vit=vector->begin(); vit!=vector->end(); vit++) {
-                (*vit)->print();
-            }
-            cout << endl;
-        }
-        cout << helpText << endl;
+        usage();
         exit(0);
     }
+}
+
+void ConfigFile::usage()
+{
+    map<string, vector<ConfigFileEntry*> >::iterator it;
+    vector<ConfigFileEntry*>::iterator vit;
+    vector<ConfigFileEntry*> *vector;
+
+    cout << "Help for configuration:" << endl << endl;
+
+    for (it=entries.begin(); it!=entries.end(); it++) {
+        vector = &(*it).second;
+        cout << (*it).first << ":" << endl;
+        for (vit=vector->begin(); vit!=vector->end(); vit++) {
+            (*vit)->print();
+        }
+        cout << endl;
+    }
+    cout << helpText << endl;
 }
