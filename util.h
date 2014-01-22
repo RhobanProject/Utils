@@ -118,6 +118,20 @@ std::list<T> vector_to_list(std::vector<T> & V) {
 vector<string> &split(const string &s, char delim, vector<string> &elems);
 list<string> &split_list(const string &s, char delim, list<string> &elems);
 
+template<typename T>
+inline string join(vector<T> tab, string delimiter) {
+    ostringstream oss;
+    int n = tab.size();
+    for (int i=0; i<n; i++) {
+        oss << tab[i];
+        if (i != n-1) {
+            oss << delimiter;
+        }   
+    }   
+
+    return oss.str();
+}
+
 string system_time();
 
 /*@}*/
