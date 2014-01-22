@@ -118,6 +118,24 @@ std::list<T> vector_to_list(std::vector<T> & V) {
 vector<string> &split(const string &s, char delim, vector<string> &elems);
 list<string> &split_list(const string &s, char delim, list<string> &elems);
 
+template<typename T>
+inline string join(const T &tab, string delimiter) {
+    ostringstream oss;
+    typename T::const_iterator it; 
+
+    bool notOver;
+    it = tab.begin();
+    do {
+        oss << (*it);
+        it++;
+        if (notOver = (it != tab.end())) {
+            oss << delimiter;
+        }   
+    } while (notOver);
+
+    return oss.str();
+}
+
 string system_time();
 
 /*@}*/

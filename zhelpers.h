@@ -22,6 +22,9 @@
 #include <assert.h>
 #include <signal.h>
 
+#include <timing/chrono.h>
+
+
 // Version checking, and patch up missing constants to match 2.1
 #if ZMQ_VERSION_MAJOR == 2
 # error "Please upgrade to ZeroMQ/3.2 for these examples"
@@ -173,7 +176,7 @@ s_clock (void)
     return (int64_t) st.wSecond * 1000 + st.wMilliseconds;
 #else
     struct timeval tv;
-    gettimeofday (&tv, NULL);
+    gettimeofday ( (chrono *) &tv, NULL);
     return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 #endif
 }

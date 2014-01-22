@@ -52,7 +52,7 @@ ConfigFile::~ConfigFile()
     }
 }
 
-string ConfigFile::getFullName(string node, string name)
+string ConfigFile::getFullName(const string node, const string name)  const
 {
     ostringstream fullOpt;
     fullOpt << node << "." << name;
@@ -60,7 +60,7 @@ string ConfigFile::getFullName(string node, string name)
     return fullOpt.str();
 }
 
-void ConfigFile::processOptions(AnyOption &options, string node, string name, string fullName)
+void ConfigFile::processOptions(AnyOption & options, const string node, const string name, string fullName) const
 {
     options.setOption(name.c_str());
     options.setOption(fullName.c_str());
@@ -109,7 +109,7 @@ void ConfigFile::write(string node, string name, bool value)
     write(node, name, new ConfigFileValue<bool>(value));
 }
 
-const YAML::Node *ConfigFile::getYaml(string node)
+const YAML::Node *ConfigFile::getYaml(string node)  const
 {
     if (doc->size()) {
         const YAML::Node *nod = doc->FindValue(node);
@@ -227,7 +227,7 @@ void ConfigFile::read(string node, string name, string defaultValue, string &out
     entries[node].push_back(new ConfigFileEntry("string", name, defaultValue));
 }
 
-string ConfigFile::readStringIfExists(string node, string name)
+string ConfigFile::readStringIfExists(string node, string name) const
 {
     string fullName = getFullName(node, name);
     AnyOption options;
@@ -250,7 +250,7 @@ string ConfigFile::readStringIfExists(string node, string name)
     return output;
 }
 
-const YAML::Node *ConfigFile::getNode(string node, string name)
+const YAML::Node *ConfigFile::getNode(string node, string name) const
 {
     const YAML::Node *yaml = getYaml(node);
 

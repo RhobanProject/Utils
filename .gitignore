@@ -14,3 +14,9 @@ bin/
 /zmq/conf7880.dir
 .externalToolBuilders
 .settings
+/protobuf-2.5.0
+/freeglut-2.8.1
+/glut-3.7.6
+/zmq/lib
+/zmq/builds
+/zmq2.2/builds

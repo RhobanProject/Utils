@@ -32,5 +32,5 @@
 // CMakeLists.txt depending on the platform used
 //
 // #define ZMQ_HAVE_WINDOWS
-
 #endif
+

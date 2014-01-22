@@ -1,6 +1,12 @@
 #ifndef TERM_DISPLAY_H
 #define TERM_DISPLAY_H
 
+#ifdef WIN32
+#include <windows.h>
+#include <stdlib.h>
+#endif
+
+#ifndef WIN32
 #define TERM_CLEAR printf ("%c[H%c[J",27,27)
 #define TERM_CLEAR_LINE printf ("%c[J",27)
 #define TERM_CURSOR_HOME printf ("%c[H",27)
@@ -12,6 +18,33 @@
 #define TERM_CURSOR_UP printf ("%cA",27)
 #define TERM_FONT_BOLD printf("%c[1m",27)
 #define TERM_FONT_NORMAL printf("%c[m",27) 
+
+#else
+
+extern COORD coordScreen;
+extern HANDLE hConsole;
+
+#define TERM_CLEAR 
+
+/* system("cls"); \
+	CONSOLE_SCREEN_BUFFER_INFO csbi; \
+	GetConsoleScreenBufferInfo(hConsole, &csbi); \
+	FillConsoleOutputCharacter(hConsole, (TCHAR) ' ', csbi.dwSize.X * csbi.dwSize.Y, coordScreen, NULL); \
+	GetConsoleScreenBufferInfo(hConsole, &csbi); \
+	FillConsoleOutputAttribute(hConsole, csbi.wAttributes, csbi.dwSize.X * csbi.dwSize.Y, coordScreen, NULL);
+*/
+
+#define TERM_CURSOR_HOME SetConsoleCursorPosition(hConsole , { 0, 0 } );
+#define TERM_CURSOR_LEFT(x) 
+#define TERM_CURSOR_RIGHT(x)
+#define TERM_CURSOR_GOTO(x,y) SetConsoleCursorPosition(hConsole , { x, y } );
+#define TERM_CURSOR_SAVE
+#define TERM_CURSOR_RESTORE
+#define TERM_CURSOR_UP
+#define TERM_FONT_BOLD
+#define TERM_FONT_NORMAL
+#endif
+
 
 #define TC_DEFAULT "0"
 #define TC_HIGHLIGHT "1"
