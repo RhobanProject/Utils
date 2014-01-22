@@ -32,8 +32,8 @@ HANDLE hConsole = NULL;
 
 #define CCALL
 #define INITIALIZER(f) \
-	static void f(void) __attribute__((constructor));
-static void f(void)
+	static void f(void) __attribute__((constructor)); \
+    static void f(void)
 
 #endif
 
