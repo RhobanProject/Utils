@@ -65,14 +65,11 @@ namespace Rhoban
     {
         int n;
 
-        chrono *c = chrono_create();
         while (size > 0) {
             n = receive(buffer, size);
             buffer += n;
             size -= n;
         }
-        cout << "ReceiveAll took " << chrono_msec(c) << endl;
-        delete_chrono(c);
     }
             
     bool TCPClientBase::waitReady(int timeout_ms)
