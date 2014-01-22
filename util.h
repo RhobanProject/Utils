@@ -119,15 +119,19 @@ vector<string> &split(const string &s, char delim, vector<string> &elems);
 list<string> &split_list(const string &s, char delim, list<string> &elems);
 
 template<typename T>
-inline string join(vector<T> tab, string delimiter) {
+inline string join(const T &tab, string delimiter) {
     ostringstream oss;
-    int n = tab.size();
-    for (int i=0; i<n; i++) {
-        oss << tab[i];
-        if (i != n-1) {
+    typename T::const_iterator it; 
+
+    bool notOver;
+    it = tab.begin();
+    do {
+        oss << (*it);
+        it++;
+        if (notOver = (it != tab.end())) {
             oss << delimiter;
         }   
-    }   
+    } while (notOver);
 
     return oss.str();
 }
