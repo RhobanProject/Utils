@@ -1,2 +1,2 @@
 
-set (SOURCES ConfigFile.cpp ConfigFileEntry.cpp CommandArgs.cpp)
+set (SOURCES ConfigFile.cpp ConfigFileEntry.cpp)

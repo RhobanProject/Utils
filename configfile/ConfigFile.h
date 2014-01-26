@@ -5,7 +5,7 @@
 #include <vector>
 #include <sstream>
 
-#include "CommandArgs.h"
+#include <args/CommandArgs.h>
 #include "ConfigFileEntry.h"
 #include "ConfigFileValue.h"
 

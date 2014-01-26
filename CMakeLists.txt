@@ -101,6 +101,7 @@ set (EXTRA_LIBS ${EXTRA_LIBS} json)
 # Sources
 set(DIRECTORIES
     .
+    args
     configfile
     json
     logging
