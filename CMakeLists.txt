@@ -137,6 +137,7 @@ if (ENABLE_ZMQ)
 		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq")
 		message("Adding graph directory")
 		set(DIRECTORIES ${DIRECTORIES} graph)
+		set(DIRECTORIES ${DIRECTORIES} zmq)
 	endif()
 
 
