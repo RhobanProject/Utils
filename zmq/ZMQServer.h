@@ -39,12 +39,9 @@ class ZMQServer
 
         void run()
         {
-            cout << "Running the server" << endl;
             while (true) {
                 char *request = s_recv(server);
-                cout << "<- " << request;
                 string response = processor.process(string(request));
-                cout << "-> " << response;
                 s_send(server, response.c_str());
                 free(request);
             }
