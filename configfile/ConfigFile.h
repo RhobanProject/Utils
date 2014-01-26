@@ -4,8 +4,8 @@
 #include <map>
 #include <vector>
 #include <sstream>
-#include <anyoption.h>
 
+#include "CommandArgs.h"
 #include "ConfigFileEntry.h"
 #include "ConfigFileValue.h"
 
@@ -20,17 +20,20 @@ class ConfigFile
     public:
         ConfigFile();
         ConfigFile(string filename);
+        ConfigFile(string filename, int argc, char *argv[]);
         ~ConfigFile();
+
+        void load(string filename);
 
         void useCommandArgs(int argc, char **argv);
 
         const YAML::Node *getNode(string node, string name);
 
-        void read(string node, string name, int value, int &output);
-        void read(string node, string name, double value, double &output);
-        void read(string node, string name, double value, float &output);
-        void read(string node, string name, string value, string &output);
-        void read(string node, string name, bool value, bool &output);
+        bool read(string node, string name, int value, int &output);
+        bool read(string node, string name, double value, double &output);
+        bool read(string node, string name, double value, float &output);
+        bool read(string node, string name, string value, string &output);
+        bool read(string node, string name, bool value, bool &output);
 
         void write(string node, string name, ConfigFileWriteable *value);
 
@@ -60,15 +63,12 @@ class ConfigFile
         void usage();
 
     protected:
+        CommandArgs args;
         map<string, vector<ConfigFileEntry*> > entries;
         map<string, map<string, ConfigFileWriteable*> > values; 
         YAML::Node *doc;
 
-        int argc;
-        char **argv;
-
         string getFullName(string node, string name);
-        void processOptions(AnyOption &options, string node, string name, string fullName);
         const YAML::Node *getYaml(string node);
 };
 
