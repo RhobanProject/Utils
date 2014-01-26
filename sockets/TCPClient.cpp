@@ -13,6 +13,12 @@
 
 #include "TCPClient.h"
 
+#ifndef WIN32
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#endif
+
 using namespace std;
 
 namespace Rhoban 
@@ -62,11 +68,14 @@ namespace Rhoban
         sin.sin_port = htons(port);
         sin.sin_family = AF_INET;
 
-        if(connect(clientSocket, (SOCKADDR *)&sin, sizeof(SOCKADDR)) == SOCKET_ERROR)
-        {   
+        if(connect(clientSocket, (SOCKADDR *)&sin, sizeof(SOCKADDR)) == SOCKET_ERROR) {
             connected = false;
             throw  string("Could not connect TCP client to ") + string(address);
         } 
+#ifndef WIN32 
+        int noDelay = 1;
+        setsockopt(clientSocket, IPPROTO_TCP, TCP_NODELAY, (void *)&noDelay, sizeof(noDelay));
+#endif
 
         connected = true;
     }

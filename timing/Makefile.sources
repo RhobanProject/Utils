@@ -1,4 +1,4 @@
   
-UTILS_TIMING_SRC = TickTimer.cpp TickMachine.cpp Player.cpp Playable.cpp
+UTILS_TIMING_SRC = TickTimer.cpp TickMachine.cpp Player.cpp Playable.cpp HighResClock.cpp
 
 UTILS_TIMING_EXE = tests/test_tick_machine

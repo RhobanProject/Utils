@@ -20,7 +20,7 @@ ConfigFile::ConfigFile(string filename, int argc, char *argv[])
     load(filename);
     useCommandArgs(argc, argv);
 }
-        
+
 void ConfigFile::load(string filename)
 {
     try {
@@ -62,7 +62,7 @@ ConfigFile::~ConfigFile()
     }
 }
 
-string ConfigFile::getFullName(string node, string name)
+string ConfigFile::getFullName(const string node, const string name)
 {
     ostringstream fullOpt;
     fullOpt << node << "." << name;
@@ -267,17 +267,6 @@ string ConfigFile::readStringIfExists(string node, string name)
     }
 
     return output;
-}
-
-const YAML::Node *ConfigFile::getNode(string node, string name)
-{
-    const YAML::Node *yaml = getYaml(node);
-
-    if (yaml) {
-        return yaml->FindValue(name);
-    }
-
-    return NULL;
 }
 
 bool ConfigFile::read(string node, string name, bool defaultValue, bool &output)

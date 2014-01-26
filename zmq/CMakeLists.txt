@@ -29,6 +29,18 @@ set (ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/include/"
 
 add_library (ZeroMQ ${ALL_SOURCES})
 
+if(MSVC)
+	if(NOT BUILD_SHARED_LIBS)
+		# correct library names
+		set_target_properties(ZeroMQ PROPERTIES
+			DEBUG_POSTFIX "${LIB_TARGET_SUFFIX}d"
+			RELEASE_POSTFIX "${LIB_TARGET_SUFFIX}"
+			MINSIZEREL_POSTFIX "${LIB_TARGET_SUFFIX}"
+			RELWITHDEBINFO_POSTFIX "${LIB_TARGET_SUFFIX}"
+		)
+	endif()
+endif()
+
 if (DEFINED WIN32)
 	target_link_libraries (ZeroMQ wsock32 ws2_32)
 endif (DEFINED WIN32)
