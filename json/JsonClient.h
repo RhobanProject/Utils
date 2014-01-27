@@ -3,12 +3,12 @@
 
 #include <json/json.h>
 #include <string>
-#include "JsonClientProxy.h"
+#include "JsonClientBase.h"
 
 using namespace std;
 
 template<typename T>
-class JsonClient : public JsonClientProxy
+class JsonClient : public JsonClientBase
 {
     public:
         JsonClient(T &sender_)
@@ -28,7 +28,7 @@ class JsonClient : public JsonClientProxy
 
         using JsonClientBase::invoke;
 
-        Json::Value invoke(const Json::Value &request)
+        Json::Value doInvoke(const Json::Value &request)
         {
             Json::Value response;
             Json::FastWriter writer;
