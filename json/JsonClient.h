@@ -23,7 +23,6 @@ class JsonClient : public JsonClientProxy
 
         string process(const string &str)
         {
-            cout << "Sending " << str << endl;
             return sender.process(str);
         }
 
