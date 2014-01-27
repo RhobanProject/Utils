@@ -39,7 +39,7 @@ class ZMQServer
 
         void run()
         {
-            while (true) {
+            while (processor.isRunning()) {
                 char *request = s_recv(server);
                 string response = processor.process(string(request));
                 s_send(server, response.c_str());

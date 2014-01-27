@@ -3,6 +3,11 @@
 
 using namespace std;
         
+JsonServer::JsonServer()
+    : running(true)
+{
+}
+        
 string JsonServer::process(const char *str)
 {
     return process(string(str));
@@ -71,4 +76,14 @@ Json::Value JsonServer::process(const Json::Value &request)
     }
 
     return response;
+}
+        
+bool JsonServer::isRunning()
+{
+    return running;
+}
+
+void JsonServer::stop()
+{
+    running = false;
 }
