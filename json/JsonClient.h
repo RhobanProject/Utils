@@ -3,11 +3,12 @@
 
 #include <json/json.h>
 #include <string>
+#include "JsonClientProxy.h"
 
 using namespace std;
 
 template<typename T>
-class JsonClient
+class JsonClient : public JsonClientProxy
 {
     public:
         JsonClient(T &sender_)
@@ -22,8 +23,11 @@ class JsonClient
 
         string process(const string &str)
         {
+            cout << "Sending " << str << endl;
             return sender.process(str);
         }
+
+        using JsonClientBase::invoke;
 
         Json::Value invoke(const Json::Value &request)
         {
@@ -45,15 +49,6 @@ class JsonClient
             }
 
             return response[1];
-        }
-
-        Json::Value invoke(const string &command, const Json::Value &parameters = Json::Value())
-        {
-            Json::Value request;
-            request[0] = command;
-            request[1] = parameters;
-
-            return invoke(request);
         }
 
     protected:

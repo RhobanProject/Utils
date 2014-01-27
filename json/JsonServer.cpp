@@ -1,4 +1,7 @@
+#include <sstream>
 #include "JsonServer.h"
+
+using namespace std;
         
 string JsonServer::process(const char *str)
 {
@@ -20,6 +23,20 @@ string JsonServer::process(const string &str)
     return "[0,\"Unable to parse the request\"]";
 }
 
+Json::Value JsonServer::processSub(const string &sub, const Json::Value &request)
+{
+    iterator it = find(sub);
+
+    if (it != end()) {
+        return it->second->process(request);
+    } else {
+        ostringstream oss;
+        oss << "Unknown sub: " << sub;
+
+        throw oss.str();
+    }
+}
+
 Json::Value JsonServer::process(const Json::Value &request)
 {
     Json::Value response;
@@ -34,8 +51,16 @@ Json::Value JsonServer::process(const Json::Value &request)
         }
 
         try {
-            response[1] = handle(command, parameters);
-            response[0] = 1;
+            if (command == "sub") {
+                if (parameters.isArray() && parameters.size() == 2) {
+                    return processSub(parameters[0].asString(), parameters[1]);
+                } else {
+                    throw string("Malformed sub request");
+                }
+            } else {
+                response[1] = handle(command, parameters);
+                response[0] = 1;
+            }
         } catch (string error) {
             response[1] = error;
         } catch (...) {
