@@ -3,18 +3,27 @@
 
 // Include a bunch of headers that we will need in the examples
 
+#ifndef WIN32
 #include <zmq.h>
+#else
+#include <zmq\include\zmq.h>
+#endif
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#ifndef WIN32
 #include <sys/time.h>
-#include <time.h>
 #include <unistd.h>
+#endif
+#include <time.h>
 #include <assert.h>
 #include <signal.h>
+
+#include <timing/chrono.h>
+
 
 // Version checking, and patch up missing constants to match 2.1
 #if ZMQ_VERSION_MAJOR == 2
@@ -167,7 +176,7 @@ s_clock (void)
     return (int64_t) st.wSecond * 1000 + st.wMilliseconds;
 #else
     struct timeval tv;
-    gettimeofday (&tv, NULL);
+    gettimeofday ( (chrono *) &tv, NULL);
     return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 #endif
 }

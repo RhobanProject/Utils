@@ -89,11 +89,11 @@ void TickMachine::register_timer(TickTimer * timer)
 	}
 	 */
 	//section critique
-	TM_CAUTION_MSG("Registering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
+	TM_DEBUG_MSG("Registering timer '" << timer->timer_name << "' (" << (long long int) timer << ") with frequency " << timer->get_frequency() << "Hz ...");
 
 	if(!timer)
 	{
-		TM_DEBUG_MSG("Null timer!");
+		TM_CAUTION_MSG("Cannot register null timer!");
 		return;
 	}
 
@@ -112,13 +112,13 @@ void TickMachine::register_timer(TickTimer * timer)
 		//timer->started.wait(5000);
 		//timer->started.unlock();
 	}
-	TM_CAUTION_MSG("Done: registered timer '" << timer->timer_name << "' (" << (long long int) timer );
+	TM_DEBUG_MSG("Done: registered timer '" << timer->timer_name << "' (" << (long long int) timer );
 
 }
 
 void TickMachine::unregister_timer(TickTimer * timer)
 {
-	TM_CAUTION_MSG("Unregistering timer '" << timer->timer_name << "'" << (long long int) timer);
+	TM_DEBUG_MSG("Unregistering timer '" << timer->timer_name << "'" << (long long int) timer);
 
 	if(currentThreadId() != threadId())
 	{
@@ -144,7 +144,7 @@ void TickMachine::unregister_timer(TickTimer * timer)
 		//timer->unregistered.wait(5000);
 		//timer->unregistered.unlock();
 	}
-	TM_CAUTION_MSG("Done: unregistered timer " << (long long int) timer);
+	TM_DEBUG_MSG("Done: unregistered timer " << (long long int) timer);
 
 }
 
@@ -152,7 +152,7 @@ void TickMachine::unregister_timer(TickTimer * timer)
 /*! \brief to delete when the timer is no longer used */
 void TickMachine::dispose_timer(TickTimer ** timer)
 {
-	TM_CAUTION_MSG("Disposing timer " << (*timer)->timer_name << " " << (long long int) timer);
+	TM_DEBUG_MSG("Disposing timer " << (*timer)->timer_name << " " << (long long int) timer);
 
 	if(currentThreadId() != threadId())
 	{
@@ -177,7 +177,7 @@ void TickMachine::dispose_timer(TickTimer ** timer)
 		timers_to_delete_list_mutex.unlock();
 	}
 	timer = 0;
-	TM_CAUTION_MSG("Done: disposed timer ");
+	TM_DEBUG_MSG("Done: disposed timer ");
 }
 
 
@@ -246,7 +246,7 @@ void TickMachine::execute()
 		{
 			timer_to_dispose = false;
 			BEGIN_SAFE(timers_to_delete_list_mutex)
-			TM_CAUTION_MSG("Asynchronously deleting " << timers_to_delete.size() << "timers");
+			TM_DEBUG_MSG("Asynchronously deleting " << timers_to_delete.size() << "timers");
 			for(list<TickTimer *>::iterator pt = timers_to_delete.begin(); pt!= timers_to_delete.end(); pt++)
 			{
 				TickTimer * timer = *pt;
@@ -258,7 +258,7 @@ void TickMachine::execute()
 				}
 				catch(string & exc)
 				{
-					TM_CAUTION_MSG("Failed to delete timer: exc")
+					TM_CAUTION_MSG("Failed to delete timer:" + exc)
 				}
 			}
 			timers_to_delete.clear();
@@ -273,11 +273,11 @@ void TickMachine::execute()
 		{
 			timer_to_register = false;
 			BEGIN_SAFE(timers_to_register_list_mutex)
-			TM_CAUTION_MSG("Asynchronously registering " << timers_to_register.size() << " timers");
+				TM_DEBUG_MSG("Asynchronously registering " << timers_to_register.size() << " timers");
 			for(list<TickTimer *>::iterator pt = timers_to_register.begin(); pt!= timers_to_register.end(); pt++)
 			{
 				TickTimer * timer = *pt;
-				TM_CAUTION_MSG("Asynchronously registering new timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
+				TM_DEBUG_MSG("Asynchronously registering new timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 				try
 				{
 					gettimeofday(&timer->start_time,0);
@@ -298,13 +298,13 @@ void TickMachine::execute()
 		if(timer_to_unregister)
 		{
 			timer_to_unregister = false;
-			TM_CAUTION_MSG("Asynchronously unregistering " << timers_to_unregister.size() << " timers");
+			TM_DEBUG_MSG("Asynchronously unregistering " << timers_to_unregister.size() << " timers");
 			for(list<TickTimer *>::iterator pt = timers_to_unregister.begin(); pt!= timers_to_unregister.end(); pt++)
 			{
 				TickTimer * timer = *pt;
 				try
 				{
-					TM_CAUTION_MSG("Asynchronously unregistering timer " << (long long int) timer);
+					TM_DEBUG_MSG("Asynchronously unregistering timer " << (long long int) timer);
 					for(list<TickTimer *>::iterator ptimer = players.begin(); ptimer != players.end(); ptimer ++)
 					{
 						if(*ptimer == timer)

@@ -523,7 +523,7 @@ string Serial::receive(size_t size, bool blocking)
 	int nb = receive(result, size, blocking);
 	string res = string(result, nb);
 #ifdef MSVC
-	delete result;
+	free(result);
 #endif
 	return res;
 }

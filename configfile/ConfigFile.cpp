@@ -1,24 +1,34 @@
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 #include <fstream>
+#include <util.h>
+#include <stdlib.h>
 #include "ConfigFile.h"
 
 using namespace std;
 
-ConfigFile::ConfigFile() : doc(NULL), argv(NULL)
+ConfigFile::ConfigFile() : doc(NULL)
 {}
 
-ConfigFile::ConfigFile(string filename) : argv(NULL)
+ConfigFile::ConfigFile(string filename)
 {
-    try
-    {
+    load(filename);
+}
+
+ConfigFile::ConfigFile(string filename, int argc, char *argv[])
+{
+    load(filename);
+    useCommandArgs(argc, argv);
+}
+
+void ConfigFile::load(string filename)
+{
+    try {
         ifstream fin(filename.c_str());
         YAML::Parser parser(fin);
         doc = new YAML::Node();
         parser.GetNextDocument(*doc);
-    }
-    catch(YAML::ParserException e)
-    {
+    } catch(YAML::ParserException e) {
         throw string("Failed to parse configuration file " + filename + ":\n\t" + string(e.what()));
     }
 }
@@ -52,24 +62,12 @@ ConfigFile::~ConfigFile()
     }
 }
 
-string ConfigFile::getFullName(string node, string name)
+string ConfigFile::getFullName(const string node, const string name)
 {
     ostringstream fullOpt;
     fullOpt << node << "." << name;
 
     return fullOpt.str();
-}
-
-AnyOption ConfigFile::processOptions(string node, string name, string fullName)
-{
-    AnyOption options;
-    options.setOption(name.c_str());
-    options.setOption(fullName.c_str());
-    if (argv != NULL) {
-        options.processCommandArgs(argc, argv);
-    }
-
-    return options;
 }
 
 void ConfigFile::write(string node, string name, ConfigFileWriteable *value)
@@ -114,15 +112,25 @@ void ConfigFile::write(string node, string name, bool value)
 
 const YAML::Node *ConfigFile::getYaml(string node)
 {
-    if (doc->size()) {
-        const YAML::Node *nod = doc->FindValue(node);
+    const YAML::Node *nod = doc;
+    vector<string> parts;
+    split(node, '.', parts);
+    vector<string>::iterator it;
 
-        if (nod && nod->size() != 0) {
-            return nod;
+    for (it=parts.begin(); it!=parts.end(); it++) {
+        if (nod != NULL && nod->size()) {
+            nod = nod->FindValue(*it);
+
+            if (!nod || nod->size() == 0) {
+                nod = NULL;
+            }
+        } else {
+            nod = NULL;
+            break;
         }
     }
 
-    return NULL;
+    return nod;
 }
 
 void ConfigFile::save(string filename)
@@ -156,26 +164,26 @@ void ConfigFile::save(string filename)
     outputFile.close();
 }
 
-void ConfigFile::useCommandArgs(int argc_, char **argv_)
+void ConfigFile::useCommandArgs(int argc, char **argv)
 {
-    argc = argc_;
-    argv = argv_;
+    args.process(argc, argv);
 }
 
-void ConfigFile::read(string node, string name, int defaultValue, int &output)
+bool ConfigFile::read(string node, string name, int defaultValue, int &output)
 {
+    bool result = true;
     string fullName = getFullName(node, name);
-    AnyOption options = processOptions(node, name, fullName);
-    const YAML::Node *yaml = getYaml(node);;
+    const YAML::Node *yaml = getYaml(node);
     const YAML::Node *nodeY;
 
-    if (char *value = options.getValue(name.c_str())) {
-        output = atoi(value);
-    } else if (char *value = options.getValue(fullName.c_str())) {
-        output = atoi(value);
+    if (args.hasOption(name)) {
+        output = args.getOptionInt(name);
+    } else if (args.hasOption(fullName)) {
+        output = args.getOptionInt(fullName);
     } else if (yaml && (nodeY = yaml->FindValue(name))) {
         *nodeY >> output;
     } else {
+        result = false;
         output = defaultValue;
     }
 
@@ -183,22 +191,25 @@ void ConfigFile::read(string node, string name, int defaultValue, int &output)
     oss << defaultValue;
     write(node, name, output);
     entries[node].push_back(new ConfigFileEntry("int", name, oss.str()));
+
+    return result;
 }
 
-void ConfigFile::read(string node, string name, double defaultValue, double &output)
+bool ConfigFile::read(string node, string name, double defaultValue, double &output)
 {
+    bool result = true;
     string fullName = getFullName(node, name);
-    AnyOption options = processOptions(node, name, fullName);
     const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
-    if (char *value = options.getValue(name.c_str())) {
-        output = atof(value);
-    } else if (char *value = options.getValue(fullName.c_str())) {
-        output = atof(value);
+    if (args.hasOption(name)) {
+        output = args.getOptionDouble(name);
+    } else if (args.hasOption(fullName)) {
+        output = args.getOptionDouble(fullName);
     } else if (yaml && (nodeY = yaml->FindValue(name))) {
         *nodeY >> output;
     } else {
+        result = false;
         output = defaultValue;
     }
 
@@ -206,41 +217,49 @@ void ConfigFile::read(string node, string name, double defaultValue, double &out
     oss << defaultValue;
     write(node, name, output);
     entries[node].push_back(new ConfigFileEntry("double", name, oss.str()));
+
+    return result;
 }
 
-void ConfigFile::read(string node, string name, double value, float &output)
+bool ConfigFile::read(string node, string name, double value, float &output)
 {
     double tmp;
-    read(node, name, value, tmp);
+    bool result = read(node, name, value, tmp);
     output = tmp;
+
+    return result;
 }
 
-void ConfigFile::read(string node, string name, string defaultValue, string &output)
+bool ConfigFile::read(string node, string name, string defaultValue, string &output)
 {
+    bool result = true;
+
     try {
         output = readStringIfExists(node, name);
     } catch(...) {
-    	// cout << "Using default value '" << defaultValue << "' for parameter '" << node << "' '" << name << "'" << endl;
+        // cout << "Using default value '" << defaultValue << "' for parameter '" << node << "' '" << name << "'" << endl;
         output = defaultValue;
+        result = false;
     }
 
     write(node, name, output);
     entries[node].push_back(new ConfigFileEntry("string", name, defaultValue));
+
+    return result;
 }
 
 string ConfigFile::readStringIfExists(string node, string name)
 {
     string fullName = getFullName(node, name);
-    AnyOption options = processOptions(node, name, fullName);
     const YAML::Node *yaml = getYaml(node);
     const YAML::Node *nodeY;
 
     string output;
 
-    if (char *value = options.getValue(name.c_str())) {
-        output = string(value);
-    } else if (char *value = options.getValue(fullName.c_str())) {
-        output = string(value);
+    if (args.hasOption(name)) {
+        output = args.getOption(name);
+    } else if (args.hasOption(fullName)) {
+        output = args.getOption(fullName);
     } else if (yaml && (nodeY = yaml->FindValue(name))) {
         *nodeY >> output;
     } else {
@@ -250,48 +269,34 @@ string ConfigFile::readStringIfExists(string node, string name)
     return output;
 }
 
-const YAML::Node *ConfigFile::getNode(string node, string name)
+bool ConfigFile::read(string node, string name, bool defaultValue, bool &output)
 {
-	const YAML::Node *yaml = getYaml(node);
-
-	if (yaml) {
-		return yaml->FindValue(name);
-	}
-
-	return NULL;
-}
-
-void ConfigFile::read(string node, string name, bool defaultValue, bool &output)
-{
+    bool result = true;
     string fullName = getFullName(node, name);
     string noName = "no-" + name;
     string fullNoName = "no-" + fullName;
-    AnyOption options;
     const YAML::Node *yaml = getYaml(node);;
     const YAML::Node *nodeY;
 
-    options.setFlag(name.c_str());
-    options.setFlag(fullName.c_str());
-    if (argv != NULL) {
-        options.processCommandArgs(argc, argv);
-    }
-
-    if (options.getFlag(name.c_str())) {
+    if (args.hasFlag(name)) {
         output = true;
-    } else if (options.getFlag(noName.c_str())) {
+    } else if (args.hasFlag(noName)) {
         output = false;
-    } else if (options.getFlag(fullName.c_str())) {
+    } else if (args.hasFlag(fullName)) {
         output = true;
-    } else if (options.getFlag(fullNoName.c_str())) {
+    } else if (args.hasFlag(fullNoName)) {
         output = false;
     } else if (yaml && (nodeY = yaml->FindValue(name))) {
         *nodeY >> output;
     } else {
+        result = false;
         output = defaultValue;
     }
 
     write(node, name, output);
     entries[node].push_back(new ConfigFileEntry("bool", name, defaultValue ? "true" : "false"));
+
+    return result;
 }
 
 void ConfigFile::addHelpLine(string help)
@@ -301,31 +306,27 @@ void ConfigFile::addHelpLine(string help)
 
 void ConfigFile::help()
 {
-    if (argv == NULL) {
-        return;
-    }
-
-    AnyOption options;
-    options.setFlag("help");
-    options.setFlag("?");
-    options.processCommandArgs(argc, argv);
-
-    if (options.getFlag("help") || options.getFlag("?")) {
-        map<string, vector<ConfigFileEntry*> >::iterator it;
-        vector<ConfigFileEntry*>::iterator vit;
-        vector<ConfigFileEntry*> *vector;
-
-        cout << "Help for configuration:" << endl << endl;
-
-        for (it=entries.begin(); it!=entries.end(); it++) {
-            vector = &(*it).second;
-            cout << (*it).first << ":" << endl;
-            for (vit=vector->begin(); vit!=vector->end(); vit++) {
-                (*vit)->print();
-            }
-            cout << endl;
-        }
-        cout << helpText << endl;
+    if (args.hasFlag("help") || args.hasFlag("?")) {
+        usage();
         exit(0);
     }
+}
+
+void ConfigFile::usage()
+{
+    map<string, vector<ConfigFileEntry*> >::iterator it;
+    vector<ConfigFileEntry*>::iterator vit;
+    vector<ConfigFileEntry*> *vector;
+
+    cout << "Help for configuration:" << endl << endl;
+
+    for (it=entries.begin(); it!=entries.end(); it++) {
+        vector = &(*it).second;
+        cout << (*it).first << ":" << endl;
+        for (vit=vector->begin(); vit!=vector->end(); vit++) {
+            (*vit)->print();
+        }
+        cout << endl;
+    }
+    cout << helpText << endl;
 }

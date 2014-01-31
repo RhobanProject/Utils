@@ -89,3 +89,17 @@ long int chrono_usec(chrono * chr) {
 /*****************************************************************************/
 /*****************************************************************************/
 
+Chrono::Chrono()
+{
+    reset();
+}
+        
+double Chrono::getTime()
+{
+    return chrono_usec(&chr)*0.000001;
+}
+
+void Chrono::reset()
+{
+    chrono_reset(&chr);
+}

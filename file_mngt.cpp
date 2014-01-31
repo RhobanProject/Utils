@@ -65,7 +65,7 @@ string file_to_string(string path)
 bool file_exists(string path)
 {
     ifstream ifile(path.c_str());
-    return ifile;
+    return ifile.is_open();
 }
 
 void file_put_contents(string path, string contents)

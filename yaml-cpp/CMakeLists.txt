@@ -159,6 +159,7 @@ if(MSVC)
 	set(LIB_RT_SUFFIX "md")	# CMake defaults to /MD for MSVC
 	set(LIB_RT_OPTION "/MD")
 	#
+	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
 	if(NOT MSVC_SHARED_RT)	# User wants to have static runtime libraries (/MT, /ML)
 		if(MSVC_STHREADED_RT)	# User wants to have old single-threaded static runtime libraries
 			set(LIB_RT_SUFFIX "ml")

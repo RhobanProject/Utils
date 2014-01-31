@@ -93,8 +93,15 @@ public:
   Condition started;
   void wait_started();
 
+  Condition dead;
+  void wait_dead();
 
 protected:
+	/**
+	* thread core
+	*/
+	virtual void execute(void) = 0;
+
   void lock();
   void unlock();
 
@@ -154,6 +161,12 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
+	 catch (exception & e) \
+	{ \
+		l.unlock();					\
+			TH_DEBUG("Thread " << Rhoban::Thread::currentThreadId() << " has left critical section") \
+			throw e;	\
+	 } \
        catch(...)					\
 	 {						\
 	   l.unlock();					\
@@ -171,7 +184,13 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
-       catch(...)					\
+	 catch (exception & e)				\
+	   {						\
+	   l->unlock();					\
+	   TH_DEBUG("Thread " << Rhoban::Thread::currentThreadId() << " has left critical section") \
+	   throw e;					\
+	 }						\
+	 catch (...)					\
 	 {						\
 	   l->unlock();					\
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
@@ -231,10 +250,12 @@ protected:
    * method to setup the thread
    */
   virtual void setup(void);
+
   /**
-   * thread core
-   */
-  virtual void execute(void)=0;
+  * method to cleanup resources used by the thread when it stops or is killed
+  */
+  virtual void cleanup(void){};
+
   void wait(void);
 
 
@@ -267,9 +288,6 @@ protected:
 
   //Usable to interthread calls safe
   Mutex safe_mutex;
-
-  Condition is_started;
-
 
 };
 
