@@ -38,10 +38,8 @@ Thread::~Thread()
     {
         if(thread_state != Dead)
         {
-            cerr << "Cancelling thread from destructor " << endl;
-			kill();
-            cerr << "Cancelled thread from destructor " << endl;
-        }
+	  kill();
+	}
         thread_state = Dead;
     }
     catch(char * err)
