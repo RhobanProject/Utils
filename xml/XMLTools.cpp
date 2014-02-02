@@ -23,7 +23,17 @@ using namespace std;
 /****************************************************************************/
 /* XML Parsing                                                              */
 /****************************************************************************/
-    
+
+/* Fixing an issue with local configurations */
+extern "C" double strtod_locale_independent(const char* s)
+{
+     std::istringstream text( s );
+     text.imbue(std::locale::classic());
+     double result;
+     text >> result;
+     return result;
+}
+
 bool XMLTools::has_child(TiXmlNode *node, const char *name)
 {
     return node->FirstChild(name) != NULL;
@@ -56,7 +66,7 @@ double XMLTools::get_double_element(TiXmlNode * node, const char * id) {
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
         if (the_child)
-        	return strtod(the_child->Value(),0);
+        	return strtod_locale_independent(the_child->Value(),0);
         else xml_parse_error(string("Xml parsing: could not read double with label ") + id + " in node " + string(node->Value()));
     }
     else
@@ -70,7 +80,7 @@ float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
-        if (the_child) return strtod(the_child->Value(),0);
+        if (the_child) return strtod_locale_independent(the_child->Value(),0);
         else xml_parse_error(string("Xml parsing: could not read double with label ") + id + " in node " + string(node->Value()));
     }
     else
@@ -81,7 +91,7 @@ float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
 
 float XMLTools::get_float_value(TiXmlNode * node)
 {
-   	return strtod(node->FirstChild()->Value(), 0);
+   	return strtod_locale_independent(node->FirstChild()->Value(), 0);
 }
 
 int XMLTools::get_int_element(TiXmlNode * node, const char * id) {
