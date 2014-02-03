@@ -1,3 +1,6 @@
+#ifndef _ABSTRACT_FACTORY_H
+#define _ABSTRACT_FACTORY_H
+
 #include <map>
 #include <iostream>
 #include <string>
@@ -37,12 +40,16 @@ class AbstractFactory
         template<typename Q>
         void registerType(string type)
         {
+            erase(type);
+            types[type] = new Instanciator<T, Q>;
+        }
+
+        void erase(string type)
+        {
             if (hasType(type)) {
                 delete types[type];
                 types.erase(type);
             }
-
-            types[type] = new Instanciator<T, Q>;
         }
 
         bool hasType(string type)
@@ -62,3 +69,5 @@ class AbstractFactory
     protected:
         map<string, Creator<T>* > types;
 };
+
+#endif
