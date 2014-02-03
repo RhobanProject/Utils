@@ -138,7 +138,10 @@ class Serializable
         virtual void from_xml(string xml_stream);
 
         //deserializes from an xml node
-        virtual void from_xml(TiXmlNode *node) { throw string("from_xml not implemented");};
+        virtual void from_xml(TiXmlNode *node) {
+          (void) node;//Suppress unused warning
+          throw string("from_xml not implemented");
+        };
 
         //serializes to an xml strem excluding class name
         virtual string to_xml() const { throw string("to_xml not implemented");};
