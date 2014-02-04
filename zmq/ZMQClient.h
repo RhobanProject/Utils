@@ -11,9 +11,11 @@ class ZMQClient
         ZMQClient(string remote);
         virtual ~ZMQClient();
 
+        void connect();
         string process(const string &request);
 
     protected:
+        string remote;
         void *context;
         void *client;
 };

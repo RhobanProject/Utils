@@ -3,12 +3,17 @@
 #include "ZMQClient.h"
 #include "zhelpers.h"
 
-ZMQClient::ZMQClient(string remote)
+ZMQClient::ZMQClient(string remote_)
     : context(NULL), client(NULL)
 {
+    remote = remote_;
     context = zmq_ctx_new();
     client = zmq_socket(context, ZMQ_REQ);
+    connect();
+}
 
+void ZMQClient::connect()
+{
     if (zmq_connect(client, remote.c_str()) != 0) {
         throw string("Unable to connect");
     }
