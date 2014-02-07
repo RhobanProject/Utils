@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (ZeroMQ)
 
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "")
+endif ()
+
 IF(DEFINED WIN32)
 	SET(SYSTEM_OS "WINDOWS")
 	SET(ZMQ_HAVE_WINDOWS 1)
@@ -40,10 +44,6 @@ if(MSVC)
 		)
 	endif()
 endif()
-
-if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
-endif ()
 
 if (DEFINED WIN32)
 	target_link_libraries (ZeroMQ wsock32 ws2_32)
