@@ -1,5 +1,5 @@
-#ifndef _ABSTRACT_FACTORY_H
-#define _ABSTRACT_FACTORY_H
+#ifndef _GENERIC_FACTORY_H
+#define _GENERIC_FACTORY_H
 
 #include <map>
 #include <iostream>
@@ -25,10 +25,10 @@ class Instanciator : public Creator<T>
 };
 
 template<typename T>
-class AbstractFactory
+class GenericFactory
 {
     public:
-        virtual ~AbstractFactory()
+        virtual ~GenericFactory()
         {
             typename map<string, Creator<T>* >::iterator it;
 
