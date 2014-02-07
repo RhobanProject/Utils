@@ -17,5 +17,6 @@ string JsonParameter::getDescription()
 
 bool JsonParameter::canDeserialize(const Json::Value &json)
 {
+    (void)json;
     return true;
 }

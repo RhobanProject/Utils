@@ -11,6 +11,10 @@ if (ROBOARD)
         CACHE STRING "")
 endif (ROBOARD)
 
+cmake_minimum_required (VERSION 2.6)
+project (RhobanUtils)
+find_package (Threads)
+
 if (MSVC)
 	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
 	add_definitions(-D_USE_MATH_DEFINES)
@@ -20,10 +24,6 @@ if (MSVC)
 else (MSVC) 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif (MSVC)
-
-cmake_minimum_required (VERSION 2.6)
-project (RhobanUtils)
-find_package (Threads)
 
 option (HAVE_COLORS 
     "Have terminal colors" ON)
