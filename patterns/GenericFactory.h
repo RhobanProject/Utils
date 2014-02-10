@@ -5,8 +5,6 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
 template<typename T>
 class Creator
 {
@@ -30,7 +28,7 @@ class GenericFactory
     public:
         virtual ~GenericFactory()
         {
-            typename map<string, Creator<T>* >::iterator it;
+            typename std::map<std::string, Creator<T>* >::iterator it;
 
             for (it=types.begin(); it!=types.end(); it++) {
                 delete it->second;
@@ -38,13 +36,13 @@ class GenericFactory
         }
 
         template<typename Q>
-        void registerType(string type)
+        void registerType(std::string type)
         {
             erase(type);
             types[type] = new Instanciator<T, Q>;
         }
 
-        void erase(string type)
+        void erase(std::string type)
         {
             if (hasType(type)) {
                 delete types[type];
@@ -52,12 +50,12 @@ class GenericFactory
             }
         }
 
-        bool hasType(string type)
+        bool hasType(std::string type)
         {
             return types.find(type) != types.end();
         }
 
-        T *create(string type)
+        T *create(std::string type)
         {
            if (hasType(type)) {
             return types[type]->create();
@@ -67,7 +65,7 @@ class GenericFactory
         }
 
     protected:
-        map<string, Creator<T>* > types;
+        std::map<std::string, Creator<T>* > types;
 };
 
 #endif
