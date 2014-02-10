@@ -6,8 +6,6 @@
 #include <string>
 #include "zhelpers.h"
 
-using namespace std;
-
 template<typename T>
 class ZMQServer
 {
@@ -18,12 +16,12 @@ class ZMQServer
             context = zmq_ctx_new();
             server = zmq_socket(context, ZMQ_REP);
 
-            ostringstream oss;
+            std::ostringstream oss;
             oss << "tcp://*:" << port;
-            string addr = oss.str();
+            std::string addr = oss.str();
             
             if (zmq_bind(server, addr.c_str()) != 0) {
-                throw string("Unable to bind server");
+                throw std::string("Unable to bind server");
             }
         }
 
@@ -41,7 +39,7 @@ class ZMQServer
         {
             while (processor.isRunning()) {
                 char *request = s_recv(server);
-                string response = processor.process(string(request));
+                std::string response = processor.process(std::string(request));
                 s_send(server, response.c_str());
                 free(request);
             }

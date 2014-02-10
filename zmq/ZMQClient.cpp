@@ -3,6 +3,8 @@
 #include "ZMQClient.h"
 #include "zhelpers.h"
 
+using std::string;
+
 ZMQClient::ZMQClient(string remote_)
     : context(NULL), client(NULL)
 {

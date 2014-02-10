@@ -1,7 +1,8 @@
 #include <sstream>
 #include "JsonServer.h"
 
-using namespace std;
+using std::string;
+using std::ostringstream;
         
 JsonServer::JsonServer()
     : running(true)
