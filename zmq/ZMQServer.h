@@ -46,9 +46,9 @@ class ZMQServer
         }
 
     protected:
-        T &processor;
         void *context;
         void *server;
+        T &processor;
 };
 
 #endif
