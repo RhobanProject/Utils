@@ -58,7 +58,7 @@ inline void syst_wait_ms(int ms)
 #else
 	Sleep(ms);
 #endif
-};
+}
 void sleep_ms(ui32 ms);
 void sleep_ms(int ms); // TODO pas terrible... les 2 sleep_ms...
 void wait_ms(int ms);

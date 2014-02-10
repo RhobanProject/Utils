@@ -30,7 +30,7 @@ void TimedThread::init(double hertz)
     play_state = playing;
 }
 
-TimedThread::TimedThread() { frequency = 1;};
+TimedThread::TimedThread() { frequency = 1;}
 
 /* dont delete this, object, use dispose() to dispose it */
 void TimedThread::dispose()
@@ -38,7 +38,7 @@ void TimedThread::dispose()
 	TickTimer::dispose();
 }
 
-TimedThread::TimedThread(double frequency){init(frequency);};
+TimedThread::TimedThread(double frequency){init(frequency);}
 
 /*
 SlowTimedThread::SlowTimedThread(): timer(1,"SlowTimedThread"), measured_frequency(1)
@@ -48,7 +48,7 @@ SlowTimedThread::SlowTimedThread(): timer(1,"SlowTimedThread"), measured_frequen
 SlowTimedThread::SlowTimedThread(): measured_frequency(1)
 {
 	max_frequency = 0;
-};
+}
 
 
 SlowTimedThread::~SlowTimedThread()
