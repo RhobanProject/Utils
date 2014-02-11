@@ -9,6 +9,7 @@ class ZMQClient
         ZMQClient(std::string remote);
         virtual ~ZMQClient();
 
+        void setTimeout(double timeout_);
         void connect();
         std::string process(const std::string &request);
 

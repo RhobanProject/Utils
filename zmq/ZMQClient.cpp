@@ -26,6 +26,14 @@ void ZMQClient::connect()
     zmq_setsockopt(client, ZMQ_LINGER, &timeout, sizeof(timeout));
 }
 
+void ZMQClient::setTimeout(double timeout_)
+{
+    int timeout = timeout_*1000;
+    zmq_setsockopt(client, ZMQ_RCVTIMEO, &timeout, sizeof(timeout));
+    timeout = timeout_*1000;
+    zmq_setsockopt(client, ZMQ_LINGER, &timeout, sizeof(timeout));
+}
+
 ZMQClient::~ZMQClient()
 {
     if (client != NULL) {
