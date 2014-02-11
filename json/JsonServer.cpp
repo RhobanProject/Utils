@@ -63,6 +63,9 @@ Json::Value JsonServer::process(const Json::Value &request)
                 } else {
                     throw string("Malformed sub request");
                 }
+            } else if (command == "ping") {
+                response[0] = 1;
+                response[1] = "pong";
             } else {
                 response[1] = handle(command, parameters);
                 response[0] = 1;
