@@ -4,31 +4,32 @@
 #include <string>
 #include <json/json.h>
 
-using namespace std;
-
 class JsonParameter
 {
     public:
-        JsonParameter(string name_, string description_);
+        JsonParameter(std::string name_);
+        virtual std::string getName();
 
+        // Serialization
+        virtual bool canDeserialize(const Json::Value &json);
         virtual void deserialize(const Json::Value &json)=0;
         virtual Json::Value serialize()=0;
 
-        virtual string getName();
-        virtual string getDescription();
-        virtual bool canDeserialize(const Json::Value &json);
+        // Accessing attributes
+        JsonParameter *setAttribute(std::string name, std::string value);
+        Json::Value getAttributes();
     
     protected:
-        string name;
-        string description;
+        std::string name;
+        Json::Value attributes;
 };
 
 template<typename T>
 class JsonParameterReference : public JsonParameter
 {
     public:
-        JsonParameterReference(T &reference_, string name_, string description_)
-            : JsonParameter(name_, description_), reference(reference_) {};
+        JsonParameterReference(T &reference_, std::string name_)
+            : JsonParameter(name_), reference(reference_) {};
 
         virtual Json::Value serialize() {
             return Json::Value(reference);
@@ -42,16 +43,18 @@ template<typename T>
 class JsonParameterType : public JsonParameterReference<T>
 {
     public:
-        JsonParameterType(T &reference_, string name_, string description_)
-            : JsonParameterReference<T>(reference_, name_, description_) {};
+        JsonParameterType(T &reference_, std::string name_)
+            : JsonParameterReference<T>(reference_, name_) {};
 };
 
 template<>
 class JsonParameterType<double> : public JsonParameterReference<double>
 {
     public:
-        JsonParameterType(double &reference_, string name_, string description_)
-            : JsonParameterReference<double>(reference_, name_, description_) {};
+        JsonParameterType(double &reference_, std::string name_)
+            : JsonParameterReference<double>(reference_, name_) {
+            setAttribute("type", "double");
+        };
 
         virtual bool canDeserialize(const Json::Value &json) {
             return json.isNumeric();
@@ -66,8 +69,10 @@ template<>
 class JsonParameterType<int> : public JsonParameterReference<int>
 {
     public:
-        JsonParameterType(int &reference_, string name_, string description_)
-            : JsonParameterReference(reference_, name_, description_) {};
+        JsonParameterType(int &reference_, std::string name_)
+            : JsonParameterReference(reference_, name_) {
+            setAttribute("type", "int");
+        };
 
         virtual bool canDeserialize(const Json::Value &json) {
             return json.isInt();
@@ -82,8 +87,10 @@ template<>
 class JsonParameterType<float> : public JsonParameterReference<float>
 {
     public:
-        JsonParameterType(float &reference_, string name_, string description_)
-            : JsonParameterReference<float>(reference_, name_, description_) {};
+        JsonParameterType(float &reference_, std::string name_)
+            : JsonParameterReference<float>(reference_, name_) {
+            setAttribute("type", "float");
+        };
 
         virtual bool canDeserialize(const Json::Value &json) {
             return json.isNumeric();
@@ -95,11 +102,13 @@ class JsonParameterType<float> : public JsonParameterReference<float>
 };
 
 template<>
-class JsonParameterType<string> : public JsonParameterReference<string>
+class JsonParameterType<std::string> : public JsonParameterReference<std::string>
 {
     public:
-        JsonParameterType(string &reference_, string name_, string description_)
-            : JsonParameterReference<string>(reference_, name_, description_) {};
+        JsonParameterType(std::string &reference_, std::string name_)
+            : JsonParameterReference<std::string>(reference_, name_) {
+            setAttribute("type", "string");
+        };
 
         virtual bool canDeserialize(const Json::Value &json) {
             return json.isString();
@@ -114,8 +123,10 @@ template<>
 class JsonParameterType<bool> : public JsonParameterReference<bool>
 {
     public:
-        JsonParameterType(bool &reference_, string name_, string description_)
-            : JsonParameterReference<bool>(reference_, name_, description_) {};
+        JsonParameterType(bool &reference_, std::string name_)
+            : JsonParameterReference<bool>(reference_, name_) {
+            setAttribute("type", "bool");
+        };
 
         virtual bool canDeserialize(const Json::Value &json) {
             return json.isBool();

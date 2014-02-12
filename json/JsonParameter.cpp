@@ -1,7 +1,9 @@
 #include "JsonParameter.h"
 
-JsonParameter::JsonParameter(string name_, string description_) 
-    : name(name_), description(description_)
+using std::string;
+
+JsonParameter::JsonParameter(string name_) 
+    : name(name_)
 {
 }
 
@@ -10,13 +12,20 @@ string JsonParameter::getName()
     return name;
 }
 
-string JsonParameter::getDescription()
-{
-    return description;
-}
-
 bool JsonParameter::canDeserialize(const Json::Value &json)
 {
     (void)json;
     return true;
+}
+
+JsonParameter *JsonParameter::setAttribute(std::string name, std::string value)
+{
+    attributes[name] = value;
+
+    return this;
+}
+
+Json::Value JsonParameter::getAttributes()
+{
+    return attributes;
 }
