@@ -3,4 +3,5 @@ set (SOURCES
     JsonUtil.cpp
     JsonServer.cpp
     JsonParameter.cpp
+    JsonParameters.cpp
     )
