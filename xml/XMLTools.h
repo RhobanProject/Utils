@@ -44,6 +44,10 @@
 	result << "</" << # truc << ">"; \
 }
 
+#define XML_WRITE_SERIALIZABLE(result, truc) {                                \
+    result << "<" << # truc << ">" << truc.to_xml() << "</" << # truc << ">"; \
+}
+
 
 #define	XML_READ_INT(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_BOOL(node, truc){ truc = XMLTools::get_bool_element(node, # truc); }
@@ -54,6 +58,13 @@
 #define	XML_READ_FLOAT_ARRAY(node, truc){ truc = XMLTools::get_float_array(node, # truc); }
 #define	XML_READ_STRING(node, truc){ truc = XMLTools::get_string_element(node, # truc); }
 #define	XML_READ_STRING_ARRAY(node, truc){ truc = XMLTools::get_string_array(node, # truc); }
+#define XML_READ_SERIALIZABLE(node, truc)           \
+  {                                                 \
+    TiXmlNode * child;                              \
+    if ((child = node->FirstChild(# truc)) != 0 ) { \
+      truc.from_xml(child);                         \
+    }                                               \
+  }
 
 using namespace std;
 /*****************************************************************************/
