@@ -11,6 +11,10 @@ if (ROBOARD)
         CACHE STRING "")
 endif (ROBOARD)
 
+cmake_minimum_required (VERSION 2.6)
+project (RhobanUtils)
+find_package (Threads)
+
 if (MSVC)
 	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
 	add_definitions(-D_USE_MATH_DEFINES)
@@ -20,10 +24,6 @@ if (MSVC)
 else (MSVC) 
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif (MSVC)
-
-cmake_minimum_required (VERSION 2.6)
-project (RhobanUtils)
-find_package (Threads)
 
 option (HAVE_COLORS 
     "Have terminal colors" ON)
@@ -38,6 +38,8 @@ option (ENABLE_ZMQ
 option (COMPILE_UTILS_TESTS
     "Compile utils tests?" OFF)
 
+option (ENABLE_YAML
+    "Enable the YAML support" ON)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -83,13 +85,15 @@ if (WIN32)
     set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif (WIN32)
 
-message("-- Adding YAML support")
-option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
-add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
-set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
-    CACHE STRING "")
-include_directories ("${YAML_HEADERS}")
-set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
+if (ENABLE_YAML)
+    message("-- Adding YAML support")
+    option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
+    add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
+    set (YAML_HEADERS "${PROJECT_SOURCE_DIR}/yaml-cpp/include"
+        CACHE STRING "")
+    include_directories ("${YAML_HEADERS}")
+    set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
+endif ()
 
 message("-- Adding JSON support")
 add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
@@ -153,6 +157,7 @@ endif (ENABLE_ZMQ)
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
+    set (SOURCES)
     include (${DIRECTORY}/Sources.cmake)
 
     set (PREFIXED_SOURCES)
@@ -192,12 +197,6 @@ foreach (SOURCE ${ALL_SOURCES})
 	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
 endforeach (SOURCE)
 
-
 # Adding library and dependecy
 add_library (RhobanUtils ${ALL_SOURCES} ${ALL_HEADERS})
 target_link_libraries (RhobanUtils ${EXTRA_LIBS})
-
-
-
-
-

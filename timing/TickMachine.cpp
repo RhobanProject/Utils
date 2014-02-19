@@ -415,6 +415,7 @@ void TickMachine::tick_players()
  */
 void TickMachine::update_granularity_and_players(double max_relative_error)
 {
+    (void)max_relative_error;
 	TM_DEBUG_MSG("update_granularity_and_players");
 
 	//default granularity is min frequency

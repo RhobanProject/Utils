@@ -3,17 +3,18 @@
 
 #include <string>
 
-using namespace std;
-
 class ZMQClient
 {
     public:
-        ZMQClient(string remote);
+        ZMQClient(std::string remote);
         virtual ~ZMQClient();
 
-        string process(const string &request);
+        void setTimeout(double timeout_);
+        void connect();
+        std::string process(const std::string &request);
 
     protected:
+        std::string remote;
         void *context;
         void *client;
 };

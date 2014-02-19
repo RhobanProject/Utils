@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <string.h>
 #endif
 
 using namespace std;
@@ -43,7 +44,8 @@ namespace Rhoban
 
         stop();
 
-        SOCKADDR_IN sin = { 0 };
+        SOCKADDR_IN sin;
+        memset(&sin, 0, sizeof(sin));
         struct hostent *hostinfo;
 #ifdef LINUX
         clientSocket = socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, 0);
