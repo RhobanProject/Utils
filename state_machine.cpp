@@ -56,7 +56,7 @@ int StateMachine::tic() {
   
   if (active_state==NULL) return -1;
 
-  if (!(active_state->is_sleeping())) {
+  if (!(active_state->is_sys_wait_msing())) {
     active_state->activity();
     this->activity();
   } 

@@ -340,7 +340,7 @@ void TickMachine::execute()
 		END_SAFE(timers_to_unregister_list_mutex)
 
 #ifdef WIN32
-		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
+		sys_wait_ms( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
 #else
 		wait_signal(SIGALRM);
 #endif

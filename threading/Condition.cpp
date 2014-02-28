@@ -76,7 +76,7 @@ int Condition::wait(Mutex * mutex, unsigned int timeout)
         throw string("Timeout while waiting for condition");
     }
 #else
-	ret = SleepConditionVariableCS(&condition,&(mutex->_mutex),timeout) ? 0 : -1;
+	ret = sys_wait_msConditionVariableCS(&condition,&(mutex->_mutex),timeout) ? 0 : -1;
 	if (ret < 0)
 	{
 		cout << "Failed to wait condition with error " << GetLastError() << endl;

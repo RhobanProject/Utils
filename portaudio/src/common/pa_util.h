@@ -149,7 +149,7 @@ void PaUtil_InitializeClock( void );
 double PaUtil_GetTime( void );
 
 
-/* void Pa_Sleep( long msec );  must also be implemented in per-platform .c file */
+/* void Pa_sys_wait_ms( long msec );  must also be implemented in per-platform .c file */
 
 
 

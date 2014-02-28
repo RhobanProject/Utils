@@ -41,28 +41,28 @@ int init_tick_machine(ui32 frequency);
 /*! \return The current tick frequency */
 unsigned int get_ticks_frequency();
 
-/*! \brief sleeps until next_tick */
+/*! \brief sys_wait_mss until next_tick */
 void wait_next_tick(void);
 
 void wait_n_ticks(ui32 tick_nb);
 
 
 
-void sleep_ms_ticks(ui32 ms);
-void sleep_ticks(chrono duration);
+void sys_wait_ms_ms_ticks(ui32 ms);
+void sys_wait_ms_ticks(chrono duration);
 
 inline void syst_wait_ms(int ms)
 {
 #ifndef WIN32
-	usleep(1000 * ms);
+	usys_wait_ms(1000 * ms);
 #else
-	Sleep(ms);
+	sys_wait_ms(ms);
 #endif
 }
-void sleep_ms(ui32 ms);
-void sleep_ms(int ms); // TODO pas terrible... les 2 sleep_ms...
+void sys_wait_ms_ms(ui32 ms);
+void sys_wait_ms_ms(int ms); // TODO pas terrible... les 2 sys_wait_ms_ms...
 void wait_ms(int ms);
-void sleep_ms(chrono duration);
+void sys_wait_ms_ms(chrono duration);
 void decrease(chrono & chronoo, chrono & duration);
 void increase(chrono & chronoo, chrono & duration);
 bool is_after(chrono & time_to_check, chrono & reference);

@@ -1,7 +1,7 @@
-#ifndef _TIMING_SLEEP_H
-#define _TIMING_SLEEP_H
+#ifndef _TIMING_sys_wait_ms_H
+#define _TIMING_sys_wait_ms_H
 
-void ms_sleep(long ms);
-void us_sleep(long us);
+void ms_sys_wait_ms(long ms);
+void us_sys_wait_ms(long us);
 
 #endif

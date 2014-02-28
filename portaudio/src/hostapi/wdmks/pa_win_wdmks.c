@@ -3103,7 +3103,7 @@ static PaError StopStream( PaStream *s )
         while(stream->streamActive)
         {
             PA_DEBUG(("W."));
-            Sleep(10); /* Let thread sleep for 10 msec */
+            sys_wait_ms(10); /* Let thread sys_wait_ms for 10 msec */
         }
     }
 
@@ -3150,7 +3150,7 @@ static PaError AbortStream( PaStream *s )
         SetEvent(stream->events[4]); /* Signal immediately */
         while(stream->streamActive)
         {
-            Sleep(10);
+            sys_wait_ms(10);
         }
     }
 

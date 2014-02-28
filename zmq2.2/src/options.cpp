@@ -74,7 +74,7 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
 #if (ZMQ_HAVE_ANDROID || ZMQ_HAVE_LINUX)
             if (stat (".", &stat_buf) || ((stat_buf.st_mode & S_IWUSR) == 0)) {
 #else
-		throw std::exception("ZMQ_SWAP unavailable in MSVC");
+		throw std::runtime_error("ZMQ_SWAP unavailable in MSVC");
 		if (true)
 		{
 //            if (stat (".", &stat_buf) || ((stat_buf.st_mode & S_IWRITE) == 0)) {

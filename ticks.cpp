@@ -122,7 +122,7 @@ void wait_n_ticks(ui32 tick_nb){
 
 #ifdef _WIN32
 	int tick_duration = 1000/ticks_frequency;
-   	for (;tick_nb>0; tick_nb--) Sleep(tick_duration);
+   	for (;tick_nb>0; tick_nb--) sys_wait_ms(tick_duration);
 #else
 	sigset_t block_set;
     sigfillset( &block_set );
@@ -135,16 +135,16 @@ void wait_n_ticks(ui32 tick_nb){
 #endif
 }
 
-void sleep_ticks(chrono duration)
+void sys_wait_ms_ticks(chrono duration)
 {
-	sleep_ms_ticks(duration.tv_sec*1000 + duration.tv_usec/1000);
+	sys_wait_ms_ms_ticks(duration.tv_sec*1000 + duration.tv_usec/1000);
 }
 
-void sleep_ms_ticks(ui32 ms) {
+void sys_wait_ms_ms_ticks(ui32 ms) {
 #ifdef _WIN32
-	Sleep(ms);
-	//usleep(ms%1000);
-	//for (int i=0; i<ms; i++) usleep(1000);
+	sys_wait_ms(ms);
+	//usys_wait_ms(ms%1000);
+	//for (int i=0; i<ms; i++) usys_wait_ms(1000);
 #else
 	if (ms<=0) {
 		fprintf(stderr,"ticks.c: wait_n_ticks: asked for waiting %d ms, waiting for next tick instead\n",ms);
@@ -185,19 +185,19 @@ void get_tick_machine_time(chrono * clock)
 #endif
 }
 
-void sleep_ms(int ms)
+void sys_wait_ms_ms(int ms)
 {
-  sleep_ms_ticks(ms);
+  sys_wait_ms_ms_ticks(ms);
 }
 
 void wait_ms(int ms)
 {
-  sleep_ms_ticks(ms);
+  sys_wait_ms_ms_ticks(ms);
 }
 
-void sleep_ms(chrono duration)
+void sys_wait_ms_ms(chrono duration)
 {
-  sleep_ticks(duration);
+  sys_wait_ms_ticks(duration);
 }
 
 void decrease(chrono & chronoo, chrono & duration)

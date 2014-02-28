@@ -278,7 +278,7 @@ void Thread::wait_started()
 	started.unlock();
 #else
 	while (thread_state == Unborn || thread_state == Starting)
-        usleep(1000);
+        usys_wait_ms(1000);
 #endif
 }
 

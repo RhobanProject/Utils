@@ -96,9 +96,9 @@ int PaUtil_CountCurrentlyAllocatedBlocks( void )
 }
 
 
-void Pa_Sleep( long msec )
+void Pa_sys_wait_ms( long msec )
 {
-    Sleep( msec );
+    sys_wait_ms( msec );
 }
 
 static int usePerformanceCounter_;
