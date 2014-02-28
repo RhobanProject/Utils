@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (ZeroMQ)
 
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "")
+endif ()
+
 IF(DEFINED WIN32)
 	SET(SYSTEM_OS "WINDOWS")
 	SET(ZMQ_HAVE_WINDOWS 1)

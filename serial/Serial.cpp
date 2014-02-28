@@ -515,17 +515,12 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 
 string Serial::receive(size_t size, bool blocking)
 {
-#ifndef MSVC
-	char result[size];
-#else
 	char * result = (char *) malloc(size);
-#endif
 	int nb = receive(result, size, blocking);
 	string res = string(result, nb);
-#ifdef MSVC
 	free(result);
-#endif
-	return res;
+	
+        return res;
 }
 
 char Serial::receiveChar()

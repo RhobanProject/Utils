@@ -44,6 +44,10 @@
 	result << "</" << # truc << ">"; \
 }
 
+#define XML_WRITE_SERIALIZABLE(result, truc) {                                \
+    result << "<" << # truc << ">" << truc.to_xml() << "</" << # truc << ">"; \
+}
+
 
 #define	XML_READ_INT(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_BOOL(node, truc){ truc = XMLTools::get_bool_element(node, # truc); }
@@ -54,6 +58,13 @@
 #define	XML_READ_FLOAT_ARRAY(node, truc){ truc = XMLTools::get_float_array(node, # truc); }
 #define	XML_READ_STRING(node, truc){ truc = XMLTools::get_string_element(node, # truc); }
 #define	XML_READ_STRING_ARRAY(node, truc){ truc = XMLTools::get_string_array(node, # truc); }
+#define XML_READ_SERIALIZABLE(node, truc)           \
+  {                                                 \
+    TiXmlNode * child;                              \
+    if ((child = node->FirstChild(# truc)) != 0 ) { \
+      truc.from_xml(child);                         \
+    }                                               \
+  }
 
 using namespace std;
 /*****************************************************************************/
@@ -138,7 +149,10 @@ class Serializable
         virtual void from_xml(string xml_stream);
 
         //deserializes from an xml node
-        virtual void from_xml(TiXmlNode *node) { throw string("from_xml not implemented");};
+        virtual void from_xml(TiXmlNode *node) {
+          (void) node;//Suppress unused warning
+          throw string("from_xml not implemented");
+        };
 
         //serializes to an xml strem excluding class name
         virtual string to_xml() const { throw string("to_xml not implemented");};

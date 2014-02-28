@@ -38,7 +38,10 @@ ui32 tick_machine_is_launched = 0;
 ui32 ticks_frequency = 0;
 ui32 ticks =0;
 
-void catcher( int sig ) {ticks++;}
+void catcher( int sig ) {
+    (void)sig;
+    ticks++;
+}
 
 int launch_tick_machine(ui32 frequency);
 

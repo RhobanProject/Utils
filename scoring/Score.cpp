@@ -58,7 +58,7 @@ double Score::getScore() const{
   }
   if (sumWeight == 0.0) return 1;
   return sumScore / sumWeight;
-};
+}
 
 void Score::mark(string mark_name,
                  string note,

@@ -92,7 +92,7 @@ void Fifo<FIFO_TYPE>::reset_fifo() {
   q_start=0;
   /* set current position to 0 */
   q_end=0;
-};
+}
 
 template <typename FIFO_TYPE>
 int Fifo<FIFO_TYPE>::size() {
@@ -100,7 +100,7 @@ int Fifo<FIFO_TYPE>::size() {
     return q_end - q_start;
   else
     return q_end + (q_size - q_start);
-};
+}
 
 template <typename FIFO_TYPE>
 FIFO_TYPE Fifo<FIFO_TYPE>::get_item() {

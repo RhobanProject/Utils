@@ -5,8 +5,6 @@
 #include <string>
 #include "JsonClientBase.h"
 
-using namespace std;
-
 template<typename T>
 class JsonClient : public JsonClientBase
 {
@@ -16,12 +14,12 @@ class JsonClient : public JsonClientBase
         {
         }
 
-        string process(const char *str)
+        std::string process(const char *str)
         {
-            return process(string(str));
+            return process(std::string(str));
         }
 
-        string process(const string &str)
+        std::string process(const std::string &str)
         {
             return sender.process(str);
         }
@@ -32,15 +30,15 @@ class JsonClient : public JsonClientBase
         {
             Json::Value response;
             Json::FastWriter writer;
-            string resp = process(writer.write(request));
+            std::string resp = process(writer.write(request));
             Json::Reader reader;
 
             if (!reader.parse(resp, response)) {
-                throw string("Unable to parse server response");
+                throw std::string("Unable to parse server response");
             }
 
             if (!response.isArray() || !response[0].isInt()) {
-                throw string("Malformed response");
+                throw std::string("Malformed response");
             }
 
             if (!response[0].asInt()) {

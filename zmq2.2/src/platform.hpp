@@ -28,7 +28,7 @@
 //  Place any MSVC-specific definitions here.
 
 #ifndef ZMQ_HAVE_WINDOWS
-#define ZMQ_HAVE_WINDOWS
+//#define ZMQ_HAVE_WINDOWS
 #endif
 
 #endif

@@ -120,16 +120,16 @@ public:
   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section");
 
 
-  #define BEGIN_SAFE(l)				\
-  try						\
-    {						\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
-  l.lock(); \
-  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
-
+#define BEGIN_SAFE(l)							\
+  try									\
+  {									\
+    TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
+    l.lock();								\
+    TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
+ 
 #define BEGIN_PSAFE(l)				\
-try						\
-  {						\
+  try						\
+    {									\
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
 l->lock(); \
 TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
