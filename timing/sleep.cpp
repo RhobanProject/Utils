@@ -5,22 +5,22 @@
 #include <windows.h>
 #endif
 
-#include "sys_wait_ms.h"
+#include "sleep.h"
 
 void ms_sys_wait_ms(long ms)
 {
 #ifdef WIN32
-    sys_wait_ms(ms);
+    syst_wait_ms(ms);
 #else
-    usys_wait_ms(1000 * ms);
+    usleep(1000 * ms);
 #endif
 }
 
-void us_sys_wait_ms(long us)
+void u_sleep(long us)
 {
 #ifdef WIN32
-    sys_wait_ms(us/1000.0);
+    Sleep(us/1000.0);
 #else
-    usys_wait_ms(us);
+    usleep(us);
 #endif
 }

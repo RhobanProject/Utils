@@ -54,7 +54,7 @@ void sys_wait_ms_ticks(chrono duration);
 inline void syst_wait_ms(int ms)
 {
 #ifndef WIN32
-	usys_wait_ms(1000 * ms);
+	usleep(1000 * ms);
 #else
 	sys_wait_ms(ms);
 #endif
