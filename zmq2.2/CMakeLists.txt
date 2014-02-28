@@ -73,11 +73,33 @@ src/zmq_init.cpp
 src/zmq_listener.cpp
     )
 
+# ADD HEADERS FILES 
+foreach (SOURCE ${ALL_SOURCES})
+	set (FILENAME_PREFIX)
+	set (FILENAME_PATH)
+	GET_FILENAME_COMPONENT(FILENAME_PREFIX ${SOURCE} NAME_WE)
+	GET_FILENAME_COMPONENT(FILENAME_PATH ${SOURCE} PATH)
+	
+	if (FILENAME_PATH STREQUAL "")
+		set (FILENAME ${FILENAME_PREFIX})
+	else ()
+		set (FILENAME ${FILENAME_PATH}/${FILENAME_PREFIX})
+	endif()
+	
+	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
+        set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.h")
+	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
+	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
+        set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.hpp")
+	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
+endforeach (SOURCE)
+
 set (ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/include/"
     CACHE STRING "")
 
-add_library (ZeroMQ ${ALL_SOURCES})
+add_library (ZeroMQ ${ALL_SOURCES} ${ALL_HEADERS})
 
 if (DEFINED WIN32)
 	target_link_libraries (ZeroMQ wsock32 ws2_32)
 endif (DEFINED WIN32)
+

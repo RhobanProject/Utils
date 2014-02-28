@@ -12,6 +12,7 @@ namespace YAML {
 class ConfigFileWriteable
 {
     public:
+		virtual ~ConfigFileWriteable(){};
         virtual void write(YAML::Emitter *emitter)=0;
 };
 

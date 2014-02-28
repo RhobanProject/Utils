@@ -46,6 +46,16 @@ namespace Rhoban
 
 class Thread
 {
+
+protected:
+	/**
+	* thread core
+	*/
+	virtual void execute(void) = 0;
+
+	void lock();
+	void unlock();
+
 public:
   Thread();
   virtual ~Thread();
@@ -96,14 +106,6 @@ public:
   Condition dead;
   void wait_dead();
 
-protected:
-	/**
-	* thread core
-	*/
-	virtual void execute(void) = 0;
-
-  void lock();
-  void unlock();
 
 public:
 
