@@ -2134,7 +2134,7 @@ struct PaWinMmeStream
     int processingThreadPriority;
     int highThreadPriority;
     int throttledThreadPriority;
-    unsigned long throttledsys_wait_msMsecs;
+    unsigned long throttledSleepMsecs;
 
     int isStopped;
     volatile int isActive;
@@ -2514,9 +2514,9 @@ static PaError OpenStream( struct PaUtilHostApiRepresentation *hostApi,
 
     stream->primeStreamUsingCallback = ( (streamFlags&paPrimeOutputBuffersUsingStreamCallback) && streamCallback ) ? 1 : 0;
 
-    /* time to sys_wait_ms when throttling due to >100% cpu usage.
+    /* time to sleep when throttling due to >100% cpu usage.
         -a quater of a buffer's duration */
-    stream->throttledsys_wait_msMsecs =
+    stream->throttledSleepMsecs =
             (unsigned long)(stream->bufferProcessor.framesPerHostBuffer *
              stream->bufferProcessor.samplePeriod * .25 * 1000);
 
@@ -3143,8 +3143,8 @@ PA_THREAD_FUNC ProcessingThreadProc( void *pArg )
                                 stream->processingThreadPriority = stream->throttledThreadPriority;
                             }
 
-                            /* sys_wait_ms to give other processes a go */
-                            sys_wait_ms( stream->throttledsys_wait_msMsecs );
+                            /* sleep to give other processes a go */
+                            Sleep( stream->throttledSleepMsecs );
                         }
                         else
                         {

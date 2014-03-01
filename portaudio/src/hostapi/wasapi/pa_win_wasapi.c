@@ -580,16 +580,16 @@ static PaError __LogPaError(PaError err, const char *func, const char *file, int
 }
 
 // ------------------------------------------------------------------------------------------
-/*! \class Threadsys_wait_msScheduler
-           Allows to emulate thread sys_wait_ms of less than 1 millisecond under Windows. Scheduler
-		   calculates number of times the thread must run untill next sys_wait_ms of 1 millisecond.
-		   It does not make thread sys_wait_msing for real number of microseconds but rather controls
-		   how many of imaginary microseconds the thread task can allow thread to sys_wait_ms.
+/*! \class ThreadSleepScheduler
+           Allows to emulate thread sleep of less than 1 millisecond under Windows. Scheduler
+		   calculates number of times the thread must run untill next sleep of 1 millisecond.
+		   It does not make thread sleeping for real number of microseconds but rather controls
+		   how many of imaginary microseconds the thread task can allow thread to sleep.
 */
 typedef struct ThreadIdleScheduler
 {
-	UINT32 m_idle_microseconds; //!< number of microseconds to sys_wait_ms
-	UINT32 m_next_sys_wait_ms;        //!< next sys_wait_ms round
+	UINT32 m_idle_microseconds; //!< number of microseconds to sleep
+	UINT32 m_next_sleep;        //!< next sleep round
 	UINT32 m_i;					//!< current round iterator position
 	UINT32 m_resolution;		//!< resolution in number of milliseconds
 }
@@ -605,13 +605,13 @@ static void ThreadIdleScheduler_Setup(ThreadIdleScheduler *sched, UINT32 resolut
 
 	sched->m_idle_microseconds = microseconds;
 	sched->m_resolution        = resolution;
-	sched->m_next_sys_wait_ms        = (resolution * 1000) / microseconds;
+	sched->m_next_sleep        = (resolution * 1000) / microseconds;
 }
-//! Iterate and check if can sys_wait_ms.
-static UINT32 ThreadIdleScheduler_Nextsys_wait_ms(ThreadIdleScheduler *sched)
+//! Iterate and check if can sleep.
+static UINT32 ThreadIdleScheduler_NextSleep(ThreadIdleScheduler *sched)
 {
-	// advance and check if thread can sys_wait_ms
-	if (++ sched->m_i == sched->m_next_sys_wait_ms)
+	// advance and check if thread can sleep
+	if (++ sched->m_i == sched->m_next_sleep)
 	{
 		sched->m_i = 0;
 		return sched->m_resolution;
@@ -760,7 +760,7 @@ static UINT32 AlignFramesPerBuffer(UINT32 nFrames, UINT32 nSamplesPerSec, UINT32
 }
 
 // ------------------------------------------------------------------------------------------
-static UINT32 GetFramessys_wait_msTime(UINT32 nFrames, UINT32 nSamplesPerSec)
+static UINT32 GetFramesSleepTime(UINT32 nFrames, UINT32 nSamplesPerSec)
 {
 	REFERENCE_TIME nDuration;
 	if (nSamplesPerSec == 0)
@@ -773,7 +773,7 @@ static UINT32 GetFramessys_wait_msTime(UINT32 nFrames, UINT32 nSamplesPerSec)
 }
 
 // ------------------------------------------------------------------------------------------
-static UINT32 GetFramessys_wait_msTimeMicroseconds(UINT32 nFrames, UINT32 nSamplesPerSec)
+static UINT32 GetFramesSleepTimeMicroseconds(UINT32 nFrames, UINT32 nSamplesPerSec)
 {
 	REFERENCE_TIME nDuration;
 	if (nSamplesPerSec == 0)
@@ -3423,7 +3423,7 @@ static PaError ReadStream( PaStream* s, void *_buffer, unsigned long frames )
 	BYTE *user_buffer = (BYTE *)_buffer;
 	BYTE *wasapi_buffer = NULL;
 	DWORD flags = 0;
-	UINT32 i, available, sys_wait_ms = 0;
+	UINT32 i, available, sleep = 0;
 	unsigned long processed;
 	ThreadIdleScheduler sched;
 
@@ -3500,7 +3500,7 @@ static PaError ReadStream( PaStream* s, void *_buffer, unsigned long frames )
 	while (frames != 0)
 	{
 		// Check if blocking call must be interrupted
-		if (WaitForSingleObject(stream->hCloseRequest, sys_wait_ms) != WAIT_TIMEOUT)
+		if (WaitForSingleObject(stream->hCloseRequest, sleep) != WAIT_TIMEOUT)
 			break;
 
 		// Get available frames (must be finding out available frames before call to IAudioCaptureClient_GetBuffer
@@ -3515,30 +3515,30 @@ static PaError ReadStream( PaStream* s, void *_buffer, unsigned long frames )
 		// Wait for more frames to become available
 		if (available == 0)
 		{
-			// Exclusive mode may require latency of 1 millisecond, thus we shall sys_wait_ms
+			// Exclusive mode may require latency of 1 millisecond, thus we shall sleep
 			// around 500 microseconds (emulated) to collect packets in time
 			if (stream->in.shareMode != AUDCLNT_SHAREMODE_EXCLUSIVE)
 			{
-				UINT32 sys_wait_ms_frames = (frames < stream->in.framesPerHostCallback ? frames : stream->in.framesPerHostCallback);
+				UINT32 sleep_frames = (frames < stream->in.framesPerHostCallback ? frames : stream->in.framesPerHostCallback);
 
-				sys_wait_ms  = GetFramessys_wait_msTime(sys_wait_ms_frames, stream->in.wavex.Format.nSamplesPerSec);
-				sys_wait_ms /= 4; // wait only for 1/4 of the buffer
+				sleep  = GetFramesSleepTime(sleep_frames, stream->in.wavex.Format.nSamplesPerSec);
+				sleep /= 4; // wait only for 1/4 of the buffer
 
 				// WASAPI input provides packets, thus expiring packet will result in bad audio
 				// limit waiting time to 2 seconds (will always work for smallest buffer in Shared)
-				if (sys_wait_ms > 2)
-					sys_wait_ms = 2;
+				if (sleep > 2)
+					sleep = 2;
 
 				// Avoid busy waiting, schedule next 1 millesecond wait
-				if (sys_wait_ms == 0)
-					sys_wait_ms = ThreadIdleScheduler_Nextsys_wait_ms(&sched);
+				if (sleep == 0)
+					sleep = ThreadIdleScheduler_NextSleep(&sched);
 			}
 			else
 			{
-				if ((sys_wait_ms = ThreadIdleScheduler_Nextsys_wait_ms(&sched)) != 0)
+				if ((sleep = ThreadIdleScheduler_NextSleep(&sched)) != 0)
 				{
-					sys_wait_ms(sys_wait_ms);
-					sys_wait_ms = 0;
+					Sleep(sleep);
+					sleep = 0;
 				}
 			}
 
@@ -3602,7 +3602,7 @@ static PaError WriteStream( PaStream* s, const void *_buffer, unsigned long fram
 	const BYTE *user_buffer = (const BYTE *)_buffer;
 	BYTE *wasapi_buffer;
 	HRESULT hr = S_OK;
-	UINT32 i, available, sys_wait_ms = 0;
+	UINT32 i, available, sleep = 0;
 	unsigned long processed;
 	ThreadIdleScheduler sched;
 
@@ -3635,7 +3635,7 @@ static PaError WriteStream( PaStream* s, const void *_buffer, unsigned long fram
 	while (frames != 0)
 	{
 		// Check if blocking call must be interrupted
-		if (WaitForSingleObject(stream->hCloseRequest, sys_wait_ms) != WAIT_TIMEOUT)
+		if (WaitForSingleObject(stream->hCloseRequest, sleep) != WAIT_TIMEOUT)
 			break;
 
 		// Get frames available
@@ -3648,14 +3648,14 @@ static PaError WriteStream( PaStream* s, const void *_buffer, unsigned long fram
 		// Wait for more frames to become available
 		if (available == 0)
 		{
-			UINT32 sys_wait_ms_frames = (frames < stream->out.framesPerHostCallback ? frames : stream->out.framesPerHostCallback);
+			UINT32 sleep_frames = (frames < stream->out.framesPerHostCallback ? frames : stream->out.framesPerHostCallback);
 
-			sys_wait_ms  = GetFramessys_wait_msTime(sys_wait_ms_frames, stream->out.wavex.Format.nSamplesPerSec);
-			sys_wait_ms /= 2; // wait only for half of the buffer
+			sleep  = GetFramesSleepTime(sleep_frames, stream->out.wavex.Format.nSamplesPerSec);
+			sleep /= 2; // wait only for half of the buffer
 
 			// Avoid busy waiting, schedule next 1 millesecond wait
-			if (sys_wait_ms == 0)
-				sys_wait_ms = ThreadIdleScheduler_Nextsys_wait_ms(&sched);
+			if (sleep == 0)
+				sleep = ThreadIdleScheduler_NextSleep(&sched);
 
 			continue;
 		}
@@ -4602,9 +4602,9 @@ PA_THREAD_FUNC ProcThreadPoll(void *param)
 	ThreadIdleScheduler scheduler;
 
 	// Calculate the actual duration of the allocated buffer.
-	DWORD sys_wait_ms_ms     = 0;
-	DWORD sys_wait_ms_ms_in;
-	DWORD sys_wait_ms_ms_out;
+	DWORD sleep_ms     = 0;
+	DWORD sleep_ms_in;
+	DWORD sleep_ms_out;
 
 	BOOL bThreadComInitialized = FALSE;
 
@@ -4633,46 +4633,46 @@ PA_THREAD_FUNC ProcThreadPoll(void *param)
 	}
 
 	// Calculate timeout for next polling attempt.
-	sys_wait_ms_ms_in  = GetFramessys_wait_msTime(stream->in.framesPerHostCallback/WASAPI_PACKETS_PER_INPUT_BUFFER, stream->in.wavex.Format.nSamplesPerSec);
-	sys_wait_ms_ms_out = GetFramessys_wait_msTime(stream->out.framesPerBuffer, stream->out.wavex.Format.nSamplesPerSec);
+	sleep_ms_in  = GetFramesSleepTime(stream->in.framesPerHostCallback/WASAPI_PACKETS_PER_INPUT_BUFFER, stream->in.wavex.Format.nSamplesPerSec);
+	sleep_ms_out = GetFramesSleepTime(stream->out.framesPerBuffer, stream->out.wavex.Format.nSamplesPerSec);
 
-	// WASAPI Input packets tend to expire very easily, let's limit sys_wait_ms time to 2 milliseconds
+	// WASAPI Input packets tend to expire very easily, let's limit sleep time to 2 milliseconds
 	// for all cases. Please propose better solution if any.
-	if (sys_wait_ms_ms_in > 2)
-		sys_wait_ms_ms_in = 2;
+	if (sleep_ms_in > 2)
+		sleep_ms_in = 2;
 
 	// Adjust polling time for non-paUtilFixedHostBufferSize. Input stream is not adjustable as it is being
 	// polled according its packet length.
 	if (stream->bufferMode != paUtilFixedHostBufferSize)
 	{
-		//sys_wait_ms_ms_in = GetFramessys_wait_msTime(stream->bufferProcessor.framesPerUserBuffer, stream->in.wavex.Format.nSamplesPerSec);
-		sys_wait_ms_ms_out = GetFramessys_wait_msTime(stream->bufferProcessor.framesPerUserBuffer, stream->out.wavex.Format.nSamplesPerSec);
+		//sleep_ms_in = GetFramesSleepTime(stream->bufferProcessor.framesPerUserBuffer, stream->in.wavex.Format.nSamplesPerSec);
+		sleep_ms_out = GetFramesSleepTime(stream->bufferProcessor.framesPerUserBuffer, stream->out.wavex.Format.nSamplesPerSec);
 	}
 
 	// Choose smallest
-	if ((sys_wait_ms_ms_in != 0) && (sys_wait_ms_ms_out != 0))
-		sys_wait_ms_ms = min(sys_wait_ms_ms_in, sys_wait_ms_ms_out);
+	if ((sleep_ms_in != 0) && (sleep_ms_out != 0))
+		sleep_ms = min(sleep_ms_in, sleep_ms_out);
 	else
 	{
-		sys_wait_ms_ms = (sys_wait_ms_ms_in ? sys_wait_ms_ms_in : sys_wait_ms_ms_out);
+		sleep_ms = (sleep_ms_in ? sleep_ms_in : sleep_ms_out);
 	}
 	// Make sure not 0, othervise use ThreadIdleScheduler
-	if (sys_wait_ms_ms == 0)
+	if (sleep_ms == 0)
 	{
-		sys_wait_ms_ms_in  = GetFramessys_wait_msTimeMicroseconds(stream->in.framesPerHostCallback/WASAPI_PACKETS_PER_INPUT_BUFFER, stream->in.wavex.Format.nSamplesPerSec);
-		sys_wait_ms_ms_out = GetFramessys_wait_msTimeMicroseconds(stream->bufferProcessor.framesPerUserBuffer, stream->out.wavex.Format.nSamplesPerSec);
+		sleep_ms_in  = GetFramesSleepTimeMicroseconds(stream->in.framesPerHostCallback/WASAPI_PACKETS_PER_INPUT_BUFFER, stream->in.wavex.Format.nSamplesPerSec);
+		sleep_ms_out = GetFramesSleepTimeMicroseconds(stream->bufferProcessor.framesPerUserBuffer, stream->out.wavex.Format.nSamplesPerSec);
 
 		// Choose smallest
-		if ((sys_wait_ms_ms_in != 0) && (sys_wait_ms_ms_out != 0))
-			sys_wait_ms_ms = min(sys_wait_ms_ms_in, sys_wait_ms_ms_out);
+		if ((sleep_ms_in != 0) && (sleep_ms_out != 0))
+			sleep_ms = min(sleep_ms_in, sleep_ms_out);
 		else
 		{
-			sys_wait_ms_ms = (sys_wait_ms_ms_in ? sys_wait_ms_ms_in : sys_wait_ms_ms_out);
+			sleep_ms = (sleep_ms_in ? sleep_ms_in : sleep_ms_out);
 		}
 
-		// Setup thread sys_wait_ms scheduler
-		ThreadIdleScheduler_Setup(&scheduler, 1, sys_wait_ms_ms/* microseconds here */);
-		sys_wait_ms_ms = 0;
+		// Setup thread sleep scheduler
+		ThreadIdleScheduler_Setup(&scheduler, 1, sleep_ms/* microseconds here */);
+		sleep_ms = 0;
 	}
 
     // Setup data processors
@@ -4750,13 +4750,13 @@ PA_THREAD_FUNC ProcThreadPoll(void *param)
 	if (!PA_WASAPI__IS_FULLDUPLEX(stream))
 	{
 		// Processing Loop
-		UINT32 next_sys_wait_ms = sys_wait_ms_ms;
-		while (WaitForSingleObject(stream->hCloseRequest, next_sys_wait_ms) == WAIT_TIMEOUT)
+		UINT32 next_sleep = sleep_ms;
+		while (WaitForSingleObject(stream->hCloseRequest, next_sleep) == WAIT_TIMEOUT)
 		{
-			// Get next sys_wait_ms time
-			if (sys_wait_ms_ms == 0)
+			// Get next sleep time
+			if (sleep_ms == 0)
 			{
-				next_sys_wait_ms = ThreadIdleScheduler_Nextsys_wait_ms(&scheduler);
+				next_sleep = ThreadIdleScheduler_NextSleep(&scheduler);
 			}
 
 			for (i = 0; i < S_COUNT; ++i)
@@ -4943,18 +4943,18 @@ PA_THREAD_FUNC ProcThreadPoll(void *param)
 		}
 #else
 		// Processing Loop
-		UINT32 next_sys_wait_ms = sys_wait_ms_ms;
-		while (WaitForSingleObject(stream->hCloseRequest, next_sys_wait_ms) == WAIT_TIMEOUT)
+		UINT32 next_sleep = sleep_ms;
+		while (WaitForSingleObject(stream->hCloseRequest, next_sleep) == WAIT_TIMEOUT)
 		{
 			UINT32 i_frames = 0, i_processed = 0;
 			BYTE *i_data = NULL, *o_data = NULL, *o_data_host = NULL;
 			DWORD i_flags = 0;
 			UINT32 o_frames = 0;
 
-			// Get next sys_wait_ms time
-			if (sys_wait_ms_ms == 0)
+			// Get next sleep time
+			if (sleep_ms == 0)
 			{
-				next_sys_wait_ms = ThreadIdleScheduler_Nextsys_wait_ms(&scheduler);
+				next_sleep = ThreadIdleScheduler_NextSleep(&scheduler);
 			}
 
 			// get available frames
