@@ -2910,7 +2910,7 @@ static PaError StartStream( PaStream *s )
            PA streams, or when also using timers for other time critical tasks
         */
         stream->timerID = timeSetEvent( timerPeriodMs, stream->systemTimerResolutionPeriodMs, (LPTIMECALLBACK) TimerCallback,
-                                             (DWORD_PTR) stream, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS );
+                                             (DWORD_PTR) stream, TIME_PERIODIC | TIME_KILL_SYNRhoban::chronoUS );
     
         if( stream->timerID == 0 )
         {

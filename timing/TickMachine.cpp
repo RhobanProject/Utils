@@ -32,7 +32,7 @@ using namespace std;
 
 TickMachine * TickMachine::the_tick_machine = NULL;
 
-chrono TickMachine::start_time;
+Rhoban::chrono TickMachine::start_time;
 
 TickMachine * TickMachine::get_tick_machine() {
 	//todo: return only when tick machine is started
@@ -187,7 +187,7 @@ TickMachine::~TickMachine()
 
 }
 
-void TickMachine::set_granularity(chrono musec)
+void TickMachine::set_granularity(Rhoban::chrono musec)
 {
 	TM_DEBUG_MSG("set_granularity");
 	granularity = musec;
@@ -246,13 +246,13 @@ void TickMachine::execute()
 		{
 			timer_to_dispose = false;
 			BEGIN_SAFE(timers_to_delete_list_mutex)
-			TM_DEBUG_MSG("Asynchronously deleting " << timers_to_delete.size() << "timers");
+			TM_DEBUG_MSG("AsynRhoban::chronously deleting " << timers_to_delete.size() << "timers");
 			for(list<TickTimer *>::iterator pt = timers_to_delete.begin(); pt!= timers_to_delete.end(); pt++)
 			{
 				TickTimer * timer = *pt;
 				try
 				{
-					TM_DEBUG_MSG("Asynchronously deleting timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
+					TM_DEBUG_MSG("AsynRhoban::chronously deleting timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 					players.remove(timer);
 					delete timer;
 				}
@@ -273,11 +273,11 @@ void TickMachine::execute()
 		{
 			timer_to_register = false;
 			BEGIN_SAFE(timers_to_register_list_mutex)
-				TM_DEBUG_MSG("Asynchronously registering " << timers_to_register.size() << " timers");
+				TM_DEBUG_MSG("AsynRhoban::chronously registering " << timers_to_register.size() << " timers");
 			for(list<TickTimer *>::iterator pt = timers_to_register.begin(); pt!= timers_to_register.end(); pt++)
 			{
 				TickTimer * timer = *pt;
-				TM_DEBUG_MSG("Asynchronously registering new timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
+				TM_DEBUG_MSG("AsynRhoban::chronously registering new timer '" << timer->timer_name << "' (" << (long long int) timer << ")");
 				try
 				{
 					gettimeofday(&timer->start_time,0);
@@ -287,7 +287,7 @@ void TickMachine::execute()
 				}
 				catch(string & exc)
 				{
-					TM_CAUTION_MSG("Failed to asynchronously  register timer: exc")
+					TM_CAUTION_MSG("Failed to asynRhoban::chronously  register timer: exc")
 				}
 			}
 			timers_to_register.clear();
@@ -298,13 +298,13 @@ void TickMachine::execute()
 		if(timer_to_unregister)
 		{
 			timer_to_unregister = false;
-			TM_DEBUG_MSG("Asynchronously unregistering " << timers_to_unregister.size() << " timers");
+			TM_DEBUG_MSG("AsynRhoban::chronously unregistering " << timers_to_unregister.size() << " timers");
 			for(list<TickTimer *>::iterator pt = timers_to_unregister.begin(); pt!= timers_to_unregister.end(); pt++)
 			{
 				TickTimer * timer = *pt;
 				try
 				{
-					TM_DEBUG_MSG("Asynchronously unregistering timer " << (long long int) timer);
+					TM_DEBUG_MSG("AsynRhoban::chronously unregistering timer " << (long long int) timer);
 					for(list<TickTimer *>::iterator ptimer = players.begin(); ptimer != players.end(); ptimer ++)
 					{
 						if(*ptimer == timer)
@@ -340,7 +340,7 @@ void TickMachine::execute()
 		END_SAFE(timers_to_unregister_list_mutex)
 
 #ifdef WIN32
-		sys_wait_ms( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
+		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
 #else
 		wait_signal(SIGALRM);
 #endif
@@ -363,7 +363,7 @@ void TickMachine::FrequencyChanged()
 
 void TickMachine::tick_players()
 {
-	chrono now;
+	Rhoban::chrono now;
 	gettimeofday(&now,0);
 
 	TM_DEBUG_MSG(players.size()<<" players to tick");
@@ -391,7 +391,7 @@ void TickMachine::tick_players()
 		}
 		else
 		{
-			chrono now;
+			Rhoban::chrono now;
 			gettimeofday(&now, NULL);
 			TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
 		}
@@ -427,7 +427,7 @@ void TickMachine::update_granularity_and_players(double max_relative_error)
 		gran = min(gran, 1.0 / (*timer_)->get_frequency());
 	}
 
-	chrono new_gran;
+	Rhoban::chrono new_gran;
 	new_gran.tv_sec = static_cast<int>(floor(gran));
 	new_gran.tv_usec = static_cast<int>(1000000*(gran-new_gran.tv_sec));
 

@@ -389,7 +389,7 @@ bool Serial::waitForData(int timeout_us)
     FD_SET(fd, &read_fds);
 
     // Set timeout 
-    chrono timeout;
+    Rhoban::chrono timeout;
     timeout.tv_sec = timeout_us/1000000;
     timeout.tv_usec = timeout_us%1000000;
 
@@ -425,7 +425,7 @@ size_t Serial::readTimeout(char *destination, size_t size, int timeout_us)
     FD_SET(fd, &read_fds);
 
     // Set timeout 
-    chrono timeout;
+    Rhoban::chrono timeout;
     timeout.tv_sec = timeout_us/1000000;
     timeout.tv_usec = timeout_us%1000000;
 
@@ -645,7 +645,7 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 	}
 	catch(string exc)
 	{
-		chrono t;
+		Rhoban::chrono t;
 		gettimeofday(&t, 0);
 		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern \n\t" << exc << endl;
 	}

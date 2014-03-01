@@ -45,7 +45,7 @@ using namespace std;
 #define TM_CAUTION_MSG(msg) { cerr << "TM CAUTION: " << msg << endl << flush; }
 #define TM_DEBUG 0
 #if TM_DEBUG==1
-#define TM_DEBUG_MSG(msg) { chrono now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
+#define TM_DEBUG_MSG(msg) { Rhoban::chrono now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
 #else
 #define TM_DEBUG_MSG(msg) {}
 #endif
@@ -109,7 +109,7 @@ class TickMachine : public Rhoban::Thread
     static TickMachine * createTickMachine();
 
     /*! \brief the time granularity of the TickMachine */
-    chrono granularity;
+    Rhoban::chrono granularity;
 
     /* The list of pending timers to be registered by execute()
      * We use a list because iterators remain valid when inserting/deleting elements
@@ -147,7 +147,7 @@ class TickMachine : public Rhoban::Thread
     void dispose_timer(TickTimer **);
 
     //for debug
-    static chrono start_time;
+    static Rhoban::chrono start_time;
 
 #ifndef WIN32
     sigset_t block_set;
@@ -171,7 +171,7 @@ class TickMachine : public Rhoban::Thread
 
     /*! sets time granularity
      * called at setup and by update_granularity_and_players() */
-    void set_granularity(chrono interval);
+    void set_granularity(Rhoban::chrono interval);
 
     /*! updates time granularity of the machine,
      *  according to the frequencies of players

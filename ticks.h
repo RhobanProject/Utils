@@ -41,40 +41,40 @@ int init_tick_machine(ui32 frequency);
 /*! \return The current tick frequency */
 unsigned int get_ticks_frequency();
 
-/*! \brief sys_wait_mss until next_tick */
+/*! \brief sleeps until next_tick */
 void wait_next_tick(void);
 
 void wait_n_ticks(ui32 tick_nb);
 
 
 
-void sys_wait_ms_ms_ticks(ui32 ms);
-void sys_wait_ms_ticks(chrono duration);
+void sleep_ms_ticks(ui32 ms);
+void sleep_ticks(Rhoban::chrono duration);
 
 inline void syst_wait_ms(int ms)
 {
 #ifndef WIN32
 	usleep(1000 * ms);
 #else
-	sys_wait_ms(ms);
+	Sleep(ms);
 #endif
 }
-void sys_wait_ms_ms(ui32 ms);
-void sys_wait_ms_ms(int ms); // TODO pas terrible... les 2 sys_wait_ms_ms...
+void sleep_ms(ui32 ms);
+void sleep_ms(int ms); // TODO pas terrible... les 2 sleep_ms...
 void wait_ms(int ms);
-void sys_wait_ms_ms(chrono duration);
-void decrease(chrono & chronoo, chrono & duration);
-void increase(chrono & chronoo, chrono & duration);
-bool is_after(chrono & time_to_check, chrono & reference);
-double to_secs(chrono & duration);
-string chronoToString(const chrono & time);
+void sleep_ms(Rhoban::chrono duration);
+void decrease(Rhoban::chrono & chronoo, Rhoban::chrono & duration);
+void increase(Rhoban::chrono & chronoo, Rhoban::chrono & duration);
+bool is_after(Rhoban::chrono & time_to_check, Rhoban::chrono & reference);
+double to_secs(Rhoban::chrono & duration);
+string chronoToString(const Rhoban::chrono & time);
 
 /*!
  * returns the number of millisec or musecs since init of the time machine
  * @return
  */
 ui32 get_msec();
-void get_tick_machine_time(chrono * clock);
+void get_tick_machine_time(Rhoban::chrono * clock);
 
 
 #endif /* TICKS_H_ */

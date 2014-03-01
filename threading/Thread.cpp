@@ -235,7 +235,7 @@ void Thread::run(void)
         throw err;
     }
 
-    s = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+    s = pthread_setcanceltype(PTHREAD_CANCEL_ASYNRhoban::chronoUS, NULL);
 
     if (s != 0) {
         string err = "pthread_setcanceltype error";

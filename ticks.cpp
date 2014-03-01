@@ -122,7 +122,7 @@ void wait_n_ticks(ui32 tick_nb){
 
 #ifdef _WIN32
 	int tick_duration = 1000/ticks_frequency;
-   	for (;tick_nb>0; tick_nb--) sys_wait_ms(tick_duration);
+   	for (;tick_nb>0; tick_nb--) Sleep(tick_duration);
 #else
 	sigset_t block_set;
     sigfillset( &block_set );
@@ -135,16 +135,16 @@ void wait_n_ticks(ui32 tick_nb){
 #endif
 }
 
-void sys_wait_ms_ticks(chrono duration)
+void sleep_ticks(Rhoban::chrono duration)
 {
-	sys_wait_ms_ms_ticks(duration.tv_sec*1000 + duration.tv_usec/1000);
+	sleep_ms_ticks(duration.tv_sec*1000 + duration.tv_usec/1000);
 }
 
-void sys_wait_ms_ms_ticks(ui32 ms) {
+void sleep_ms_ticks(ui32 ms) {
 #ifdef _WIN32
-	sys_wait_ms(ms);
-	//usys_wait_ms(ms%1000);
-	//for (int i=0; i<ms; i++) usys_wait_ms(1000);
+	Sleep(ms);
+	//usleep(ms%1000);
+	//for (int i=0; i<ms; i++) usleep(1000);
 #else
 	if (ms<=0) {
 		fprintf(stderr,"ticks.c: wait_n_ticks: asked for waiting %d ms, waiting for next tick instead\n",ms);
@@ -174,7 +174,7 @@ ui32 get_msec()
 #endif
 }
 
-void get_tick_machine_time(chrono * clock)
+void get_tick_machine_time(Rhoban::chrono * clock)
 {
 #ifdef _WIN32
 #else
@@ -185,46 +185,46 @@ void get_tick_machine_time(chrono * clock)
 #endif
 }
 
-void sys_wait_ms_ms(int ms)
+void sleep_ms(int ms)
 {
-  sys_wait_ms_ms_ticks(ms);
+  sleep_ms_ticks(ms);
 }
 
 void wait_ms(int ms)
 {
-  sys_wait_ms_ms_ticks(ms);
+  sleep_ms_ticks(ms);
 }
 
-void sys_wait_ms_ms(chrono duration)
+void sleep_ms(Rhoban::chrono duration)
 {
-  sys_wait_ms_ticks(duration);
+  sleep_ticks(duration);
 }
 
-void decrease(chrono & chronoo, chrono & duration)
+void decrease(Rhoban::chrono & chronoo, Rhoban::chrono & duration)
 {
   chronoo.tv_sec -= duration.tv_sec;
   chronoo.tv_usec -= duration.tv_usec;
 }
 
-void increase(chrono & chronoo, chrono & duration)
+void increase(Rhoban::chrono & chronoo, Rhoban::chrono & duration)
 {
   chronoo.tv_usec += duration.tv_usec;
   chronoo.tv_sec += duration.tv_sec + chronoo.tv_usec/1000000;
   chronoo.tv_usec %= 1000000;
 }
 
-bool is_after(chrono & time_to_check, chrono & reference)
+bool is_after(Rhoban::chrono & time_to_check, Rhoban::chrono & reference)
 {
   long diff =       ((time_to_check.tv_sec - reference.tv_sec)*1000000 + (time_to_check.tv_usec - reference.tv_usec));
   return (diff>=0);
 }
 
-double to_secs(chrono & duration)
+double to_secs(Rhoban::chrono & duration)
 {
   return duration.tv_usec/1000000.0 +duration.tv_sec;
 }
 
-string chronoToString(const chrono & time)
+string chronoToString(const Rhoban::chrono & time)
 {
   return std::string(my_itoa(time.tv_sec)+" secs "+my_itoa(time.tv_usec)+ " musecs");
 }

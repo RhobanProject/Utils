@@ -344,7 +344,7 @@ typedef struct PaHostErrorInfo{
 
 /** Return information about the last host error encountered. The error
  information returned by Pa_GetLastHostErrorInfo() will never be modified
- asynchronously by errors occurring in other PortAudio owned threads
+ asynRhoban::chronously by errors occurring in other PortAudio owned threads
  (such as the thread that manages the stream callback.)
 
  This function is provided as a last resort, primarily to enhance debugging

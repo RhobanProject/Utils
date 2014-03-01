@@ -2637,7 +2637,7 @@ static PaError CloseStream( PaStream* s )
 
 /*
 Write the supplied packet to the pin
-Asynchronous
+AsynRhoban::chronous
 Should return false on success
 */
 static BOOL PinWrite(HANDLE h, DATAPACKET* p)
@@ -2649,7 +2649,7 @@ static BOOL PinWrite(HANDLE h, DATAPACKET* p)
 
 /*
 Read to the supplied packet from the pin
-Asynchronous
+AsynRhoban::chronous
 Should return false on success
 */
 static BOOL PinRead(HANDLE h, DATAPACKET* p)

@@ -156,12 +156,12 @@ class State {
 
  State() : wait_n_tick(0), father(NULL) {};
  
-  bool is_sys_wait_msing() { 
+  bool is_sleeping() { 
     if (wait_n_tick == 0) return false; 
     else wait_n_tick--; 
     return true; 
   }
-  void sys_wait_ms_tick(int ms) { 
+  void sleep_tick(int ms) { 
     if (father == NULL) return;
     int tick_nb = (ms * father->frequency) / 1000;
     wait_n_tick = (tick_nb > 0)? tick_nb : 0; 

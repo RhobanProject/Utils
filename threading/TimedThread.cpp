@@ -98,7 +98,7 @@ double SlowTimedThread::get_frequency()
 }
 
 /*
- * asynchronously stops the timed thread
+ * asynRhoban::chronously stops the timed thread
  *
  * We do not use Thread::kill() because join is blocking from another TimedThread
  *
@@ -122,9 +122,9 @@ void SlowTimedThread::kill()
 
 void SlowTimedThread::execute()
 {
-	chrono now;
-	chrono last;
-	chrono before;
+	Rhoban::chrono now;
+	Rhoban::chrono last;
+	Rhoban::chrono before;
 	gettimeofday(&now,NULL);
 
 	while(thread_state != Dying && thread_state != Dead)

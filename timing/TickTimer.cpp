@@ -49,7 +49,7 @@ TickTimer::TickTimer(double hertz, string name) :
 
 
 /*! \brief Initializes the the variables before play. */
-void TickTimer::prepare_play(bool forever, chrono durations)
+void TickTimer::prepare_play(bool forever, Rhoban::chrono durations)
 {
 	ticks_elapsed = 0;
 	Playable::prepare_play(forever, durations);
@@ -76,7 +76,7 @@ void TickTimer::unregister()
 	}
 }
 
-void TickTimer::set_relative(chrono granularity)
+void TickTimer::set_relative(Rhoban::chrono granularity)
 {
 	double gran = granularity.tv_sec + granularity.tv_usec/1000000.0;
 	ui32 newrelative = (uint) floor( 1.0 / (gran * frequency) );
@@ -90,7 +90,7 @@ void TickTimer::set_relative(chrono granularity)
 		tick_counter = relative;
 
 		//for win32
-		chrono now;
+		Rhoban::chrono now;
 		gettimeofday(&now, NULL);
 
 		int new_ticks_elapsed = (int) (1 + (to_secs(now ) - to_secs(start_time) ) * frequency);
@@ -104,7 +104,7 @@ void TickTimer::set_relative(chrono granularity)
 }
 
 
-bool TickTimer::is_tickable(chrono now)
+bool TickTimer::is_tickable(Rhoban::chrono now)
 {
 	return (relative > 0) && ( (to_secs(now ) - to_secs(start_time) ) * frequency - ticks_elapsed >= 0);
 }

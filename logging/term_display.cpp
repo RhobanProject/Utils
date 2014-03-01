@@ -8,7 +8,7 @@
 #include "term_display.h"
 #include <timing/chrono.h>
 
-chrono tt_chr;
+Rhoban::chrono tt_chr;
 
 bool colorsAllowed = false;
 
