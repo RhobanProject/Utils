@@ -155,10 +155,11 @@ void Thread::wait_for_resume(bool lock)
 
 void Thread::kill(void)
 {
-    if(!is_alive()) return;
+	    if(!is_alive()) return;
     wait_started();
     thread_state = Dying;
 	cleanup();
+
 #ifndef MSVC
 #ifndef WIN32
     if(_Thread)
@@ -178,7 +179,11 @@ void Thread::kill(void)
 	TerminateThread(_Thread,0);
 #endif
 
-    thread_state = Dead;
+	dead.lock();
+	dead.broadcast();
+	thread_state = Dead;
+	dead.unlock();
+  
 }
 
 int Thread::currentThreadId(void)
