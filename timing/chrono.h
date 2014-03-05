@@ -41,7 +41,7 @@ namespace Rhoban
 
 namespace Rhoban
 {
-	typedef struct timeval Rhoban::chrono;
+	typedef struct timeval chrono;
 #endif
 
 
