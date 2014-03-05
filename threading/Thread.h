@@ -51,7 +51,7 @@ protected:
 	/**
 	* thread core
 	*/
-	virtual void execute(void) = 0;
+	virtual void execute() = 0;
 
 	void lock();
 	void unlock();
@@ -258,6 +258,7 @@ protected:
   */
   virtual void cleanup(void){};
 
+  /* wait end of the thread */
   void wait(void);
 
 

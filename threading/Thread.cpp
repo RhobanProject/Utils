@@ -303,7 +303,7 @@ void Thread::wait(void)
 #ifndef MSVC
     pthread_join (_Thread, NULL);
 #else
-	TerminateThread(_Thread,0);
+	wait_dead();
 #endif
 }
 
