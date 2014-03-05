@@ -42,6 +42,10 @@ Thread::~Thread()
 	}
         thread_state = Dead;
     }
+    catch(std::exception & err)
+    {
+        cerr << "Exception '"<<err.what()<<"' when killing thread "<< this<<endl;
+    }
     catch(char * err)
     {
         cerr << "Exception '"<<err<<"' when killing thread "<< this<<endl;
@@ -214,6 +218,10 @@ void Thread::run(void)
         started.broadcast();
         started.unlock();
         execute();
+}
+    catch(std::exception & err) 
+{
+        cerr<<"Exception "<< err.what() << std::endl;
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
     } catch (string exc) {
