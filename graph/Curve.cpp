@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Curve::Curve(string name_, chrono *start_) : name(name_), start(start_), count(0)
+Curve::Curve(string name_, Rhoban::chrono *start_) : name(name_), start(start_), count(0)
 {
     values = new deque<CurveEntry*>();
 }
@@ -25,7 +25,7 @@ void Curve::push(double value)
 
 double Curve::elapsed()
 {
-    chrono n;
+    Rhoban::chrono n;
     gettimeofday(&n, NULL);
     decrease(n, *start);
 

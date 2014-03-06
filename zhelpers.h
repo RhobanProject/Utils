@@ -170,7 +170,7 @@ HIDE_UNUSED
 static int64_t
 s_clock (void)
 {
-#if (defined (__WINDOWS__))
+#ifdef WIN32
     SYSTEMTIME st;
     GetSystemTime (&st);
     return (int64_t) st.wSecond * 1000 + st.wMilliseconds;
