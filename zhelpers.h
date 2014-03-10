@@ -4,7 +4,7 @@
 // Include a bunch of headers that we will need in the examples
 
 #ifndef WIN32
-#include <zmq.h>
+#include <zmq/include/zmq.h>
 #else
 #include <zmq\include\zmq.h>
 #endif
@@ -176,7 +176,7 @@ s_clock (void)
     return (int64_t) st.wSecond * 1000 + st.wMilliseconds;
 #else
     struct timeval tv;
-    gettimeofday ( (chrono *) &tv, NULL);
+    gettimeofday ( (Rhoban::chrono *) &tv, NULL);
     return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 #endif
 }
