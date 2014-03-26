@@ -61,7 +61,7 @@ extern "C"
 #define paWinMmeUseChannelMask                          (0x04)
 
 /* By default, the mme implementation drops the processing thread's priority
-    to THREAD_PRIORITY_NORMAL and sys_wait_mss the thread if the CPU load exceeds 100%
+    to THREAD_PRIORITY_NORMAL and sleeps the thread if the CPU load exceeds 100%
     This flag disables any priority throttling. The processing thread will always
     run at THREAD_PRIORITY_TIME_CRITICAL.
 */

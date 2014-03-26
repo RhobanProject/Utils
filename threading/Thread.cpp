@@ -42,6 +42,10 @@ Thread::~Thread()
 	}
         thread_state = Dead;
     }
+    catch(std::exception & err)
+    {
+        cerr << "Exception '"<<err.what()<<"' when killing thread "<< this<<endl;
+    }
     catch(char * err)
     {
         cerr << "Exception '"<<err<<"' when killing thread "<< this<<endl;
@@ -155,10 +159,11 @@ void Thread::wait_for_resume(bool lock)
 
 void Thread::kill(void)
 {
-    if(!is_alive()) return;
+	    if(!is_alive()) return;
     wait_started();
     thread_state = Dying;
 	cleanup();
+
 #ifndef MSVC
 #ifndef WIN32
     if(_Thread)
@@ -178,7 +183,11 @@ void Thread::kill(void)
 	TerminateThread(_Thread,0);
 #endif
 
-    thread_state = Dead;
+	dead.lock();
+	dead.broadcast();
+	thread_state = Dead;
+	dead.unlock();
+  
 }
 
 int Thread::currentThreadId(void)
@@ -209,6 +218,10 @@ void Thread::run(void)
         started.broadcast();
         started.unlock();
         execute();
+}
+    catch(std::exception & err) 
+{
+        cerr<<"Exception "<< err.what() << std::endl;
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
     } catch (string exc) {
@@ -303,7 +316,7 @@ void Thread::wait(void)
 #ifndef MSVC
     pthread_join (_Thread, NULL);
 #else
-	TerminateThread(_Thread,0);
+	wait_dead();
 #endif
 }
 

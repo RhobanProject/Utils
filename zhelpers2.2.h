@@ -11,7 +11,7 @@ Helper header file for example applications.
 //  Include a bunch of headers that we will need in the examples
 
 #ifndef WIN32
-#include <zmq.h>
+#include <zmq2.2/include/zmq.h>
 #else
 #include <zmq2.2/include/zmq.h>
 #endif

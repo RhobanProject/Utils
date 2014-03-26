@@ -17,7 +17,7 @@ using namespace std;
 class Curve
 {
     public:
-        Curve(string name_, chrono *start_);
+        Curve(string name_, Rhoban::chrono *start_);
         ~Curve();
         void push(double value);
         vector<pair<double, double> > getValues(double time);
@@ -27,7 +27,7 @@ class Curve
         string name;
 
     protected:
-        chrono *start;
+        Rhoban::chrono *start;
         deque<CurveEntry*> *values;
         int count;
 };

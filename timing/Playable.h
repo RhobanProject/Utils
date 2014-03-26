@@ -34,7 +34,7 @@ class Playable
         virtual ~Playable();
 
         virtual void play();
-        virtual void play(chrono duration);
+        virtual void play(Rhoban::chrono duration);
         virtual void play(ui32 msecs);
         virtual void play(double secs);
         virtual void suspend();
@@ -89,26 +89,26 @@ class Playable
 
     protected:
         /*! \brief Initializes the the variables before play. */
-        virtual void prepare_play(bool forever, chrono durations);
+        virtual void prepare_play(bool forever, Rhoban::chrono durations);
 
         /*! \brief Should the play be played forever? */
         bool forever;
 
 
         /*! \brief Start time. */
-        chrono start_time;
+        Rhoban::chrono start_time;
 
         /*! last time update was performed. */
-        chrono last_step_time;
+        Rhoban::chrono last_step_time;
 
         /*! \brief Stop time. */
-        chrono stop_time;
+        Rhoban::chrono stop_time;
 
         /*! last time update was performed. */
-        chrono suspend_start;
+        Rhoban::chrono suspend_start;
 
         /*! \brief Last reset time. */
-        chrono reset_time;
+        Rhoban::chrono reset_time;
 
 };
 

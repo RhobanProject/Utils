@@ -15,7 +15,7 @@ class Graph
 
     protected:
         vector<Curve*> curves;
-        chrono startTime;
+        Rhoban::chrono startTime;
 };
 
 #endif // _GRAPH_H

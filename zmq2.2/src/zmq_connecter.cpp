@@ -113,7 +113,7 @@ void zmq::zmq_connecter_t::start_connecting ()
     //  Open the connecting socket.
     int rc = tcp_connecter.open ();
 
-    //  Connect may succeed in synchronous manner.
+    //  Connect may succeed in synRhoban::chronous manner.
     if (rc == 0) {
         handle = add_fd (tcp_connecter.get_fd ());
         handle_valid = true;

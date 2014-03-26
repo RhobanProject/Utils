@@ -13,12 +13,12 @@
 
 void Playable::play()
 {
-    chrono ttl = {0,0};
+    Rhoban::chrono ttl = {0,0};
     prepare_play(true,ttl);
     resume();
 }
 
-void Playable::play(chrono duration)
+void Playable::play(Rhoban::chrono duration)
 {
     prepare_play(false,duration);
     resume();
@@ -26,7 +26,7 @@ void Playable::play(chrono duration)
 
 void Playable::play(ui32 msecs)
 {
-    chrono duration;
+    Rhoban::chrono duration;
     duration.tv_sec = msecs/1000;
     duration.tv_usec = (msecs % 1000) * 1000;
     play(duration);
@@ -34,7 +34,7 @@ void Playable::play(ui32 msecs)
 
 void Playable::play(double secs)
 {
-    chrono duration;
+    Rhoban::chrono duration;
     duration.tv_sec = (long) floor(secs);
     duration.tv_usec = (ui32) ( (secs - duration.tv_sec) * 1000000);
     play(duration);
@@ -69,7 +69,7 @@ void Playable::resume()
     TM_DEBUG_MSG("Resuming player");
     if(is_suspended())
     {
-        chrono now;
+        Rhoban::chrono now;
         gettimeofday( &now , 0);
         decrease(now, suspend_start);
         suspend_time += to_secs(now);
@@ -104,8 +104,8 @@ bool Playable::is_running()
         return false;
     if(forever)
         return true;
-    chrono time_to_live = stop_time;
-    chrono now;
+    Rhoban::chrono time_to_live = stop_time;
+    Rhoban::chrono now;
     gettimeofday(&now,0);
     decrease(time_to_live,now);
     if(1000000 * time_to_live.tv_sec + time_to_live.tv_usec > 0)
@@ -123,7 +123,7 @@ bool Playable::try_play()
     if(is_running())
     {
         gettimeofday(&last_step_time , 0);
-        chrono now = last_step_time;
+        Rhoban::chrono now = last_step_time;
         decrease(now, start_time);
         double new_real_time = to_secs(now);
         real_time = new_real_time - suspend_time;
@@ -143,7 +143,7 @@ void Playable::reset()
 
 double Playable::since_last_reset()
 {
-    chrono now;
+    Rhoban::chrono now;
     gettimeofday(&now,0);
     decrease(now, reset_time);
     return to_secs(now);
@@ -190,7 +190,7 @@ Playable::Playable()
     suspend_time = 0;
 }
 
-void Playable::prepare_play(bool forever_, chrono duration_)
+void Playable::prepare_play(bool forever_, Rhoban::chrono duration_)
 {
     forever = forever_;
 

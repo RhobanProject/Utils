@@ -130,12 +130,12 @@ public:
 	double get_frequency();
 
 	/*
-	 * asynchronously stops the timed thread
+	 * asynRhoban::chronously stops the timed thread
 	 */
 	void stop();
 
 	/*
-	 * synchronously stops the timed thread
+	 * synRhoban::chronously stops the timed thread
 	 */
 	virtual void kill();
 

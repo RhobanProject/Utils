@@ -82,7 +82,7 @@ int zmq::tcp_connecter_t::open ()
     if (rc == 0)
         return 0;
 
-    //  Asynchronous connect was launched.
+    //  AsynRhoban::chronous connect was launched.
     if (rc == SOCKET_ERROR && (WSAGetLastError () == WSAEINPROGRESS ||
           WSAGetLastError () == WSAEWOULDBLOCK)) {
         errno = EAGAIN;
@@ -216,7 +216,7 @@ int zmq::tcp_connecter_t::open ()
         if (rc == 0)
             return 0;
 
-        //  Asynchronous connect was launched.
+        //  AsynRhoban::chronous connect was launched.
         if (rc == -1 && errno == EINPROGRESS) {
             errno = EAGAIN;
             return -1;

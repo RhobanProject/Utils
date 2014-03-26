@@ -18,7 +18,7 @@ void ms_sleep(long ms) {
 void ms_sys_wait_ms(long ms)
 {
 #ifdef WIN32
-    syst_wait_ms(ms);
+    Sleep(ms);
 #else
     usleep(1000 * ms);
 #endif

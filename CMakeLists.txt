@@ -22,7 +22,11 @@ if (MSVC)
 	add_definitions(-D_WINSOCKAPI_)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else (MSVC) 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+  IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+     set(CMAKE_CXX_FLAGS " -Wall -g -Wno-overloaded-virtual")
+  ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")  
+  ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif (MSVC)
 
 option (HAVE_COLORS 

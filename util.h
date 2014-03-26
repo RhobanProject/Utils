@@ -129,7 +129,8 @@ inline string join(const T &tab, string delimiter) {
     do {
         oss << (*it);
         it++;
-        if (notOver = (it != tab.end())) {
+	notOver = (it != tab.end());
+        if (notOver) {
             oss << delimiter;
         }   
     } while (notOver);

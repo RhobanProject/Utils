@@ -40,7 +40,7 @@ namespace zmq
 
     //  The shutdown mechanism for pipe works as follows: Either endpoint
     //  (or even both of them) can ask pipe to terminate by calling 'terminate'
-    //  method. Pipe then terminates in asynchronous manner. When the part of
+    //  method. Pipe then terminates in asynRhoban::chronous manner. When the part of
     //  the shutdown tied to the endpoint is done it triggers 'terminated'
     //  event. When endpoint processes the event and returns, associated
     //  reader/writer object is deallocated.
