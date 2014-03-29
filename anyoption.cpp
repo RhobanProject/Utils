@@ -7,71 +7,8 @@
  * Licence Creative Commons *CC BY-NC-SA
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
-/*
- * AnyOption 1.3  
- *
- * kishan at hackorama dot com  www.hackorama.com JULY 2001 
- *
- * + Acts as a common facade class for reading 
- *   commandline options as well as options from
- *   an optionfile with delimited type value pairs 
- *
- * + Handles the POSIX style single character options ( -w )
- *   as well as the newer GNU long options ( --width )
- * 
- * + The option file assumes the traditional format of
- *   first character based comment lines and type value
- *   pairs with a delimiter , and flags which are not pairs
- * 
- *  	# this is a coment
- *  	# next line is an option value pair
- *  	width : 100
- *     	# next line is a flag 
- *      noimages   
- * 
- * + Supports printing out Help and Usage  
- * 
- * + Why not just use getopt() ? 
- *
- *   getopt() Its a POSIX standard not part of ANSI-C. 
- *   So it may not be available on platforms like Windows.
- *
- * + Why it is so long ?
- *
- *   The actual code which does command line parsing 
- *   and option file parsing are done in  few methods. 
- *   Most of the extra code are for providing a flexible
- *   common public interface to both a resourcefile and
- *   and command line supporting POSIX style and  
- *   GNU long option as well as mixing of both. 
- * 
- * + Please see "anyoption.h" for public method descriptions 
- *   
- */
-
-/* Updated Auguest 2004 
- * Fix from  Michael D Peters (mpeters at sandia.gov) 
- * to remove static local variables, allowing multiple instantiations 
- * of the reader (for using multiple configuration files).  There is
- * an error in the destructor when using multiple instances, so you
- * cannot delete your objects (it will crash), but not calling the 
- * destructor only introduces a small memory leak, so I
- * have not bothered tracking it down.
- *
- * Also updated to use modern C++ style headers, rather than
- * depricated iostream.h (it was causing my compiler problems)
- */
-
-/* 
- * Updated September 2006  
- * Fix from Boyan Asenov for a bug in mixing up option indexes 
- * leading to exception when mixing different options types
- */
-
 #include "anyoption.h"
 
-//Hugo: strcpy is not in <string>
-#include "string.h"
 
 AnyOption::AnyOption()
 {
@@ -90,32 +27,46 @@ AnyOption::AnyOption(int maxopt, int maxcharopt)
 
 AnyOption::~AnyOption()
 {
-	/*
-	There is a small memory leak here but otherwise it is a mess to cleanup cleanly
-
-	//added by Hugo
-	for(int i = 0 ; i< option_counter; i++)
-	{
-		delete options[i];
-		options[i] = NULL;
-	}
-
-	if(values != NULL)
-		for(int i = 0 ; i< g_value_counter; i++)
-		{
-			delete values[i];
-			values[i] = NULL;
-		}
-	for(int i = 0 ; i< usage_lines; i++)
-	{
-		delete usage[i];
-		usage[i] = NULL;
-	}
+	
 
 	if( mem_allocated )
-		cleanup();
-		*/
+	{
+		for(int i = 0 ; i < option_counter; ++i)
+		{
+			delete[] options[i];
+			options[i] = NULL;
+		}
 
+		free (options);
+		
+		if( values != NULL )
+		{
+			
+			for(int i = 0 ; i < g_value_counter; ++i)
+			{
+				free(values[i]);
+				values[i] = NULL;
+			}
+			free (values);
+		}
+
+		for(int i = 0 ; i < usage_lines; ++i)
+		{
+			delete[] usage[i];
+			usage[i] = NULL;
+		}
+		free (usage);
+		
+		free (optiontype);
+		free (optionindex);	
+		free (optionchars);
+		free (optchartype);
+		free (optcharindex);
+		
+		
+		if( new_argv != NULL )
+			free (new_argv);		
+	}
 }
 
 void
@@ -193,8 +144,8 @@ AnyOption::alloc()
 	if( mem_allocated )
 		return true;
 
-	size = (max_options+1) * sizeof(const char*);
-	options = (const char**)malloc( size );	
+	size = (max_options+1) * sizeof(char*);
+	options = (char**)malloc( size );	
 	optiontype = (int*) malloc( (max_options+1)*sizeof(int) );	
 	optionindex = (int*) malloc( (max_options+1)*sizeof(int) );	
 	if( options == NULL || optiontype == NULL || optionindex == NULL )
@@ -222,8 +173,8 @@ AnyOption::alloc()
 		optcharindex[i] = -1 ;
 	}
 
-	size = (max_usage_lines+1) * sizeof(const char*) ;
-	usage = (const char**) malloc( size );
+	size = (max_usage_lines+1) * sizeof(char*) ;
+	usage = (char**) malloc( size );
 
 	if( usage == NULL  ){
 		mem_allocated = false;
@@ -238,16 +189,14 @@ AnyOption::alloc()
 bool
 AnyOption::doubleOptStorage()
 {
-	options = (const char**)realloc( options,  
-			((2*max_options)+1) * sizeof( const char*) );
-	optiontype = (int*) realloc(  optiontype ,  
-			((2 * max_options)+1)* sizeof(int) );	
-	optionindex = (int*) realloc(  optionindex,  
-			((2 * max_options)+1) * sizeof(int) );	
+	options = (char**)realloc( options, ((2*max_options)+1) * sizeof(char*) );
+	optiontype = (int*) realloc(  optiontype , ((2 * max_options)+1)* sizeof(int) );	
+	optionindex = (int*) realloc(  optionindex, ((2 * max_options)+1) * sizeof(int) );	
 	if( options == NULL || optiontype == NULL || optionindex == NULL )
 		return false;
 	/* init new storage */
-	for( int i = max_options ; i < 2*max_options ; i++ ){
+	for( int i = max_options ; i < 2*max_options ; i++ )
+	{
 		options[i] = NULL;
 		optiontype[i] = 0 ;
 		optionindex[i] = -1 ;
@@ -282,8 +231,7 @@ AnyOption::doubleCharStorage()
 bool
 AnyOption::doubleUsageStorage()
 {
-	usage = (const char**)realloc( usage,  
-			((2*max_usage_lines)+1) * sizeof( const char*) );
+	usage = (char**)realloc( usage,((2*max_usage_lines)+1) * sizeof(char*) );
 	if ( usage == NULL )
 		return false;
 	for( int i = max_usage_lines ; i < 2*max_usage_lines ; i++ )
@@ -291,23 +239,6 @@ AnyOption::doubleUsageStorage()
 	max_usage_lines = 2 * max_usage_lines ;
 	return true;
 
-}
-
-
-void
-AnyOption::cleanup()
-{
-	free (options);
-	free (optiontype);
-	free (optionindex);	
-	free (optionchars);
-	free (optchartype);
-	free (optcharindex);
-	free (usage);
-	if( values != NULL )
-		free (values);
-	if( new_argv != NULL )
-		free (new_argv);
 }
 
 void
@@ -565,15 +496,18 @@ AnyOption::setFlag( const char *opt , char optchar )
 void
 AnyOption::addOption( const char *opt, int type )
 {
-	if( option_counter >= max_options ){
-		if( doubleOptStorage() == false ){
+	if( option_counter >= max_options )
+	{
+		if( doubleOptStorage() == false )
+		{
 			addOptionError( opt );
 			return;
 		}
 	}
 	char * opt_cpy = new char[1024];
 	strcpy(opt_cpy, opt);
-	delete options[ option_counter ];
+	delete options[option_counter];
+
 	options[ option_counter ] = opt_cpy ;
 	optiontype[ option_counter ] =  type ;
 	optionindex[ option_counter ] = g_value_counter; 

@@ -13,7 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <string>
+#include "string.h"
 
 #define COMMON_OPT 	1
 #define COMMAND_OPT 	2
@@ -181,7 +181,7 @@ class AnyOption
 
         /* option strings storage + indexing */
         int max_options; 	/* maximum number of options */
-        const char **options; 	/* storage */
+        char **options; 	/* storage */
         int *optiontype; 	/* type - common, command, file */
         int *optionindex;	/* index into value storage */
         int option_counter; 	/* counter for added options  */
@@ -198,7 +198,7 @@ class AnyOption
         int g_value_counter; 	/* globally updated value index LAME! */
 
         /* help and usage */
-        const char **usage; 	/* usage */
+        char **usage; 	/* usage */
         int max_usage_lines;	/* max usage lines reseverd */
         int usage_lines;	/* number of usage lines */
 
