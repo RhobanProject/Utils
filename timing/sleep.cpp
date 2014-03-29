@@ -7,7 +7,15 @@
 
 #include "sleep.h"
 
-void ms_sleep(long ms)
+void ms_sleep(long ms) {
+#ifdef WIN32
+    syst_wait_ms(ms);
+#else
+    usleep(1000 * ms);
+#endif
+}  
+
+void ms_sys_wait_ms(long ms)
 {
 #ifdef WIN32
     Sleep(ms);
