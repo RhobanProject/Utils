@@ -8,7 +8,7 @@
  * http://creativecommons.org/licenses/by-nc-sa/3.0
  *************************************************/
 
-
+#include <iostream>
 #include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
@@ -177,4 +177,30 @@ string system_time() {
        << "-" << now->tm_min
        << "-" << now->tm_sec;
   return str.str();
+}
+
+bool endsWith(std::string const &fullString, std::string const &ending)
+{
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+vector<string> getLines(const string &header)
+{
+    vector<string> lines;
+    string line = "";
+    for (int pos=0; pos<header.length(); pos++) {
+        if (header[pos] == '\r' || header[pos] == '\n') {
+            if (line != "") {
+                lines.push_back(line);
+            }
+            line = "";
+        } else {
+            line += header[pos];
+        }
+    }
+    return lines;
 }

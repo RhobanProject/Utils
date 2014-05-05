@@ -121,6 +121,7 @@ set(DIRECTORIES
     scoring
     serial
     sockets
+    http
     tests
     threading
     timing
