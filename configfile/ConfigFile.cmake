@@ -14,9 +14,8 @@ macro (config_file NAME)
         COMMAND python3 "${CONFIG_FILE_GENERATOR}" "${PROJECT_SOURCE_DIR}" "${NAME}" "${OUTPUT_DIR}"
         DEPENDS "${YAML_FILE}" ${ARGN}
         )
-    set (ALL_SOURCES ${ALL_SOURCES}
-        "${OUTPUT_DIR}/${NAME}.cpp"
-        )
+    set (ALL_SOURCES ${ALL_SOURCES} ${GENERATE_FILES})
+	
 endmacro (config_file)
 
 include_directories ("${PROJECT_BINARY_DIR}/configs")

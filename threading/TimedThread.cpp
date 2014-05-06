@@ -120,12 +120,17 @@ void SlowTimedThread::kill()
 
 
 
+double SlowTimedThread::elapsed_time_since_start()
+{
+	return now_chr.tv_sec - start_chr.tv_sec + (now_chr.tv_usec - start_chr.tv_usec) / 1000000.0;
+}
+
 void SlowTimedThread::execute()
 {
-	Rhoban::chrono now;
 	Rhoban::chrono last;
 	Rhoban::chrono before;
-	gettimeofday(&now,NULL);
+	gettimeofday(&now_chr,NULL);
+	gettimeofday(&start_chr, NULL);
 
 	while(thread_state != Dying && thread_state != Dead)
 	{
@@ -142,11 +147,11 @@ void SlowTimedThread::execute()
 		gettimeofday(&before,NULL);
 		step();
 
-		last = now;
-		gettimeofday(&now,NULL);
-		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now.tv_sec - last.tv_sec + (now.tv_usec - last.tv_usec) /1000000.0 ));
+		last = now_chr;
+		gettimeofday(&now_chr,NULL);
+		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now_chr.tv_sec - last.tv_sec + (now_chr.tv_usec - last.tv_usec) /1000000.0 ));
 
-		double step_ms = 1000 * (now.tv_sec - before.tv_sec) + (now.tv_usec - before.tv_usec) /1000.0;
+		double step_ms = 1000 * (now_chr.tv_sec - before.tv_sec) + (now_chr.tv_usec - before.tv_usec) /1000.0;
 		int to_wait = 1000.0 / max_frequency - step_ms;
 
 		//cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
