@@ -56,6 +56,7 @@ namespace Rhoban
              */
             string receiveString(bool lineTerminates = false);
             string receiveStringSize(int size);
+            string receiveStringMaxSize(int size);
 
             /**
              * Receives a formatted string

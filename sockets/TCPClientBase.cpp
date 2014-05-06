@@ -103,6 +103,14 @@ namespace Rhoban
 
         return true;
     }
+
+    string TCPClientBase::receiveStringMaxSize(int size)
+    {
+        char c[size];
+        int n = receive(c, size);
+
+        return string(c, n);
+    }
             
     string TCPClientBase::receiveStringSize(int size)
     {
@@ -192,13 +200,13 @@ namespace Rhoban
     void TCPClientBase::transmitString(string str, bool lineTerminates)
     {
         string buffer = str;
-	buffer.resize(str.size()+1);
 
         if (lineTerminates) {
+	    buffer.resize(str.size()+1);
             buffer[buffer.size()-1] = '\n';
         }
 
-	transmitAll(buffer.c_str(), buffer.size());
+	transmitAll(buffer.c_str(), buffer.length());
     }
 
     void TCPClientBase::transmitFormat(const char *format, ...)

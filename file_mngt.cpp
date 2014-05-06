@@ -18,48 +18,48 @@
 
 int store_in_file(char * name, ui8 * src, int size) {
 
-  FILE * f;
+    FILE * f;
 
-  if ((f=fopen(name, "w")) == NULL) {
-    printf("Erreur d'ouverture en ecriture\n");
-    return 0;
-  }
-  
-  int i;
-  for (i=0; i<size; i++)
-    fputc(src[i], f);
-  
-  fclose(f);
-  return 1;
+    if ((f=fopen(name, "w")) == NULL) {
+        printf("Erreur d'ouverture en ecriture\n");
+        return 0;
+    }
+
+    int i;
+    for (i=0; i<size; i++)
+        fputc(src[i], f);
+
+    fclose(f);
+    return 1;
 
 }
 
 int read_file(char * name, ui8 * dest, int size) {
 
-  FILE * f;
+    FILE * f;
 
-  if ((f=fopen(name, "r")) == NULL) {
-    printf("Erreur d'ouverture en lecture\n");
-    return 0;
-  }
-  
-  int i;
-  for (i=0; i<size; i++)
-    dest[i] = fgetc(f);
-  
-  fclose(f);
-  return 1;
-  
+    if ((f=fopen(name, "r")) == NULL) {
+        printf("Erreur d'ouverture en lecture\n");
+        return 0;
+    }
+
+    int i;
+    for (i=0; i<size; i++)
+        dest[i] = fgetc(f);
+
+    fclose(f);
+    return 1;
+
 }
 
 string file_to_string(string path)
 {
-  ifstream in_file(path.c_str());
-  string contents(istreambuf_iterator<char>(in_file), 
-		  (istreambuf_iterator<char>()) );
-  in_file.close();
+    ifstream in_file(path.c_str());
+    string contents(istreambuf_iterator<char>(in_file), 
+            (istreambuf_iterator<char>()) );
+    in_file.close();
 
-  return contents;
+    return contents;
 }
 
 bool file_exists(string path)
@@ -78,3 +78,10 @@ void file_put_contents(string path, string contents)
     }
 }
 
+string file_get_contents(string path)
+{
+    std::ifstream ifs(path.c_str());
+    std::string content( (std::istreambuf_iterator<char>(ifs) ),
+            (std::istreambuf_iterator<char>()    ) );
+    return content;
+}
