@@ -34,7 +34,7 @@ namespace Rhoban
 	};
 
 	typedef struct tttt chrono;
-	int gettimeofday(Rhoban::chrono *tp, void *tz);
+	int gettimeofday(Rhoban::chrono *tp, void *tz = NULL);
 #else
 #include <time.h>
 #include <sys/time.h>

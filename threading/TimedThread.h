@@ -104,7 +104,7 @@ protected:
 
 };
 
-class SlowTimedThread : public Thread
+class SlowTimedThread : protected Thread
 {
 public:
 	SlowTimedThread();
@@ -145,6 +145,8 @@ public:
 	double measured_frequency;
 	double max_frequency;
 
+	double elapsed_time_since_start();
+
 protected:
 
 	/*!
@@ -153,6 +155,10 @@ protected:
 	 */
 	virtual void step()=0;
 	void execute();
+
+private:
+	Rhoban::chrono start_chr;
+	Rhoban::chrono now_chr;
 
 
 	//TickTimer timer;
