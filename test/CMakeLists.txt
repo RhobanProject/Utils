@@ -8,6 +8,11 @@ if (ROBOARD)
         CACHE STRING "")
 endif (ROBOARD)
 
+option (ENABLE_ZMQ
+    "Compile and use ZMQ?" ON)
+
+option (RHOBANMATH "RhobanMath support" OFF)
+
 cmake_minimum_required (VERSION 2.6)
 project (RhobanUtilsTest)
 
@@ -30,3 +35,6 @@ add_custom_target (send
 
 add_executable(TestSerial serial.cpp)
 target_link_libraries (TestSerial ${EXTRA_LIBS})
+
+add_executable(TestHTTP http.cpp)
+target_link_libraries (TestHTTP ${EXTRA_LIBS})

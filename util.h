@@ -140,5 +140,9 @@ inline string join(const T &tab, string delimiter) {
 
 string system_time();
 
+bool endsWith(std::string const &fullString, std::string const &ending);
+
+vector<string> getLines(const string &header);
+
 /*@}*/
 #endif

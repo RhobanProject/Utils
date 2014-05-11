@@ -618,6 +618,7 @@ size_t Serial::send(const char *data, size_t size)
 		//cout << "Sending " << dwToWrite - got << " bytes " << endl;
 		WriteFile(handle, data + got, dwToWrite - got, &dwWritten, NULL);
 		got += dwWritten;
+		if (dwWritten == 0) Sleep(10);
 		//cout << "Sent " << got <<"/" << size <<  endl;
 	}
 	FlushFileBuffers(handle);

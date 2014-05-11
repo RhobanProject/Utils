@@ -18,6 +18,12 @@
 #include <stdlib.h>
 #include "chrono.h"
 
+#ifdef MSVC
+#include <sys/timeb.h>
+#include <time.h>
+#endif
+
+
 /*!\brief compute tv0-tv1 and put it into dtv */
 void compute_tv_diff(Rhoban::chrono *tv0,
 		     Rhoban::chrono *tv1,
@@ -43,7 +49,7 @@ void compute_tv_diff(Rhoban::chrono *tv0,
 int Rhoban::gettimeofday (Rhoban::chrono *tp, void *tz)
 {
 struct _timeb timebuffer;
-	_ftime (&timebuffer);
+	_ftime64_s (&timebuffer);
 	tp->tv_sec = timebuffer.time;
 	tp->tv_usec = timebuffer.millitm * 1000;
 return 0;

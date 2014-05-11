@@ -59,12 +59,24 @@ namespace Rhoban
                  */
                 void deleteAllClients()
                 {
+                    lock();
                     while (clients.size() > 0) {
                         T *client = clients.back();
                         cleanClient(client);
 
                         clients.pop_back();
                     }
+                    unlock();
+                }
+
+                void lock()
+                {
+                    mutex.lock();
+                }
+
+                void unlock()
+                {
+                    mutex.unlock();
                 }
 
                 /**
@@ -169,6 +181,13 @@ namespace Rhoban
                         deleteClient(*i);
                     }
                 }
+                
+                /**
+                 * Clients
+                 * Note: you should call lock() and unlock() if you want to access it from
+                 * the outside of this class
+                 */
+                vector<T *> clients;
 
             protected:
                 /**
@@ -177,14 +196,14 @@ namespace Rhoban
                 SOCKET socketDescriptor;
 
                 /**
+                 * Mutex to access clients list
+                 */
+                Mutex mutex;
+
+                /**
                  * Server in address
                  */
                 struct sockaddr_in sinserv;
-
-                /**
-                 * Clients
-                 */
-                vector<T *> clients;
 
                 /**
                  * Creating a client, can be overloaded
@@ -214,6 +233,8 @@ namespace Rhoban
                         newClient = accept(socketDescriptor, (SOCKADDR*)&clientAddr, (socklen_t*) &addrSize);
 #endif
 
+                        lock();
+
                         if (newClient != INVALID_SOCKET) {
                             T *client = createClient();
                             client->setSocket(newClient);
@@ -235,6 +256,7 @@ namespace Rhoban
 
                         deleteClients(dead);
                         dead.clear();
+                        unlock();
                     }
 
                     // Deleting all the clients

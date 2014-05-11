@@ -99,6 +99,10 @@ if (ENABLE_YAML)
     set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 endif ()
 
+message("-- Adding Eigen support")
+set (EIGEN_HEADERS "${PROJECT_SOURCE_DIR}/eigen-3.2" CACHE STRING "")
+include_directories ("${EIGEN_HEADERS}")
+
 message("-- Adding JSON support")
 add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
 set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
@@ -117,6 +121,7 @@ set(DIRECTORIES
     scoring
     serial
     sockets
+    http
     tests
     threading
     timing

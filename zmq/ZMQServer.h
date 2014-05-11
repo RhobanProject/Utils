@@ -4,10 +4,11 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <threading/Thread.h>
 #include "zhelpers.h"
 
 template<typename T>
-class ZMQServer
+class ZMQServer : public Rhoban::Thread
 {
     public:
         ZMQServer(int port, T &processor_)
@@ -43,6 +44,11 @@ class ZMQServer
                 s_send(server, response.c_str());
                 free(request);
             }
+        }
+
+        void execute()
+        {
+            run();
         }
 
     protected:

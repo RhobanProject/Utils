@@ -22,6 +22,8 @@ string file_to_string(string path);
 
 void file_put_contents(string path, string contents);
 
+string file_get_contents(string path);
+
 bool file_exists(string path);
 
 #endif /* FILE_MNGT_H */
