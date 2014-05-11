@@ -73,10 +73,13 @@ extern HANDLE hConsole;
 #define TC_LIGHT_CYAN    "96"
 #define TC_WHITE         "97"
 #define TC_BLANC         "97"// Kept for compatibility, deprecated (french name)
-#define TERM_COLOR(c) {term_set_color(c);}
+#define TERM_COLOR(c...) {term_set_color(c);}
 
-void term_set_color(const char * c);
-void term_separator();
+void term_enable_colors();
+void term_disable_colors();
+
+void term_set_color(const char * c, char * out = NULL);
+void term_separator(char * out = NULL);
 void print_n_times(int n, char c);
 void term_title(char * title);
 void term_subtitle(char * title);

@@ -85,10 +85,23 @@ FOREGROUND_GREEN	Text color contains green.
 FOREGROUND_RED	Text color contains red.
 FOREGROUND_INTENSITY*/
 
-void term_set_color(const char * c){
-	if (colorsAllowed){
+int term_color_enabled = 1;
+
+void term_enable_colors() {
+  term_color_enabled = 1;
+}
+
+void term_disable_colors() {
+  term_color_enabled = 0;
+}
+
+void term_set_color(const char * c, char * out){
+	if (colorsAllowed && term_color_enabled){
 #ifndef WIN32
-		printf("\033[%sm", c);
+    if (out == NULL)
+      printf("\033[%sm", c);
+    else
+      sprintf(out, "\033[%sm", c);
 #else
 		std::string color(c);
 		WORD code;
@@ -115,8 +128,11 @@ void term_set_color(const char * c){
 	}
 }
 
-void term_separator() {
-  printf("-------------------------------------------------------------------------------\n");
+void term_separator(char * out) {
+  if (out == NULL)
+    printf("-------------------------------------------------------------------------------\n");
+  else
+    sprintf(out, "-------------------------------------------------------------------------------\n");
 }
 
 void print_n_times(int n, char c) {
