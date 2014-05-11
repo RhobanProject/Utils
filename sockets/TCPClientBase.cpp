@@ -106,10 +106,18 @@ namespace Rhoban
 
     string TCPClientBase::receiveStringMaxSize(int size)
     {
+#ifndef MSVC
         char c[size];
         int n = receive(c, size);
-
         return string(c, n);
+#else
+		char * c = (char *)malloc(size);
+		int n = receive(c, size);
+		string answer(c, n);
+		delete c;
+		return answer;
+#endif
+
     }
             
     string TCPClientBase::receiveStringSize(int size)
