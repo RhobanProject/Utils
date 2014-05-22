@@ -98,10 +98,10 @@ void term_disable_colors() {
 void term_set_color(const char * c, char * out){
 	if (colorsAllowed && term_color_enabled){
 #ifndef WIN32
-    if (out == NULL)
-      printf("\033[%sm", c);
-    else
-      sprintf(out, "\033[%sm", c);
+		if (out == NULL)
+			printf("\033[%sm", c);
+		else
+			sprintf(out, "\033[%sm", c);
 #else
 		std::string color(c);
 		WORD code;
@@ -119,14 +119,58 @@ void term_set_color(const char * c, char * out){
 			code = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
 		else
 			code = FOREGROUND_RED;
+		SetConsoleTextAttribute(hConsole, code);
 
-
+		if (out != NULL)
+			sprintf(out, "%s", c);
+		/*
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
 		FillConsoleOutputAttribute(hConsole, code, csbi.dwSize.X * csbi.dwSize.Y, coordScreen, NULL);
+		*/
 #endif
 	}
 }
+
+#ifdef WIN32
+void ClearScreen()
+{
+	HANDLE                     hStdOut;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	DWORD                      count;
+	DWORD                      cellCount;
+	COORD                      homeCoords = { 0, 0 };
+
+	hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hStdOut == INVALID_HANDLE_VALUE) return;
+
+	/* Get the number of cells in the current buffer */
+	if (!GetConsoleScreenBufferInfo(hStdOut, &csbi)) return;
+	cellCount = csbi.dwSize.X *csbi.dwSize.Y;
+
+	/* Fill the entire buffer with spaces */
+	if (!FillConsoleOutputCharacter(
+		hStdOut,
+		(TCHAR) ' ',
+		cellCount,
+		homeCoords,
+		&count
+		)) return;
+
+	/* Fill the entire buffer with the current colors and attributes */
+	if (!FillConsoleOutputAttribute(
+		hStdOut,
+		csbi.wAttributes,
+		cellCount,
+		homeCoords,
+		&count
+		)) return;
+
+	/* Move the cursor home */
+	SetConsoleCursorPosition(hStdOut, homeCoords);
+}
+
+#endif
 
 void term_separator(char * out) {
   if (out == NULL)

@@ -120,8 +120,12 @@ public:
 	 *
 	 *
 	 */
+	//creates the thread and returns immediately
 	void init(double hertz);
+	//creates the thread paused and returns immediately
 	void init_suspended(double hertz);
+	//creates the thread, wait for it to be started, and returns
+	void init_started(double hertz);
 
 	/*!
 	 * frequency can be changed using set_frequency()

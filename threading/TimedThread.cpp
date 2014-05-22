@@ -83,6 +83,13 @@ void SlowTimedThread::init_suspended(double hertz)
 	suspend_thread();
 }
 
+void SlowTimedThread::init_started(double hertz)
+{
+	init(hertz);
+	wait_started();
+}
+
+
 /*!
  * frequency can be changed using set_frequency()
  */

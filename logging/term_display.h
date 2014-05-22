@@ -24,7 +24,8 @@
 extern COORD coordScreen;
 extern HANDLE hConsole;
 
-#define TERM_CLEAR 
+void ClearScreen();
+#define TERM_CLEAR  ClearScreen();
 
 /* system("cls"); \
 	CONSOLE_SCREEN_BUFFER_INFO csbi; \
@@ -73,7 +74,7 @@ extern HANDLE hConsole;
 #define TC_LIGHT_CYAN    "96"
 #define TC_WHITE         "97"
 #define TC_BLANC         "97"// Kept for compatibility, deprecated (french name)
-#define TERM_COLOR(c...) {term_set_color(c);}
+#define TERM_COLOR(c,...) {term_set_color(c, __VA_ARGS__);}
 
 void term_enable_colors();
 void term_disable_colors();
