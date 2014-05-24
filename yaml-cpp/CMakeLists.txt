@@ -45,11 +45,13 @@ option(BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 # --> Apple
 option(APPLE_UNIVERSAL_BIN "Apple: Build universal binary" OFF)
 
-# --> Microsoft Visual C++
-# see http://msdn.microsoft.com/en-us/library/aa278396(v=VS.60).aspx
-#     http://msdn.microsoft.com/en-us/library/2kzt1wy3(v=VS.71).aspx
-option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
-option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
+if(MSVC)
+	# --> Microsoft Visual C++
+	# see http://msdn.microsoft.com/en-us/library/aa278396(v=VS.60).aspx
+	#     http://msdn.microsoft.com/en-us/library/2kzt1wy3(v=VS.71).aspx
+	option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" ON)
+	option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
+endif(MSVC)
 
 ###
 ### Sources, headers, directories and libs
