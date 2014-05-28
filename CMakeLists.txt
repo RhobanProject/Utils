@@ -144,6 +144,11 @@ if (ENABLE_ZMQ)
 		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq2.2/include"
 			CACHE STRING "ZMQ headers directory")
 		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq2.2")
+        elseif(${ZMQ_VERSION} MATCHES "3.2")
+		message("Using ZMQ version 3.2")
+		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq3.2/include"
+			CACHE STRING "ZMQ headers directory")
+		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq3.2")
 	else()
 		message("Using ZMQ version ${ZMQ_VERSION}")
 		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq/include"
