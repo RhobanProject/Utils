@@ -30,7 +30,9 @@
 #define xml_parse_error(str,...)   { throw string(str); }
 #define interpretor_error(str,...) { throw string(str); }
 
-#define XML_WRITE(result, truc ){ result << "<" << # truc << ">" << truc << "</" <<  # truc << ">"; }
+#define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">"; }
+
+#define XML_WRITE(result, truc ) XML_WRITE_GENERIC(result, truc, truc)
 #define XML_WRITE_INT(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
 #define XML_WRITE_CHAR(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
 #define XML_WRITE_BOOL(result, truc){ result << "<" << # truc << ">" << ( truc ? "true" : "false") << "</" << # truc << ">"; }
@@ -48,6 +50,7 @@
     result << "<" << # truc << ">" << truc.to_xml() << "</" << # truc << ">"; \
 }
 
+#define	XML_READ_GENERIC(node, variable, label){ variable = XMLTools::get_double_element(node, # label); }
 
 #define	XML_READ_INT(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
 #define	XML_READ_BOOL(node, truc){ truc = XMLTools::get_bool_element(node, # truc); }
