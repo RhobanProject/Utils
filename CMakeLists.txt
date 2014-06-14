@@ -1,6 +1,11 @@
 option (ROBOARD
     "Compile for Roboard" OFF)
 
+option (32BIT "Compilation 32 bit" OFF)
+IF(32BIT)
+	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
+ENDIF(32BIT)
+
 # The root supposed for all rhoban clones
 set (BASE "../")
 
