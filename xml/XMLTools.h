@@ -27,17 +27,19 @@
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
 
+using namespace std;
+
 #define xml_parse_error(str,...)   { throw string(str); }
 #define interpretor_error(str,...) { throw string(str); }
 
-#define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">"; }
+#define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">" << endl; }
 
-#define XML_WRITE(result, truc ) XML_WRITE_GENERIC(result, truc, truc)
-#define XML_WRITE_INT(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
-#define XML_WRITE_CHAR(result, truc){ result << "<" << # truc << ">" << (int) truc << "</" << # truc << ">"; }
-#define XML_WRITE_BOOL(result, truc){ result << "<" << # truc << ">" << ( truc ? "true" : "false") << "</" << # truc << ">"; }
-#define XML_WRITE_DOUBLE(result, truc){ result.precision(100); result << "<" << # truc << ">" << truc << "</" << # truc << ">"; }
-#define XML_WRITE_STRING(result, truc){ result << "<" << # truc << ">" << truc << "</" << # truc << ">"; }
+#define XML_WRITE(result, truc )		XML_WRITE_GENERIC(result, truc, truc)
+#define XML_WRITE_INT(result, truc)		XML_WRITE_GENERIC(result, (int) truc, truc)
+#define XML_WRITE_CHAR(result, truc)	XML_WRITE_GENERIC(result, (int) truc, truc)
+#define XML_WRITE_BOOL(result, truc)	XML_WRITE_GENERIC(result, ( truc ? "true" : "false"), truc)
+#define XML_WRITE_DOUBLE(result, truc)  result.precision(100); XML_WRITE(result, truc)
+#define XML_WRITE_STRING(result, truc ) XML_WRITE(result, truc )
 
 #define XML_WRITE_STRING_ARRAY(result, truc){ \
 	result << "<" << # truc << ">"; \
@@ -69,7 +71,6 @@
     }                                               \
   }
 
-using namespace std;
 /*****************************************************************************/
 /*
 */
@@ -172,6 +173,7 @@ class Serializable
 
     protected:
         Serializable();
+
         virtual ~Serializable();
 
 };
