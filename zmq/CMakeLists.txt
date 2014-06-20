@@ -1,9 +1,15 @@
 cmake_minimum_required (VERSION 2.6)
 project (ZeroMQ)
+option (32BIT "Compilation 32 bit" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "")
 endif ()
+
+IF(32BIT)
+	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
+ENDIF(32BIT)
+
 
 IF(DEFINED WIN32)
 	SET(SYSTEM_OS "WINDOWS")
