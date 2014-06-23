@@ -45,18 +45,28 @@ namespace Rhoban
         }
 
 #ifdef WIN32
-	if (n < 0 && errno != EAGAIN && errno != WSAEWOULDBLOCK ) {
+	
+		if (n < 0)
+		{
+			int err = WSAGetLastError();
+			if (err != EAGAIN && err != WSAEWOULDBLOCK) {
+				connected = false;
+				stringstream ss;
+				ss << "Error while receiving data from client socket " << clientSocket;
+				throw std::runtime_error(ss.str());
+			}
+
+		}
+
 #else 
         if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+			connected = false;
+			ostringstream err;
+			err << "Error while receiving data from client socket " << clientSocket;
+			err << " (" << strerror(errno) << ")";
+			throw err.str();
+		}
 #endif
-            connected = false;
-            ostringstream err;
-            err << "Error while receiving data";
-#ifndef WIN32
-            err << " (" << strerror(errno) << ")";
-#endif
-            throw err.str();
-        }
 
         return n;
     }
@@ -180,16 +190,29 @@ namespace Rhoban
 
     int TCPClientBase::transmit(const char *buffer, int size)
     {
+		if (size == 0)
+			return 0;
+
         int n = send(clientSocket, buffer, size, 0);
 
+
 #ifdef WIN32
-	if (n < 0 && errno != EAGAIN && errno != WSAEWOULDBLOCK ) {
+		if (n <= 0)
+		{
+			int err = WSAGetLastError();
+			if (err != EAGAIN && err != WSAEWOULDBLOCK) {
+				connected = false;
+				stringstream ss;
+				ss << "Error while sending data to client socket " << clientSocket;
+				throw std::runtime_error(ss.str());
+			}
+		}
 #else 
         if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-#endif
             connected = false;
-            throw string("Error while sending data");
+			throw std::runtime_error("Error while sending data");
         }
+#endif
 
         return n;
     }
@@ -276,13 +299,15 @@ namespace Rhoban
 
     void TCPClientBase::stop()
     {
-        if (clientSocket) {
+		if (clientSocket && clientSocket != INVALID_SOCKET) {
 #ifdef WIN32
             closesocket(clientSocket);
+			Sleep(200);
 #else
             close(clientSocket);
 #endif
-        }
+			clientSocket = INVALID_SOCKET;
+		}
 
         connected = false;
     }
