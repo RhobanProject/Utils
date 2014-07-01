@@ -110,19 +110,17 @@ double SlowTimedThread::get_frequency()
  * We do not use Thread::kill() because join is blocking from another TimedThread
  *
  */
-void SlowTimedThread::stop()
+void SlowTimedThread::stop(bool wait)
 {
 	if(is_alive())
 	{
 		wait_started();
 		    thread_state = Dying;
 	}
+	if (wait)
+		wait_dead();
 }
 
-void SlowTimedThread::kill()
-{
-	Thread::kill();
-}
 
 
 

@@ -117,8 +117,6 @@ public:
 	 *
 	 * The TimedThread will be automatically animated and the step()
 	 *  method will be called at the given frequency
-	 *
-	 *
 	 */
 	//creates the thread and returns immediately
 	void init(double hertz);
@@ -134,14 +132,10 @@ public:
 	double get_frequency();
 
 	/*
-	 * asynRhoban::chronously stops the timed thread
+	 * stops the timed thread, and wait it to be dead if parameter is true
 	 */
-	void stop();
+	void stop(bool wait_dead = false);
 
-	/*
-	 * synRhoban::chronously stops the timed thread
-	 */
-	virtual void kill();
 
 	/*
 	 * the effective calling freauency of the timed thread
