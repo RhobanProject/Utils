@@ -49,26 +49,29 @@ using namespace std;
 }
 
 #define XML_WRITE_SERIALIZABLE(result, truc) {                                \
-    result << "<" << # truc << ">" << truc.to_xml() << "</" << # truc << ">"; \
+	result << "<" << # truc << ">" << truc.to_xml() << "</" << # truc << ">"; \
 }
 
 #define	XML_READ_GENERIC(node, variable, label){ variable = XMLTools::get_double_element(node, # label); }
 
-#define	XML_READ_INT(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
-#define	XML_READ_BOOL(node, truc){ truc = XMLTools::get_bool_element(node, # truc); }
-#define	XML_READ_CHAR(node, truc){ truc = XMLTools::get_int_element(node, # truc); }
-#define	XML_READ_DOUBLE(node, truc){ truc = XMLTools::get_double_element(node, # truc); }
-#define	XML_READ_DOUBLE_ARRAY(node, truc){ truc = XMLTools::get_double_array(node, # truc); }
-#define	XML_READ_FLOAT(node, truc){ truc = XMLTools::get_float_element(node, # truc); }
-#define	XML_READ_FLOAT_ARRAY(node, truc){ truc = XMLTools::get_float_array(node, # truc); }
-#define	XML_READ_STRING(node, truc){ truc = XMLTools::get_string_element(node, # truc); }
-#define	XML_READ_STRING_ARRAY(node, truc){ truc = XMLTools::get_string_array(node, # truc); }
+#define	XML_READ_INT(node, truc){ try{ truc = XMLTools::get_int_element(node, # truc); } catch(...){}}
+#define	XML_READ_BOOL(node, truc){ try{ truc = XMLTools::get_bool_element(node, # truc); } catch(...){} }
+#define	XML_READ_CHAR(node, truc){ try{ truc = XMLTools::get_int_element(node, # truc); } catch(...){} }
+#define	XML_READ_DOUBLE(node, truc){try{  truc = XMLTools::get_double_element(node, # truc); } catch(...){} }
+#define	XML_READ_DOUBLE_ARRAY(node, truc){try{  truc = XMLTools::get_double_array(node, # truc); } catch(...){} }
+#define	XML_READ_FLOAT(node, truc){ try{ truc = XMLTools::get_float_element(node, # truc); } catch(...){} }
+#define	XML_READ_FLOAT_ARRAY(node, truc){try{  truc = XMLTools::get_float_array(node, # truc); } catch(...){} }
+#define	XML_READ_STRING(node, truc){ try{ truc = XMLTools::get_string_element(node, # truc); } catch(...){} }
+#define	XML_READ_STRING_ARRAY(node, truc){try{  truc = XMLTools::get_string_array(node, # truc); } catch(...){} }
 #define XML_READ_SERIALIZABLE(node, truc)           \
-  {                                                 \
+  { \
+try{ \
+	\
     TiXmlNode * child;                              \
     if ((child = node->FirstChild(# truc)) != 0 ) { \
       truc.from_xml(child);                         \
     }                                               \
+	catch (...){}\
   }
 
 /*****************************************************************************/
