@@ -116,9 +116,9 @@ void SlowTimedThread::stop(bool wait)
 	{
 		wait_started();
 		    thread_state = Dying;
+		if (wait)
+			wait_dead();
 	}
-	if (wait)
-		wait_dead();
 }
 
 

@@ -110,7 +110,7 @@ namespace Rhoban
                         throw string("Failed to create socket");
                     } 
 
-#ifdef _WIN32
+#ifdef MSVC
                     char on = 1;
 #else
                     int on = 1;
@@ -119,12 +119,15 @@ namespace Rhoban
                         throw string("Failed to set socket options");
                     }
 
+#ifndef MSVC
                     if (bind(socketDescriptor, (SOCKADDR*) &sinserv, sizeof(sinserv)))
                     {
                         perror("bind()");
                         throw string("Failed to bind socket");
                     }
-
+#else
+					bind(socketDescriptor, (SOCKADDR*)&sinserv, sizeof(sinserv));
+#endif
                     if (listen(socketDescriptor, 32) == SOCKET_ERROR)
                     {
                         perror("listen()");
