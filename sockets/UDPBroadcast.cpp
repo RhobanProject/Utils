@@ -115,6 +115,7 @@ void UDPBroadcast::broadcastMessage(unsigned char* data, size_t len)
     if (_writeFd == -1) {
         std::cout << 
             "WARNING: UDPBroadcast: closed write socket" << std::endl;
+        openWrite();
         return;
     }
    
@@ -152,6 +153,7 @@ bool UDPBroadcast::checkMessage(unsigned char* data, size_t& len)
     if (_readFd == -1) {
         std::cout << 
             "WARNING: UDPBroadcast: closed read socket" << std::endl;
+        openRead();
         return false;
     }
    
