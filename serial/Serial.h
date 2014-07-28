@@ -41,6 +41,8 @@ class Serial
          */
         void disconnect();
 
+	bool IsOpen();
+
         /**
          * Set the baudrate
          */
