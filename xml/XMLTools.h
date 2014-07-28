@@ -68,9 +68,9 @@ using namespace std;
 try{ \
 	\
     TiXmlNode * child;                              \
-    if ((child = node->FirstChild(# truc)) != 0 ) { \
-      truc.from_xml(child);                         \
-    }                                               \
+    if ((child = node->FirstChild(# truc)) != 0 ) \
+	  truc.from_xml(child);                         \
+	}\
 	catch (...){}\
   }
 
