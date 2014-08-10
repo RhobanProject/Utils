@@ -17,7 +17,6 @@ namespace Rhoban
     {
         vector<string> lines;
         string line = "";
-        char last_c = 0;
 
         while (waitReady(5000)) {
             char c;
