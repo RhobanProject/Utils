@@ -4,6 +4,8 @@
 #ifdef WIN32
 #include <windows.h>
 #include <stdlib.h>
+#else
+#include <unistd.h>
 #endif
 
 #ifndef WIN32
