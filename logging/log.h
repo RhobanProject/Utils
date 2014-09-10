@@ -35,10 +35,10 @@
 #define COLOR_NONE 0
 
 #if(HAVE_COLORS)
-#define T_COLOR_RED "\e[0;31m"
-#define T_COLOR_GREEN "\e[0;32m"
-#define T_COLOR_BLUE "\e[0;34m"
-#define T_COLOR_RESET "\e[0m"
+#define T_COLOR_RED "\x1b[0;31m"
+#define T_COLOR_GREEN "\x1b[0;32m"
+#define T_COLOR_BLUE "\x1b[0;34m"
+#define T_COLOR_RESET "\x1b[0m"
 #else
 #define T_COLOR_RED ""
 #define T_COLOR_GREEN ""
