@@ -3,10 +3,10 @@
 
 #ifdef WIN32
 #include <windows.h>
-#include <stdlib.h>
 #else
 #include <unistd.h>
 #endif
+#include <stdlib.h>
 
 #ifndef WIN32
 #define TERM_CLEAR printf ("%c[H%c[J",27,27)
