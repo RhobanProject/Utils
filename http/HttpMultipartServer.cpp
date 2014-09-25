@@ -12,7 +12,7 @@ namespace Rhoban
         TCPServer<HttpMultipartClient>::run(port);
     }
                
-    void HttpMultipartServer::pushFrame(string url, string type, string frame_)
+    void HttpMultipartServer::pushFrame(string url, string type, const string & frame_)
     {
         if (currentFrame.find(url) == currentFrame.end()) {
             currentFrame[url] = 0;

@@ -71,6 +71,8 @@ bool Serial::IsOpen()
 {
 	#ifndef WIN32
     		return (fd  > 0)?true:false;
+	#else
+	return (handle > 0) ? true : false;
 	#endif
 }
 
