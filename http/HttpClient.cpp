@@ -55,6 +55,10 @@ namespace Rhoban
     {
         if (lines.size()) {
             url = getUrl(lines[0]);
+            int pos = url.find("?", 0);
+            if (pos >= 0) {
+                url = url.substr(0, pos);
+            }
 
             return true;
         } else {
