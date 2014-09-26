@@ -67,6 +67,13 @@ Serial::~Serial()
 	recording = false;
 }
 
+bool Serial::IsOpen()
+{
+	#ifndef WIN32
+    		return (fd  > 0)?true:false;
+	#endif
+}
+
 void Serial::setRts(int value)
 {
 #ifndef WIN32

@@ -89,7 +89,6 @@ int Thread::start(void * arg)
             &id);   // returns the thread identifier 
 	return 0;
 #endif
-	started.broadcast();
 }
 
 /*!
@@ -217,6 +216,7 @@ void Thread::run(void)
         thread_state = Running;
         started.broadcast();
         started.unlock();
+
         execute();
 }
     catch(std::exception & err) 

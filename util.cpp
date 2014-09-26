@@ -192,7 +192,7 @@ vector<string> getLines(const string &header)
 {
     vector<string> lines;
     string line = "";
-    for (int pos=0; pos<header.length(); pos++) {
+    for (unsigned int pos=0; pos<header.length(); pos++) {
         if (header[pos] == '\r' || header[pos] == '\n') {
             if (line != "") {
                 lines.push_back(line);

@@ -1,6 +1,11 @@
 option (ROBOARD
     "Compile for Roboard" OFF)
 
+option (32BIT "Compilation 32 bit" OFF)
+IF(32BIT)
+	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
+ENDIF(32BIT)
+
 # The root supposed for all rhoban clones
 set (BASE "../")
 
@@ -15,12 +20,27 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
 
+option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
+
 if (MSVC)
 	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
+
+	IF(NOT MSVC_SHARED_RT)
+	foreach(flag_var
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${flag_var} MATCHES "/MD")
+      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+	endif(${flag_var} MATCHES "/MD")
+	endforeach(flag_var)
+	ENDIF(NOT MSVC_SHARED_RT)
+
 	add_definitions(-D_USE_MATH_DEFINES)
 	add_definitions(-DMSVC)
 	add_definitions(-D_WINSOCKAPI_)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
+
 else (MSVC) 
   IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
      set(CMAKE_CXX_FLAGS " -Wall -g -Wno-overloaded-virtual")
@@ -144,6 +164,11 @@ if (ENABLE_ZMQ)
 		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq2.2/include"
 			CACHE STRING "ZMQ headers directory")
 		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq2.2")
+        elseif(${ZMQ_VERSION} MATCHES "3.2")
+		message("Using ZMQ version 3.2")
+		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq3.2/include"
+			CACHE STRING "ZMQ headers directory")
+		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq3.2")
 	else()
 		message("Using ZMQ version ${ZMQ_VERSION}")
 		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq/include"

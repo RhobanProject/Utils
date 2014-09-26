@@ -1,9 +1,15 @@
 cmake_minimum_required (VERSION 2.6)
 project (ZeroMQ)
+option (32BIT "Compilation 32 bit" OFF)
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "")
 endif ()
+
+IF(32BIT)
+	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
+ENDIF(32BIT)
+
 
 IF(DEFINED WIN32)
 	SET(SYSTEM_OS "WINDOWS")
@@ -55,7 +61,22 @@ endforeach (SOURCE)
 
 add_library (ZeroMQ ${ALL_SOURCES})
 
+option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
+
 if(MSVC)
+	option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" OFF)
+	option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
+
+			IF(NOT MSVC_SHARED_RT)
+	foreach(flag_var
+        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+		if(${flag_var} MATCHES "/MD")
+      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+	endif(${flag_var} MATCHES "/MD")
+	endforeach(flag_var)
+	ENDIF(NOT MSVC_SHARED_RT)
+
 	if(NOT BUILD_SHARED_LIBS)
 		# correct library names
 		set_target_properties(ZeroMQ PROPERTIES

@@ -70,7 +70,7 @@ class JsonParameterType<int> : public JsonParameterReference<int>
 {
     public:
         JsonParameterType(int &reference_, std::string name_)
-            : JsonParameterReference(reference_, name_) {
+            : JsonParameterReference<int>(reference_, name_) {
             setAttribute("type", "int");
         };
 

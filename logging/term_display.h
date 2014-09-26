@@ -3,8 +3,10 @@
 
 #ifdef WIN32
 #include <windows.h>
-#include <stdlib.h>
+#else
+#include <unistd.h>
 #endif
+#include <stdlib.h>
 
 #ifndef WIN32
 #define TERM_CLEAR printf ("%c[H%c[J",27,27)
@@ -24,16 +26,8 @@
 extern COORD coordScreen;
 extern HANDLE hConsole;
 
-#define TERM_CLEAR 
-
-/* system("cls"); \
-	CONSOLE_SCREEN_BUFFER_INFO csbi; \
-	GetConsoleScreenBufferInfo(hConsole, &csbi); \
-	FillConsoleOutputCharacter(hConsole, (TCHAR) ' ', csbi.dwSize.X * csbi.dwSize.Y, coordScreen, NULL); \
-	GetConsoleScreenBufferInfo(hConsole, &csbi); \
-	FillConsoleOutputAttribute(hConsole, csbi.wAttributes, csbi.dwSize.X * csbi.dwSize.Y, coordScreen, NULL);
-*/
-
+void ClearScreen();
+#define TERM_CLEAR  ClearScreen();
 #define TERM_CURSOR_HOME SetConsoleCursorPosition(hConsole , { 0, 0 } );
 #define TERM_CURSOR_LEFT(x) 
 #define TERM_CURSOR_RIGHT(x)
@@ -73,12 +67,17 @@ extern HANDLE hConsole;
 #define TC_LIGHT_CYAN    "96"
 #define TC_WHITE         "97"
 #define TC_BLANC         "97"// Kept for compatibility, deprecated (french name)
+void term_set_color(const char * c, char * out = NULL);
+
+#ifndef WIN32
 #define TERM_COLOR(c...) {term_set_color(c);}
+#else
+#define TERM_COLOR(c,...) {term_set_color(c,__VA_ARGS__);}
+#endif
 
 void term_enable_colors();
 void term_disable_colors();
 
-void term_set_color(const char * c, char * out = NULL);
 void term_separator(char * out = NULL);
 void print_n_times(int n, char c);
 void term_title(char * title);
