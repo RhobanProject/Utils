@@ -3,15 +3,20 @@
 #endif
 #ifdef WIN32
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #include "sleep.h"
+
 
 void ms_sleep(long ms) {
 #ifdef WIN32
 	Sleep(ms);
 #else
-    usleep(1000 * ms);
+  #ifndef DARWIN
+	usleep(1000 * ms);
+  #endif
 #endif
 }  
 
