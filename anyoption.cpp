@@ -772,6 +772,15 @@ AnyOption::getValue( const char *option )
 }
 
 bool
+AnyOption::hasFlag(const char *option)
+{
+	for (int i = 0; i < option_counter; i++)
+		if (strcmp(options[i], option) == 0)
+			return true;
+	return false;
+}
+
+bool
 AnyOption::getFlag( const char *option )
 {
 	if( !valueStoreOK() )

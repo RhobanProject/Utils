@@ -147,7 +147,8 @@ class AnyOption
          * will return NULL if no value is set 
          */
         char *getValue( const char *_option );
-        bool  getFlag( const char *_option );
+		bool  hasFlag(const char *_option);
+		bool  getFlag(const char *_option);
         char *getValue( char _optchar );
         bool  getFlag( char _optchar );
 
