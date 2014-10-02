@@ -22,6 +22,8 @@
 #define THREAD_H
 #include <logging/log.h>
 
+#include <stdexcept>
+
 #ifndef MSVC
 #include <pthread.h>
 #endif
@@ -152,7 +154,13 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
-     catch(...)						\
+     catch(runtime_error & e)						\
+       {						\
+	 unlock();					\
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
+	 throw e;	\
+       } \
+	catch (...)						\
        {						\
 	 unlock();					\
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
