@@ -15,10 +15,8 @@
  */
 #ifdef _WIN32
 #include <winsock2.h>
-#include <windows.h>
-#endif
-
-#ifndef MSVC
+#include <Windows.h>
+#else
 #include <sys/time.h>
 #include <unistd.h>
 #include <signal.h>
@@ -30,6 +28,7 @@
 #include <time.h>
 #include <errno.h>
 
+#include <time.h>
 
 #include "ticks.h"
 #include "util.h"
@@ -48,6 +47,20 @@ int launch_tick_machine(ui32 frequency);
 int init_tick_machine()
 {
 	return init_tick_machine(DEFAULT_TICKS_FREQUENCY);
+}
+
+string date_to_filename()
+{
+	time_t t = time(NULL);
+	string date = asctime(localtime(&t));
+	date.pop_back();
+	for (size_t i = 0; i < date.size(); i++) {
+		if (date[i] == ' ')
+			date[i] = '_';
+		if (date[i] == ':')
+			date[i] = '-';
+	}
+	return date;
 }
 
 int init_tick_machine(ui32 frequency){

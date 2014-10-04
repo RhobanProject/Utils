@@ -86,7 +86,6 @@ protected:
      **************************************
      the following fields and methods
      should only be accessed by the tick machine
-     or superclasses
      *****************************************/
 
     /*! \brief computes the relative frequency */

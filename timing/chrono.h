@@ -84,9 +84,40 @@ class Chrono
     public:
         Chrono();
         double getTime();
-        void reset();
+		double getTimeMsec();
+		double getTimeUsec();
+		void reset();
 
-    protected:
+		Chrono& operator+=(const Chrono& chr){
+			this->chr.tv_sec += chr.chr.tv_sec;
+			this->chr.tv_usec += chr.chr.tv_usec;
+			return *this;
+		}
+
+		Chrono& operator-=(const Chrono& chr){
+			if (this->chr.tv_usec < chr.chr.tv_usec)
+			{
+				this->chr.tv_usec += 1000000;
+				this->chr.tv_sec -= 1;
+			}
+			if (this->chr.tv_usec < chr.chr.tv_usec)
+			{
+				int d = chr.chr.tv_usec / 1000000;
+				this->chr.tv_usec -= d * 1000000;
+				this->chr.tv_sec += d;
+			}
+			this->chr.tv_sec -= chr.chr.tv_sec;
+			this->chr.tv_usec -= chr.chr.tv_usec;
+			return *this;
+		}
+
+		// friends defined inside class body are inline and are hidden from non-ADL lookup
+		friend Chrono operator+(Chrono chr,	const Chrono& rhs){	return chr += rhs;}
+
+		// friends defined inside class body are inline and are hidden from non-ADL lookup
+		friend Chrono operator-(Chrono chr, const Chrono& rhs){ return chr -= rhs; }
+
+protected:
         Rhoban::chrono chr;
 };
 
