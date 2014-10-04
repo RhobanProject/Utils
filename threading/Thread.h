@@ -24,6 +24,7 @@
 
 #ifndef MSVC
 #include <pthread.h>
+#include <stdexcept>
 #endif
 
 #include "Mutex.h"
