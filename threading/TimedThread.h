@@ -28,7 +28,7 @@
  * are scheduled in a unique thread called the TickMachine
  *
  * the two following classes are the same
- * 'RepeatedTask' is probably a better name
+ * 'RepeatedLightweightTask' is probably a better name
  */
 class TimedThread;
 class RepeatedLightweightTask;
@@ -47,45 +47,47 @@ class RepeatedTask;
 
 
 /*
- *       * TimedThreads are stepped one by one, one at a time.
- *       * A step is a call to step()
- *
- * As a consequence, the running time of the call to step() should be quite small,
- * because in the meantime other TimedThreads are waiting
- *
- * If the running time of the call to step() is large,
- * dont use TimedThread but SlowTimedThread instead.
+*		In a TimedThread a.k.a. RepeatedLightweightTask the running time of a call to step()
+*       should be small (<1ms).
+*
+*       If the running time of the call to step() is large or unknown dont use TimedThread=RepeatedLighweightTask
+*		but SlowTimedThread = RepeatedTask instead.
+*
+*       The reason is TimedThreads a.k.a. RepeatedLightweightTask are stepped one by one, one at a time
+*		and in the meantime other RepeatedLightweightTasks are waiting
  */
 using namespace Rhoban;
 
 class TimedThread : public Player
 {
 protected:
-	/* dont delete this, object, use dispose() to dispose it */
+	/* dont delete this, object, use dispose() instead. The TickMAchine will take care of the deletion in a separate thread. */
 	virtual ~TimedThread(){};
 
 public:
 	TimedThread();
 
-	/* dont delete this, object, use dispose() to dispose it */
+	/* delete the object asynchronously on the TickMachine thread. Equivalent to ~TimeThread(). */
 	void dispose();
 
+	/*!
+	* @param frequency_
+	* this sets the tick frequency and creates and starts the timed thread
+	*
+	* The TimedThread will be automatically animated and the step()
+	*  method will be called at the given frequency
+	*
+	*/
+	void init(double hertz);
+
 	/*
-	 * This constructors avoid to use init(frequency)
+	Sae as init but the thread is suspended on startup, use Playable::pplay() to start it */
+	void init_suspended(double hertz);
+
+	/*
+	 * This constructor avoid to use init(frequency)
 	 */
 	TimedThread(double frequency);
-
-	/*!
-	 * @param frequency_
-	 * this sets the tick frequency and creates and starts the timed thread
-	 *
-	 * The TimedThread will be automatically animated and the step()
-	 *  method will be called at the given frequency
-	 *
-	 *
-	 */
-	void init(double hertz);
-	void init_suspended(double hertz);
 
 	/*!
 	 * frequency can be changed using set_frequency() inherited from TickTimer
@@ -136,7 +138,6 @@ public:
 	 */
 	void stop(bool wait_dead = false);
 
-
 	/*
 	 * the effective calling freauency of the timed thread
 	 */
@@ -155,8 +156,7 @@ protected:
 	void execute();
 
 private:
-	Rhoban::chrono start_chr;
-	Rhoban::chrono now_chr;
+	Chrono start;
 
 
 	//TickTimer timer;

@@ -46,7 +46,8 @@ void wait_next_tick(void);
 
 void wait_n_ticks(ui32 tick_nb);
 
-
+/* compute a string containing hour and date and which can be used in a filename */
+string date_to_filename();
 
 void sleep_ms_ticks(ui32 ms);
 void sleep_ticks(Rhoban::chrono duration);
@@ -59,6 +60,15 @@ inline void syst_wait_ms(int ms)
 	Sleep(ms);
 #endif
 }
+inline void syst_wait_us(int us)
+{
+#ifndef WIN32
+	usleep(us);
+#else
+	Sleep(us / 1000);
+#endif
+}
+
 void sleep_ms(ui32 ms);
 void sleep_ms(int ms); // TODO pas terrible... les 2 sleep_ms...
 void wait_ms(int ms);
