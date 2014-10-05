@@ -24,13 +24,16 @@
 #include "TinyXml/tinystr.h"
 #include "TinyXml/tinyxml.h"
 
+#include <stdexcept>
+#include <type_traits>
+
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
 
 using namespace std;
 
-#define xml_parse_error(str,...)   { throw string(str); }
-#define interpretor_error(str,...) { throw string(str); }
+#define xml_parse_error(str,...)   { throw runtime_error(str); }
+#define interpretor_error(str,...) { throw runtime_error(str); }
 
 #define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">" << endl; }
 
@@ -55,6 +58,7 @@ using namespace std;
 #define	XML_READ_GENERIC(node, variable, label){ variable = XMLTools::get_double_element(node, # label); }
 
 #define	XML_READ_INT(node, truc){ try{ truc = XMLTools::get_int_element(node, # truc); } catch(...){}}
+#define	XML_READ_INT_ARRAY(node, truc){try{  truc = XMLTools::get_int_array(node, # truc); } catch(...){} }
 #define	XML_READ_BOOL(node, truc){ try{ truc = XMLTools::get_bool_element(node, # truc); } catch(...){} }
 #define	XML_READ_CHAR(node, truc){ try{ truc = XMLTools::get_int_element(node, # truc); } catch(...){} }
 #define	XML_READ_DOUBLE(node, truc){try{  truc = XMLTools::get_double_element(node, # truc); } catch(...){} }
@@ -74,37 +78,173 @@ try{ \
 	catch (...){}\
   }
 
+#define XML_READ_MAP(node, truc, keytype, valuetype) {try{ truc = XMLTools::get_map<keytype,valuetype>(node, # truc); } catch(...){} }
+#define XML_READ_VECTOR(node, truc, valuetype) {try{ truc = XMLTools::get_array<valuetype>(node, # truc); } catch(...){} }
+
 /*****************************************************************************/
 /*
 */
 namespace XMLTools
 {
 	float get_float_value(TiXmlNode * node);
+	double get_double_value(TiXmlNode * node);
+	int get_int_value(TiXmlNode * node);
+	string get_string_value(TiXmlNode * node);
+
+
+
+	template <typename T> struct is_vector { static const bool value = false; };
+	template <typename T> struct is_vector< std::vector<T> > { static const bool value = true; };
+
+	// metafunction to extract what type a vector is specialised on
+	// vector_type<vector<T>>::type == T
+	template <class T>
+	struct vector_type
+	{
+	private:
+		template <class T>
+		struct ident
+		{
+			typedef T type;
+		};
+
+		template <class C>
+		static ident<C> test(vector<C>);
+
+		static ident<void> test(...);
+
+		typedef decltype(test(T())) vec_type;
+	public:
+		typedef typename vec_type::type type;
+	};
+
+	template < typename T >
+//	const typename enable_if< is_not_vector<T>::value , T>::type
+	T get_value(TiXmlNode * node);
+
+	template <>
+	float get_value<float>(TiXmlNode * node){ return get_float_value(node); };
+
+	template <>
+	int get_value<int>(TiXmlNode * node){ return get_int_value(node); };
+
+	template <>
+	string get_value<string>(TiXmlNode * node){ return get_string_value(node); };
+
+	template <>
+	double get_value<double>(TiXmlNode * node){ return get_double_value(node); };
+
+
+	template <typename T>
+	const typename enable_if<is_vector<T>::value, T>::type
+		get_value(TiXmlNode * node)
+	{
+		T result;
+		if (!node) throw string("XMLTools getstringarray null node");
+		for (TiXmlNode* child = node; child != 0; child = child->NextSibling())
+			if (!child->FirstChild())
+				xml_parse_error(string("Xml parsing: Error while reading element int array with label ") + array_id + " in node " + string(node->Value()));
+			else
+				result.push_back(get_value< vector_type<T>::type >(child->FirstChild()));
+		return result;
+	}
+
 	
-    string get_string_element(TiXmlNode * node, const char * id);
+	template < typename T>
+	const typename enable_if<!is_vector<T>::value, T>::type
+	get_element(TiXmlNode * node, const char * id)
+	{
+		if (!node) throw runtime_error("XMLTools getstringelement null node");
+		TiXmlNode * the_father = node->FirstChild(id);
+		if (the_father)
+		{
+			TiXmlNode* the_child = the_father->FirstChild();
+			if (the_child)
+				return get_value<T>(the_child);
+			else
+				xml_parse_error(string("XMLTools null child node"));
+		}
+		else
+			xml_parse_error(string("Xml parsing: could not find node with label ") + id + " in node " + string(node->Value()));
+	}
 
-    vector<string> get_string_array(TiXmlNode * node, const char * id);
+
+	template <typename T>
+	const typename enable_if<is_vector<T>::value, T>::type
+		get_element(TiXmlNode * node, const char * id)
+	{
+		if (!node) throw runtime_error("XMLTools getstringelement null node");
+		TiXmlNode * the_father = node->FirstChild(id);
+		if (the_father)
+		{
+			TiXmlNode* the_child = the_father->FirstChild();
+			if (the_child)
+			{
+				T result;
+				if (!node) throw string("XMLTools getstringarray null node");
+				for (TiXmlNode* child = node; child != 0; child = child->NextSibling())
+					if (!child->FirstChild())
+					{
+					xml_parse_error(string("Xml parsing: Error while reading element int array with label ") + string(id) + " in node " + string(node->Value()));
+					}
+					else
+						result.push_back(get_value< vector_type<T>::type >(child->FirstChild()));
+				return result;
+			}
+			else
+				xml_parse_error(string("XMLTools null child node"));
+		}
+		else
+			xml_parse_error(string("Xml parsing: could not find node with label ") + id + " in node " + string(node->Value()));
+	}
 
 
-    vector<double> get_double_array(TiXmlNode * node, const char * id);
+	float get_float_element(TiXmlNode * node, const char * id){ return get_element<float>(node, id); };
+	double get_double_element(TiXmlNode * node, const char * id){ return get_element<double>(node, id); };
+	int get_int_element(TiXmlNode * node, const char * id){ return get_element<int>(node, id); };
+	bool get_bool_element(TiXmlNode * node, const char * id){ return get_element<bool>(node, id); };
+	string get_string_element(TiXmlNode * node, const char * id){ return get_element<string>(node, id); };
 
-    vector<float> get_float_array(TiXmlNode * node, const char * id);
+	
 
     bool has_child(TiXmlNode *node, const char *name);
 
     TiXmlNode *get_child(TiXmlNode *node, const char *name);
 
-    vector<int> get_int_array(TiXmlNode * node, const char * id);
 
-    double get_double_element(TiXmlNode * node, const char * id);
 
-    float get_float_element(TiXmlNode * node, const char * id);
+	vector<float> get_float_array(TiXmlNode * node, const char * id){ return get_element< vector<float> >(node, id); }
+	vector<int> get_int_array(TiXmlNode * node, const char * id){ return get_element< vector<int> >(node, id); }
+	vector<string> get_string_array(TiXmlNode * node, const char * id){ return get_element< vector<string> >(node, id); }
+	vector<double> get_double_array(TiXmlNode * node, const char * id){ return get_element< vector<double> >(node, id); }
 
-    int get_int_element(TiXmlNode * node, const char * id);
+	template <typename T, typename U>
+	map<T, U> get_map(TiXmlNode * node, const char * id)
+	{
+		if (!node) throw string("XMLTools getstringarray null node");
+		TiXmlNode* the_values = node->FirstChild(array_id);
+		if (the_values){
+			map<T,U> result;
+			for (TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
+			{
+				TiXmlNode* key = child->FirstChild();
+				if (!key)
+					xml_parse_error(string("Xml parsing: Error while reading map key with label ") + array_id + " in node " + string(node->Value()));
+				TiXmlNode* value = key->NextSibling();
+				if (!value)
+					xml_parse_error(string("Xml parsing: Error while reading map value with label ") + array_id + " in node " + string(node->Value()));
+				else
+					result[get_element<T>(key)] = get_element<U>(value);
+			}
+			return result;
+		}
+		else
+		{
+			xml_parse_error(string("Xml parsing: Could not find (int array) node with label  ") + array_id + " in node " + string(node->Value()));
+		}
+	}
 
-    bool get_bool_element(TiXmlNode * node, const char * id);
-
-    float * get_float_array_with_3_element(TiXmlNode * node, const char * id);
+	float * get_float_array_with_3_element(TiXmlNode * node, const char * array_id);
 
 #ifndef NO_RHOBANMATH
     Matrix extract_double_array(TiXmlNode* node, const char * array_id);
