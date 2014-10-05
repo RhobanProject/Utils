@@ -27,6 +27,6 @@
 //  platform.hpp.in on platforms supported by GNU autotools.
 //  Place any MSVC-specific definitions here.
 
-#define ZMQ_HAVE_WINDOWS
+//#define ZMQ_HAVE_WINDOWS
 
 #endif
