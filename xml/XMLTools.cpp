@@ -44,29 +44,86 @@ TiXmlNode *XMLTools::get_child(TiXmlNode *node, const char *name)
     return node->FirstChild(name);
 }
 
+string XMLTools::get_string_element(TiXmlNode * node, const char * id) {
+    if(!node) throw string("XMLTools getstringelement null node");
+    TiXmlNode * the_father = node->FirstChild( id );
+    if(the_father){
+        TiXmlNode* the_child = the_father->FirstChild();
+        if (the_child)
+            return string(the_child->Value());
+        else
+            return "";
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: could not find (string) node with label ") + id + " in node " + string(node->Value()));
+    }
+}
+
+double XMLTools::get_double_element(TiXmlNode * node, const char * id) {
+    if(!node) throw string("XMLTools getdoublelement null node");
+    TiXmlNode * the_father = node->FirstChild( id );
+    if(the_father){
+        TiXmlNode* the_child = the_father->FirstChild();
+        if (the_child)
+        	return strtod_locale_independent(the_child->Value());
+        else xml_parse_error(string("Xml parsing: could not read double with label ") + id + " in node " + string(node->Value()));
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: could not find (double) node with label ") + id + " in node " + string(node->Value()));
+    }
+}
+
+float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
+    if(!node) throw string("XMLTools getdoublelement null node");
+    TiXmlNode * the_father = node->FirstChild( id );
+    if(the_father){
+        TiXmlNode* the_child = the_father->FirstChild();
+        if (the_child) return strtod_locale_independent(the_child->Value());
+        else xml_parse_error(string("Xml parsing: could not read double with label ") + id + " in node " + string(node->Value()));
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: could not find (double) node with label ") + id + " in node " + string(node->Value()));
+    }
+}
+
 float XMLTools::get_float_value(TiXmlNode * node)
 {
    	return strtod_locale_independent(node->FirstChild()->Value());
 }
 
-int XMLTools::get_int_value(TiXmlNode * node)
-{
-	if (!node)
-		xml_parse_error("Cannot compute the int value of a null node");
-	return atoi(node->FirstChild()->Value());
-}
-double XMLTools::get_double_value(TiXmlNode * node)
-{
-	if (!node)
-		xml_parse_error("Cannot compute the double value of a null node");
-	return strtod_locale_independent(node->FirstChild()->Value());
+int XMLTools::get_int_element(TiXmlNode * node, const char * id) {
+    if(!node) throw string("XMLTools getintelement null node");
+    TiXmlNode * the_father = node->FirstChild( id );
+    if(the_father){
+        TiXmlNode* the_child = the_father->FirstChild();
+        if (the_child) return atoi(the_child->Value());
+        else xml_parse_error(string("Xml parsing: could not read (int) value for label ") +id + " in node " + string(node->Value()));
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: could not find (int) node with label  ") + id + " in node " + string(node->Value()));
+    }
 }
 
-string XMLTools::get_string_value(TiXmlNode * node)
-{
-	if (!node)
-		xml_parse_error("Cannot compute the string value of a null node");
-	return string(node->FirstChild()->Value());
+bool XMLTools::get_bool_element(TiXmlNode * node, const char * id) {
+    if(!node) throw string("XMLTools getintelement null node");
+    TiXmlNode * the_father = node->FirstChild( id );
+    if(the_father)
+    {
+        TiXmlNode* the_child = the_father->FirstChild();
+        if (the_child)
+        {
+            return !strcmp( the_child->Value() , "1") || !strcmp( the_child->Value() , "true");
+        }
+        else xml_parse_error(string("Xml parsing: could not read (int) value for label ") +id + " in node " + string(node->Value()));
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: could not find boolean node with label  ") + id + " in node " + string(node->Value()));
+    }
 }
 
 float * XMLTools::get_float_array_with_3_element(TiXmlNode * node, const char * array_id) {
@@ -134,6 +191,103 @@ Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 }
 #endif
 
+vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id)
+{
+    if(!node) throw string("XMLTools getstring array null node");
+    TiXmlNode* the_values = node->FirstChild( array_id );
+    if(the_values){
+        vector<string> result;
+        for ( TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
+        {
+            if(!child)
+            {
+                xml_parse_error( string("Xml parsing: Error while reading element string array with label ") +array_id + " in node " + string(node->Value()));
+            }
+            else if(!child->FirstChild())
+            {
+                xml_parse_error( string("Xml parsing: Error while reading element string array with label ") +array_id + " in node " + string(node->Value()));
+            }
+            else
+                result.push_back(child->FirstChild()->Value());
+        }
+        return result;
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: Could not find (double array) node with label  ") +array_id + " in node " + string(node->Value()));
+    }
+}
+
+
+vector<int> XMLTools::get_int_array(TiXmlNode* node, const char * array_id)
+{
+    if(!node) throw string("XMLTools getstringarray null node");
+    TiXmlNode* the_values = node->FirstChild( array_id );
+    if(the_values){
+        vector<int> result;
+        for ( TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
+        {
+            if(!child->FirstChild())
+            {
+                xml_parse_error( string("Xml parsing: Error while reading element int array with label ") +array_id + " in node " + string(node->Value()));
+            }
+            else
+                result.push_back(atoi(child->FirstChild()->Value()));
+        }
+        return result;
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: Could not find (int array) node with label  ") +array_id + " in node " + string(node->Value()));
+    }
+}
+
+vector<double> XMLTools::get_double_array(TiXmlNode* node, const char * array_id)
+{
+    if(!node) throw string("XMLTools getstringarray null node");
+    TiXmlNode* the_values = node->FirstChild( array_id );
+    if(the_values){
+        vector<double> result;
+        for ( TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
+        {
+            if(!child->FirstChild())
+            {
+                xml_parse_error( string("Xml parsing: Error while reading element int array with label ") +array_id + " in node " + string(node->Value()));
+            }
+            else
+                result.push_back(atof(child->FirstChild()->Value()));
+        }
+        return result;
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: Could not find (int array) node with label  ") +array_id + " in node " + string(node->Value()));
+    }
+}
+
+
+vector<float> XMLTools::get_float_array(TiXmlNode* node, const char * array_id)
+{
+    if(!node) throw string("XMLTools getstringarray null node");
+    TiXmlNode* the_values = node->FirstChild( array_id );
+    if(the_values){
+        vector<float> result;
+        for ( TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
+        {
+            if(!child->FirstChild())
+            {
+                xml_parse_error( string("Xml parsing: Error while reading element int array with label ") +array_id + " in node " + string(node->Value()));
+            }
+            else
+                result.push_back(atof(child->FirstChild()->Value()));
+        }
+        return result;
+    }
+    else
+    {
+        xml_parse_error(string("Xml parsing: Could not find (int array) node with label  ") +array_id + " in node " + string(node->Value()));
+    }
+}
 
 TiXmlDocument * XMLTools::stream_to_node(const string xml_stream)
 {
