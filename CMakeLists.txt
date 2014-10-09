@@ -2,24 +2,10 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
 
-
-option (ROBOARD
-    "Compile for Roboard" OFF)
-
 option (32BIT "Compilation 32 bit" OFF)
 IF(32BIT)
 	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
 ENDIF(32BIT)
-
-# The root supposed for all rhoban clones
-set (BASE "../")
-
-if (ROBOARD)
-    set (CMAKE_CXX_FLAGS "-m32 -mtune=i586 -march=i586"
-        CACHE STRING "")
-    set (CMAKE_CXX_COMPILER "g++-4.4"
-        CACHE STRING "")
-endif (ROBOARD)
 
 option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
 
