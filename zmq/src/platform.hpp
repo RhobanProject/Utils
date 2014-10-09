@@ -27,10 +27,4 @@
 //  platform.hpp.in on platforms supported by GNU autotools.
 //  Place any MSVC-specific definitions here.
 
-// Greg:
-// This should not be in the repository, the defines are done in the
-// CMakeLists.txt depending on the platform used
-//
-// #define ZMQ_HAVE_WINDOWS
 #endif
-

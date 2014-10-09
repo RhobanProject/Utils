@@ -17,7 +17,7 @@ namespace Rhoban
                HttpMultipartServer(int port_);
 
                void execute();
-               void pushFrame(string url, string type, string frame);
+               void pushFrame(string url, string type, const string & frame);
 
         protected:
                std::map<std::string, int> currentFrame;

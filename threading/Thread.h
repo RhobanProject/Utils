@@ -22,8 +22,11 @@
 #define THREAD_H
 #include <logging/log.h>
 
+#include <stdexcept>
+
 #ifndef MSVC
 #include <pthread.h>
+#include <stdexcept>
 #endif
 
 #include "Mutex.h"
@@ -152,7 +155,13 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
-     catch(...)						\
+     catch(runtime_error & e)						\
+       {						\
+	 unlock();					\
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
+	 throw e;	\
+       } \
+	catch (...)						\
        {						\
 	 unlock();					\
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
@@ -163,13 +172,19 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
   l.unlock();						\
   TH_DEBUG("Thread " << Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
-     catch(std::exception & str)				\
+     catch(const std::runtime_error & str)				\
        {						\
 	 l.unlock();					\
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
-       catch(string & str)				\
+     catch(const std::exception & str)				\
+       {						\
+	 l.unlock();					\
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
+	 throw str;					\
+       }						\
+       catch(const string & str)				\
 	 {						\
 	   l.unlock();					\
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
