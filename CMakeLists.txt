@@ -1,3 +1,8 @@
+cmake_minimum_required (VERSION 2.6)
+project (RhobanUtils)
+find_package (Threads)
+
+
 option (ROBOARD
     "Compile for Roboard" OFF)
 
@@ -15,10 +20,6 @@ if (ROBOARD)
     set (CMAKE_CXX_COMPILER "g++-4.4"
         CACHE STRING "")
 endif (ROBOARD)
-
-cmake_minimum_required (VERSION 2.6)
-project (RhobanUtils)
-find_package (Threads)
 
 option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
 
@@ -188,13 +189,14 @@ if (ENABLE_ZMQ)
     endif(UNIX AND NOT APPLE)
 endif (ENABLE_ZMQ)
 
+set (SOURCES)
+set (ALL_SOURCES)
+set (PREFIXED_SOURCES)
 foreach (DIRECTORY ${DIRECTORIES})
     message("-- Utils: Adding ${DIRECTORY}/")
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${DIRECTORY}")
-    set (SOURCES)
     include (${DIRECTORY}/Sources.cmake)
 
-    set (PREFIXED_SOURCES)
     foreach (SOURCE ${SOURCES})
         set (PREFIXED_SOURCES ${PREFIXED_SOURCES} ${DIRECTORY}/${SOURCE})
     endforeach (SOURCE)
@@ -211,7 +213,7 @@ endif (COMPILE_UTILS_TESTS)
 add_subdirectory (xml/TinyXml)
 set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
 
-
+set (ALL_HEADERS)
 # ADD HEADERS FILES 
 foreach (SOURCE ${ALL_SOURCES})
 	set (FILENAME_PREFIX)
@@ -222,15 +224,15 @@ foreach (SOURCE ${ALL_SOURCES})
 	set (FILENAME ${FILENAME_PATH}/${FILENAME_PREFIX})
 
 	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
-#		message("Adding header " ${FILENAME}.h)
         set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.h")
 	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.h")
 	if(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
-#		message("Adding header " ${FILENAME}.hpp)
         set (ALL_HEADERS ${ALL_HEADERS} "${FILENAME}.hpp")
 	endif(EXISTS "${PROJECT_SOURCE_DIR}/${FILENAME}.hpp")
 endforeach (SOURCE)
 
 # Adding library and dependecy
-add_library (RhobanUtils ${ALL_SOURCES} ${ALL_HEADERS})
-target_link_libraries (RhobanUtils ${EXTRA_LIBS})
+if (NOT TARGET RhobanUtils)
+	add_library (RhobanUtils ${ALL_SOURCES} ${ALL_HEADERS})
+	target_link_libraries (RhobanUtils ${EXTRA_LIBS})
+endif()
