@@ -21,7 +21,7 @@ namespace Rhoban
 
             void colorize(LoggerLevel lvl);
             void resetColor();
-            void prefix(LoggerLevel lvl);
+            void prefix();
 
             void error(const char *fmt, ...);
             void warning(const char *fmt, ...);

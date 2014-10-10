@@ -24,7 +24,7 @@ namespace Rhoban
 #endif
     }
 
-    void Logger::prefix(LoggerLevel lvl)
+    void Logger::prefix()
     {
         struct tm now;
         time_t timestamp;
@@ -55,6 +55,8 @@ namespace Rhoban
                 case LoggerDebug:
                     color = T_COLOR_BLUE;
                     break;
+                case LoggerNone:
+                    break;
             }
 
             if (color != NULL) {
@@ -71,9 +73,9 @@ namespace Rhoban
     }
 
 #define LOG(lvl)                        \
-    if (lvl <= level) {                  \
+    if (lvl <= level) {                 \
         colorize(lvl);                  \
-        prefix(lvl);                    \
+        prefix();                       \
         va_list args;                   \
         va_start(args, fmt);            \
         vfprintf(stderr, fmt, args);    \
