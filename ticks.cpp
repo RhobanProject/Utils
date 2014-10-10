@@ -53,7 +53,7 @@ string date_to_filename()
 {
 	time_t t = time(NULL);
 	string date = asctime(localtime(&t));
-	date.pop_back();
+    date = date.substr(0, date.length()-1);
 	for (size_t i = 0; i < date.size(); i++) {
 		if (date[i] == ' ')
 			date[i] = '_';
