@@ -1,5 +1,5 @@
 
-#include "ZmqContext.h"
+#include "ZMQContext.h"
 #include <threading/Thread.h>
 
 #ifdef WIN32
