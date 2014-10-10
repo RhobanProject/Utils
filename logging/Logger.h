@@ -4,6 +4,7 @@
 #include <string>
 
 typedef enum {
+    LoggerNone,
     LoggerError,
     LoggerWarning,
     LoggerMessage,
