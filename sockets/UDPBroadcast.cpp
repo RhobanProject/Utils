@@ -2,9 +2,6 @@
 
 
 #ifdef MSVC
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -13,7 +10,6 @@
 #include <unistd.h>
 #include <ifaddrs.h>
 #include <linux/if.h>
-#endif
 #include <errno.h>
 #include <string.h>
 
@@ -202,3 +198,4 @@ void UDPBroadcast::retrieveBroadcastAddress()
 }
 
 
+#endif

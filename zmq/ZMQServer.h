@@ -30,9 +30,11 @@ class ZMQServer : public Rhoban::Thread
         {
             if (server != NULL) {
                 zmq_close(server);
+                server = NULL;
             }
             if (context != NULL) {
                 zmq_ctx_destroy(context);
+                context = NULL;
             }
         }
 

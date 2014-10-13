@@ -74,7 +74,7 @@ void SlowTimedThread::init(double hertz)
 	//timer.set_frequency(hertz);
 	max_frequency = hertz;
 	if(!is_alive())
-		start(0);
+		Thread::start(0);
 }
 
 void SlowTimedThread::init_suspended(double hertz)
@@ -87,6 +87,7 @@ void SlowTimedThread::init_started(double hertz)
 {
 	init(hertz);
 	wait_started();
+	start.reset();
 }
 
 
@@ -127,15 +128,13 @@ void SlowTimedThread::stop(bool wait)
 
 double SlowTimedThread::elapsed_time_since_start()
 {
-	return now_chr.tv_sec - start_chr.tv_sec + (now_chr.tv_usec - start_chr.tv_usec) / 1000000.0;
+	return start.getTime();
 }
 
 void SlowTimedThread::execute()
 {
-	Rhoban::chrono last;
-	Rhoban::chrono before;
-	gettimeofday(&now_chr,NULL);
-	gettimeofday(&start_chr, NULL);
+	start.reset();
+	Chrono last, before;
 
 	while(thread_state != Dying && thread_state != Dead)
 	{
@@ -149,24 +148,23 @@ void SlowTimedThread::execute()
 		}
 
 		//timer.wait_next_tick();
-		gettimeofday(&before,NULL);
+		before.reset();
+
 		step();
 
-		last = now_chr;
-		gettimeofday(&now_chr,NULL);
-		measured_frequency = 0.9 * measured_frequency + min( 1000.0 , 0.1 / ( now_chr.tv_sec - last.tv_sec + (now_chr.tv_usec - last.tv_usec) /1000000.0 ));
+		measured_frequency = 0.9 * measured_frequency + 0.1 / min(1000.0, last.getTime());
+		last.reset();
 
-		double step_ms = 1000 * (now_chr.tv_sec - before.tv_sec) + (now_chr.tv_usec - before.tv_usec) /1000.0;
-		int to_wait = 1000.0 / max_frequency - step_ms;
+		int to_wait = max(1.0, 1000000.0 / max_frequency - min(0.0, before.getTimeUsec()));
 
 		//cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
 
-		syst_wait_ms(max(1,to_wait));
+		syst_wait_us(to_wait);
 
 		//cout << /*TM_CAUTION_MSG*/ "Waiting nexttick in Timedthread " << this->ThreadId() << endl;
 		//cout << /*TM_CAUTION_MSG*/ "Done Stepping Timedthread " << this->ThreadId() << endl;
 	}
-	thread_state = Dead;
+	//not yet thread_state = Dead;
 }
 
 void TimedThread::init_suspended(double hertz)
