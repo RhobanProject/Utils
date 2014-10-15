@@ -2,6 +2,8 @@
 #define UTILS_TIMING_BENCHMARK_HPP
 
 #include <chrono>
+#include <map>
+#include <vector>
 
 
 // TODO: create an example tests for this class
@@ -16,19 +18,17 @@ namespace Utils {
       static std::map<std::string, Benchmark> benchmarks;
       static std::map<std::string, bool> benchmarksStatus;
 
-      typedef time_point<std::chrono::steady_clock> TimeStamp;
+      typedef std::chrono::time_point<std::chrono::steady_clock> TimeStamp;
       typedef std::pair<std::string, TimeStamp> namedTS;
       typedef std::pair<std::string, double> namedTime;//In seconds
       /* Local variables */
       std::vector<namedTS> pendingTimers;
       std::vector<namedTime> finishedTimers;
 
-      /* Should only be called by getBenchmark */
-      Benchmark(const std::string& benchmarkName);
-
       static Benchmark& getBenchmark(const std::string& name);
 
     public:
+      Benchmark();
 
       /**
        * Take a timestamp associated with timingName and place it into the
@@ -58,9 +58,17 @@ namespace Utils {
       /**
        * Get the benchmark status (activated, disabled)
        */
-      static void getStatus(const std::string& benchmarkName);
+      static bool isActivated(const std::string& benchmarkName);
 
-      
+      /**
+       * Print all informations
+       */
+      static void print(const std::string& benchmarkName);
+
+      /**
+       * Clear all the content of the given benchmark
+       */
+      static void clear(const std::string& benchmarkName);
 
     };
   }
