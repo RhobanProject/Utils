@@ -15,61 +15,63 @@ namespace Utils {
     {
     private:
       /* Static variables */
-      static std::map<std::string, Benchmark> benchmarks;
-      static std::map<std::string, bool> benchmarksStatus;
+      static Benchmark * current;
 
+      // typedefs
       typedef std::chrono::time_point<std::chrono::steady_clock> TimeStamp;
       typedef std::pair<std::string, TimeStamp> namedTS;
       typedef std::pair<std::string, double> namedTime;//In seconds
+      typedef std::pair<std::string, Benchmark *> namedBenchmark;
       /* Local variables */
+      Benchmark * father;
+      std::string name;
+      std::vector<namedBenchmark> children;
       std::vector<namedTS> pendingTimers;
       std::vector<namedTime> finishedTimers;
 
-      static Benchmark& getBenchmark(const std::string& name);
+      static Benchmark * getCurrent();
+
+      void print();
+
+      double totalTime();
 
     public:
-      Benchmark();
+      Benchmark(Benchmark * f, const std::string & n) : father(f), name(n) {};
+
+      /**
+       * Open a new benchmark or subBenchmark
+       * It is not recommended to open several subBenchmark with the same name
+       */
+      static void open(const std::string& benchmarkName);
+
+      /**
+       * Close current benchmark or subBenchmark and return to previous context
+       * if needed
+       */
+      static void close();
 
       /**
        * Take a timestamp associated with timingName and place it into the
-       * benchmark of the given name
+       * current benchmark
        */
-      static void start(const std::string& benchmarkName,
-                        const std::string& timingName);
+      static void start(const std::string& timingName);
 
       /**
-       * End last timing and start a new one with timingName
+       * End last timing and start a new one named newTimingName
        * throw an exception if there were no timing started
        */
-      static void reNew(const std::string& benchmarkName,
-                        const std::string& newTimingName);
+      static void reNew(const std::string& newTimingName);
 
       /**
-       * End the last timing which started for the given benchmark
+       * End the last timing which started for the current benchmark
        * throw an exception if there were no timing started
        */
-      static void end(const std::string& benchmarkName);
+      static void end();
 
       /**
-       * Set the benchmark status (activated, disabled)
+       * Print all informations of current benchmark
        */
-      static void setStatus(const std::string& benchmarkName, bool activated);
-
-      /**
-       * Get the benchmark status (activated, disabled)
-       */
-      static bool isActivated(const std::string& benchmarkName);
-
-      /**
-       * Print all informations
-       */
-      static void print(const std::string& benchmarkName);
-
-      /**
-       * Clear all the content of the given benchmark
-       */
-      static void clear(const std::string& benchmarkName);
-
+      static void printCurrent();
     };
   }
 }

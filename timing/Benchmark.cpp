@@ -10,97 +10,92 @@ namespace Utils {
   namespace Timing {
 
     /* Static variables */
-    std::map<std::string, Benchmark> Benchmark::benchmarks;
-    std::map<std::string, bool> Benchmark::benchmarksStatus;
+    Benchmark * Benchmark::current = NULL;
 
-    Benchmark::Benchmark()
+    Benchmark * Benchmark::getCurrent()
     {
-      std::cout << "Initializing a benchmark" << std::endl;
+      if (current == NULL)
+        open("Default");
+      return current;
     }
 
-    Benchmark& Benchmark::getBenchmark(const std::string& name)
+    void Benchmark::open(const std::string& benchmarkName)
     {
-      // Throw an error if there is already an entry with the same name
-      try {
-        return benchmarks.at(name);
+      Benchmark * newB = new Benchmark(current, benchmarkName);
+      if (current != NULL) {
+        current->children.push_back(namedBenchmark(benchmarkName, newB));
       }
-      catch (std::out_of_range e){
-        Benchmark b;
-        benchmarks[name] = b;
-        benchmarksStatus[name] = true;
-        return benchmarks[name];
-      }
+      current = newB;
     }
 
-    void Benchmark::start(const std::string& benchmarkName,
-                          const std::string& timingName)
+    void Benchmark::close()
     {
-      Benchmark& b = getBenchmark(benchmarkName);
-      if (!isActivated(benchmarkName)) return;
+      if (current == NULL)
+        throw std::runtime_error("No active benchmark to close");
+      Benchmark * toClose = current;
+      current = toClose->father;
+      // Suppress Benchmark if the link is lost
+      if (current == NULL)
+        delete(toClose);
+    }
+
+    void Benchmark::start(const std::string& timingName)
+    {
+      Benchmark * b = getCurrent();
+
       namedTS newEntry = namedTS(timingName, steady_clock::now());
-      b.pendingTimers.push_back(newEntry);
+      b->pendingTimers.push_back(newEntry);
     }
 
-    void Benchmark::end(const std::string& benchmarkName)
+    void Benchmark::end()
     {
-      Benchmark& b = getBenchmark(benchmarkName);
-      if (!isActivated(benchmarkName)) return;
-      if (b.pendingTimers.size() == 0)
+      Benchmark * b = getCurrent();
+
+      if (b->pendingTimers.size() == 0)
         throw std::runtime_error("No timer to end!");
-      namedTS start = b.pendingTimers.back();
       TimeStamp now = steady_clock::now();
-      b.pendingTimers.pop_back();
+      namedTS start = b->pendingTimers.back();
+      b->pendingTimers.pop_back();
       double elapsedTicks = double((now - start.second).count());
       double time = elapsedTicks * steady_clock::period::num / steady_clock::period::den;
       namedTime timeEntry(start.first, time);
-      b.finishedTimers.push_back(timeEntry);
+      b->finishedTimers.push_back(timeEntry);
     }
 
-    void Benchmark::reNew(const std::string& benchmarkName,
-                          const std::string& newTimingName)
+    void Benchmark::reNew(const std::string& newTimingName)
     {
-      end(benchmarkName);
-      start(benchmarkName, newTimingName);
-    }
-    
-    void Benchmark::setStatus(const std::string& benchmarkName, bool activated)
-    {
-      // Create benchmark if required
-      getBenchmark(benchmarkName);
-      benchmarksStatus[benchmarkName] = activated;
-    }
-    
-    bool Benchmark::isActivated(const std::string& benchmarkName)
-    {
-      // Create benchmark if required
-      getBenchmark(benchmarkName);
-      return benchmarksStatus[benchmarkName];
+      end();
+      start(newTimingName);
     }
 
-    void Benchmark::print(const std::string& benchmarkName)
+    double Benchmark::totalTime()
     {
-      Benchmark& b = getBenchmark(benchmarkName);
-      if (!isActivated(benchmarkName)) return;
+      double t = 0;
+      for (auto& e : finishedTimers){
+        t += e.second;
+      }
+      return t;
+    }
 
-      std::cout << benchmarkName << std::endl;
+    void Benchmark::print()
+    {
       int oldPrecision = std::cout.precision();
       std::cout.precision(3);
       std::cout.setf(std::ios::fixed, std::ios::floatfield);
-      for(auto& e : b.finishedTimers) {
-        std::cout << std::setw(8) << (e.second * 1000) << " ms : " << e.first
-                  << std::endl;
+      for(auto& e : finishedTimers) {
+        std::cout << '\t'  << std::setw(8) << (e.second * 1000) << " ms : "
+                  << e.first << std::endl;
       }
+      std::cout << totalTime() * 1000 << " ms : " << name << std::endl;
       std::cout.precision(oldPrecision);
       std::cout.unsetf(std::ios::floatfield);
     }
 
-    void Benchmark::clear(const std::string& benchmarkName)
+    void Benchmark::printCurrent()
     {
-      Benchmark& b = getBenchmark(benchmarkName);
-      if (!isActivated(benchmarkName)) return;
+      Benchmark * b = getCurrent();
 
-      b.pendingTimers.clear();
-      b.finishedTimers.clear();
+      b->print();
     }
   }
 }
