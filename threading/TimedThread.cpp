@@ -152,10 +152,14 @@ void SlowTimedThread::execute()
 
 		step();
 
-		measured_frequency = 0.9 * measured_frequency + 0.1 / min(1000.0, last.getTime());
+		double t = last.getTime();
+		measured_frequency = 0.9 * measured_frequency + 0.1 / min(1000.0, t);
+
+
 		last.reset();
 
-		int to_wait = max(1.0, 1000000.0 / max_frequency - min(0.0, before.getTimeUsec()));
+		double t2 = before.getTimeUsec();
+		int to_wait = max(1.0, 1000000.0 / max_frequency - t2);
 
 		//cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
 
