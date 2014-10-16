@@ -25,18 +25,23 @@ namespace Utils {
       /* Local variables */
       Benchmark * father;
       std::string name;
+      TimeStamp openingTime;
+      TimeStamp closingTime;
+      bool isTimerActive;
+      namedTS currentTimer;
       std::vector<namedBenchmark> children;
-      std::vector<namedTS> pendingTimers;
       std::vector<namedTime> finishedTimers;
 
       static Benchmark * getCurrent();
 
       void print();
+      void print(int depth, int width);
 
-      double totalTime();
+      double getTime() const;
+      double getSubTime() const;
 
     public:
-      Benchmark(Benchmark * f, const std::string & n) : father(f), name(n) {};
+      Benchmark(Benchmark * father, const std::string & name);
 
       /**
        * Open a new benchmark or subBenchmark
@@ -48,7 +53,7 @@ namespace Utils {
        * Close current benchmark or subBenchmark and return to previous context
        * if needed
        */
-      static void close();
+      static void close(bool print = false);
 
       /**
        * Take a timestamp associated with timingName and place it into the
@@ -60,18 +65,13 @@ namespace Utils {
        * End last timing and start a new one named newTimingName
        * throw an exception if there were no timing started
        */
-      static void reNew(const std::string& newTimingName);
+      static void r(const std::string& newTimingName);
 
       /**
        * End the last timing which started for the current benchmark
        * throw an exception if there were no timing started
        */
       static void end();
-
-      /**
-       * Print all informations of current benchmark
-       */
-      static void printCurrent();
     };
   }
 }
