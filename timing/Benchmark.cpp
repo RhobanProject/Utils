@@ -51,29 +51,6 @@ namespace Utils {
         delete(toClose);
     }
 
-    void Benchmark::start(const std::string& timingName)
-    {
-      Benchmark * b = getCurrent();
-
-      b->currentTimer.first  = timingName;
-      b->currentTimer.second = steady_clock::now();
-      b->isTimerActive = true;
-    }
-
-    void Benchmark::end()
-    {
-      Benchmark * b = getCurrent();
-
-      if (!b->isTimerActive)
-        throw std::runtime_error("No timer to end!");
-      TimeStamp now = steady_clock::now();
-      TimeStamp start = b->currentTimer.second;
-      double elapsedTicks = double((now - start).count());
-      double time = elapsedTicks * steady_clock::period::num / steady_clock::period::den;
-      namedTime timeEntry(b->currentTimer.first, time);
-      b->finishedTimers.push_back(timeEntry);
-    }
-
     double Benchmark::getTime() const
     {
       double elapsedTicks = double((closingTime - openingTime).count());
@@ -85,9 +62,6 @@ namespace Utils {
     double Benchmark::getSubTime() const
     {
       double t = 0;
-      for (auto& e : finishedTimers) {
-        t += e.second;
-      }
       for (auto& c : children) {
         t += c.second->getTime();
       }
@@ -124,17 +98,17 @@ namespace Utils {
       // Build and sort printable data
       typedef std::tuple<std::string, double, Benchmark *> printableEntry;
       std::vector<printableEntry> subFields;
-      for(auto& t : finishedTimers) {
-        subFields.push_back(printableEntry(t.first, t.second, NULL));
-      }
       for(auto& c : children) {
         subFields.push_back(printableEntry(c.first,
                                            c.second->getTime(),
                                            c.second));
       }
-      subFields.push_back(printableEntry("Unknown",
-                                         getTime() - getSubTime(),
-                                         NULL));
+      // Add Unknown field only if there are other information
+      if (subFields.size() > 0) {
+        subFields.push_back(printableEntry("Unknown",
+                                           getTime() - getSubTime(),
+                                           NULL));
+      }
       // Ordering
       std::sort(subFields.begin(), subFields.end(), cmp);
       // Printing

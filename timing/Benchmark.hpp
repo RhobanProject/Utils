@@ -19,8 +19,6 @@ namespace Utils {
 
       // typedefs
       typedef std::chrono::time_point<std::chrono::steady_clock> TimeStamp;
-      typedef std::pair<std::string, TimeStamp> namedTS;
-      typedef std::pair<std::string, double> namedTime;//In seconds
       typedef std::pair<std::string, Benchmark *> namedBenchmark;
       /* Local variables */
       Benchmark * father;
@@ -28,9 +26,7 @@ namespace Utils {
       TimeStamp openingTime;
       TimeStamp closingTime;
       bool isTimerActive;
-      namedTS currentTimer;
       std::vector<namedBenchmark> children;
-      std::vector<namedTime> finishedTimers;
 
       static Benchmark * getCurrent();
 
@@ -54,24 +50,6 @@ namespace Utils {
        * if needed
        */
       static void close(bool print = false);
-
-      /**
-       * Take a timestamp associated with timingName and place it into the
-       * current benchmark
-       */
-      static void start(const std::string& timingName);
-
-      /**
-       * End last timing and start a new one named newTimingName
-       * throw an exception if there were no timing started
-       */
-      static void r(const std::string& newTimingName);
-
-      /**
-       * End the last timing which started for the current benchmark
-       * throw an exception if there were no timing started
-       */
-      static void end();
     };
   }
 }
