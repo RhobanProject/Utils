@@ -4,8 +4,8 @@
 #include <chrono>
 #include <map>
 #include <vector>
-
-
+#include <string>
+#include <stdexcept>
 // TODO: create an example tests for this class
 
 namespace Utils {
