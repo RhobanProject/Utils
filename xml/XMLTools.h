@@ -64,14 +64,13 @@ using namespace std;
 #define	XML_READ_STRING(node, truc){ try{ truc = XMLTools::get_string_element(node, # truc); } catch(...){} }
 #define	XML_READ_STRING_ARRAY(node, truc){try{  truc = XMLTools::get_string_array(node, # truc); } catch(...){} }
 #define XML_READ_SERIALIZABLE(node, truc)           \
-  { \
-try{ \
-	\
-    TiXmlNode * child;                              \
-    if ((child = node->FirstChild(# truc)) != 0 ) \
-	  truc.from_xml(child);                         \
-	}\
-	catch (...){}\
+  {                                                 \
+    try{                                            \
+      TiXmlNode * child;                            \
+      if ((child = node->FirstChild(# truc)) != 0 ) \
+        truc.from_xml(child);                       \
+    }                                               \
+    catch (...){}                                   \
   }
 
 /*****************************************************************************/
