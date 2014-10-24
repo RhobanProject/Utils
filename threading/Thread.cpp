@@ -10,6 +10,7 @@
 #include <iostream>
 #ifndef MSVC
 #include <unistd.h>
+#include <stdexcept>
 #else
 #include "windows.h"
 #endif
@@ -329,8 +330,10 @@ void Thread::block_signal(int signal)
     sigset_t signal_mask;
     sigemptyset (&signal_mask);
     sigaddset (&signal_mask, signal);
-    sigprocmask(SIG_BLOCK,&signal_mask,NULL);
-    pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
+//    intt ret = sigprocmask(SIG_BLOCK,&signal_mask,NULL);
+   int ret =  pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
+	if (ret == -1)
+		throw runtime_error("Failed to set signal mask");
 #endif
 }
 
