@@ -1,3 +1,5 @@
+#ifndef MACOSX
+
 #include "HttpMultipartServer.h"
 
 namespace Rhoban
@@ -36,3 +38,4 @@ namespace Rhoban
         TCPServer<HttpMultipartClient>::unlock();
     }
 }
+#endif

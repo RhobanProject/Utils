@@ -1,6 +1,6 @@
 #include <iostream>
 
-
+#ifdef DARWIN
 #ifdef MSVC
 #else
 #include <sys/types.h>
@@ -198,4 +198,5 @@ void UDPBroadcast::retrieveBroadcastAddress()
 }
 
 
+#endif
 #endif
