@@ -28,10 +28,11 @@ namespace Rhoban
     {
         struct tm now;
         time_t timestamp;
+#ifndef WIN32
         time(&timestamp);
         now = *localtime(&timestamp);
-
-        fprintf(stderr, "[%02d:%02d:%02d] ", now.tm_hour, now.tm_min, now.tm_sec);
+		fprintf(stderr, "[%02d:%02d:%02d] ", now.tm_hour, now.tm_min, now.tm_sec);
+#endif
         fprintf(stderr, "[%s] ", module.c_str());
     }
 

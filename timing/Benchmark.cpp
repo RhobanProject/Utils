@@ -17,7 +17,9 @@ namespace Utils {
     Benchmark::Benchmark(Benchmark * f, const std::string & n)
       : father(f), name(n)
     {
+#ifndef WIN32
       openingTime = steady_clock::now();
+#endif
       isTimerActive = false;
     }
 
@@ -42,7 +44,9 @@ namespace Utils {
       if (current == NULL)
         throw std::runtime_error("No active benchmark to close");
       Benchmark * toClose = current;
+#ifndef WIN32
       toClose->closingTime = steady_clock::now();
+#endif
       current = toClose->father;
       if (print)
         toClose->print();
