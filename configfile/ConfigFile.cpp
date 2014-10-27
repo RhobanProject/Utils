@@ -138,9 +138,9 @@ void ConfigFile::save(string filename)
     map<string, map<string, ConfigFileWriteable*> >::iterator it;
     YAML::Emitter emitter;
 
+    emitter << YAML::BeginMap;
     for (it = values.begin(); it != values.end(); it++) {
         string section = (*it).first;
-        emitter << YAML::BeginMap;
         emitter << YAML::Key << section << YAML::Value;
 
         emitter << YAML::BeginMap;
@@ -154,9 +154,9 @@ void ConfigFile::save(string filename)
             writeable->write(&emitter);
         }
         emitter << YAML::EndMap;
-        emitter << YAML::EndMap;
         emitter << YAML::Newline;
     }
+    emitter << YAML::EndMap;
 
     ofstream outputFile;
     outputFile.open(filename.c_str());

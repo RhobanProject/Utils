@@ -24,7 +24,7 @@
 
 #include <stdexcept>
 
-#ifndef MSVC
+#ifndef WIN32
 #include <pthread.h>
 #include <stdexcept>
 #endif
