@@ -20,7 +20,7 @@ class ZMQServer : public Rhoban::Thread
             std::ostringstream oss;
             oss << "tcp://*:" << port;
             std::string addr = oss.str();
-            
+
             if (zmq_bind(server, addr.c_str()) != 0) {
                 throw std::string("Unable to bind server");
             }
@@ -43,7 +43,13 @@ class ZMQServer : public Rhoban::Thread
             while (processor.isRunning()) {
                 char *request = s_recv(server);
                 std::string response = processor.process(std::string(request));
-                s_send(server, response.c_str());
+                
+                zmq_msg_t message;
+                zmq_msg_init_size (&message, response.size());
+                memcpy(zmq_msg_data(&message), response.c_str(), response.size());
+                zmq_msg_send (&message, server, 0);
+                zmq_msg_close(&message);
+
                 free(request);
             }
         }
