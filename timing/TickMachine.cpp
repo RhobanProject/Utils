@@ -34,9 +34,10 @@ TickMachine * TickMachine::the_tick_machine = NULL;
 
 Rhoban::chrono TickMachine::start_time;
 
+Rhoban::Mutex tm_mutex;
+
 TickMachine * TickMachine::get_tick_machine() {
-	if (TickMachine::the_tick_machine != NULL) return TickMachine::the_tick_machine;
-	TickMachine::the_tick_machine = TickMachine::createTickMachine();
+	TickMachine::createTickMachine();
 	return TickMachine::the_tick_machine;
 };
 
@@ -49,10 +50,23 @@ double TickMachine::max_frequency = 150.0;
 
 TickMachine * TickMachine::createTickMachine()
 {
-	TickMachine * new_tick_machine;
+	BEGIN_SAFE(tm_mutex)
+		if (the_tick_machine == NULL)
+		{
+		TM_DEBUG_MSG("Tick machine creating...");
+		the_tick_machine = new TickMachine();
+		TM_DEBUG_MSG("Tick machine created and starting...");
+		the_tick_machine->start(0);
+		the_tick_machine->wait_started();
+		TM_DEBUG_MSG("Tick machine started ...");
+		}
+	END_SAFE(tm_mutex)
+		return the_tick_machine;
+}
 
-	gettimeofday(&start_time,0);
-
+TickMachine::TickMachine() : timer_to_register(false), timer_to_unregister(false), timer_to_dispose(false)
+{
+	gettimeofday(&start_time, 0);
 #ifndef WIN32
 	/*blocks the alarm signal for the calling thread
 	otherwise the thread would be immediately killed by
@@ -61,17 +75,6 @@ TickMachine * TickMachine::createTickMachine()
 	Thread::block_signal(SIGALRM);
 #endif
 
-	TM_DEBUG_MSG("Tick machine creating...");
-	new_tick_machine = new TickMachine();
-	TM_DEBUG_MSG("Tick machine created and starting...");
-	new_tick_machine->start(0);
-	new_tick_machine->wait_started();
-	TM_DEBUG_MSG("Tick machine started ...");
-	return new_tick_machine;
-}
-
-TickMachine::TickMachine() : timer_to_register(false), timer_to_unregister(false), timer_to_dispose(false)
-{
 	timer_should_be_updated = false;
 	granularity_should_be_updated  = false;
 	granularity.tv_sec = 0;
@@ -240,7 +243,6 @@ void TickMachine::execute()
 	TM_DEBUG_MSG("Starting Loop !");
 	while(true)
 	{
-
 		if(timer_to_dispose)
 		{
 			timer_to_dispose = false;
@@ -366,14 +368,13 @@ void TickMachine::tick_players()
 	gettimeofday(&now,0);
 
 	TM_DEBUG_MSG(players.size()<<" players to tick");
-	for (list<TickTimer *>::iterator timer_ = players.begin();timer_ != players.end();timer_++)
+	for (auto timer : players)
 	{
-		TickTimer * timer = *timer_;
 		/* Tricky case: a timer has been unregistered (hence probably deleted) by a timer before in the same tm round
 		 * In this case it should be skipped
 		 */
-		for(list<TickTimer *>::iterator tt = timers_to_unregister.begin(); tt != timers_to_unregister.end(); tt++)
-			if(*tt == timer)
+		for(auto tt : timers_to_unregister)
+			if(tt == timer)
 				continue;
 
 #ifndef WIN32
@@ -396,17 +397,6 @@ void TickMachine::tick_players()
 		}
 #endif
 	}
-
-	/* old version, more precise but too heavy and useless
-       if(is_after(now, (*player_)->next_tick_date))
-    //			(*player_)->tick(now);
-    {
-    cout << "Unskipped: frequency "<< (*player_)->frequency << " interval " << to_secs((*player_)->tick_interval) <<" overhead " <<  to_secs(now) - to_secs((*player_)->next_tick_date)<<endl;
-    (*player_)->tick(now);
-    }
-    else
-    cout << "Skipped: frequency "<< (*player_)->frequency << " interval " << to_secs((*player_)->tick_interval) << " to go " <<  to_secs((*player_)->next_tick_date) - to_secs(now)<<endl;
-	 */
 }
 /*!
  * updates time granularity of the machine,
