@@ -208,7 +208,7 @@ endforeach (DIRECTORY)
 
 
 if (COMPILE_UTILS_TESTS)
-  add_executable (scoringTest test/ScoringTest.cpp scoring/Score.cpp scoring/Mark.cpp tests/TestCase.cpp)
+  add_executable (scoringTest test/ScoringTest.cpp scoring/Score.cpp scoring/Mark.cpp tests/TestCase.cpp logging/term_display.cpp)
 endif (COMPILE_UTILS_TESTS)
 
 # Adding TinyXml
