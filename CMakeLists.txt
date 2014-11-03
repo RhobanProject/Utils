@@ -141,7 +141,6 @@ set(DIRECTORIES
     .
     args
     configfile
-	encodings
     json
     logging
     observer
