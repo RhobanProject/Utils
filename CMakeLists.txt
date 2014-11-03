@@ -34,7 +34,6 @@ else (MSVC)
   ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")  
   ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-endif (MSVC)
 
 
 #Check for c++11 support
@@ -49,6 +48,8 @@ else ()
     message(FATAL_ERROR "Your C++ compiler is not g++ (unknown support for C++11)")
 endif ()
 endif ()
+
+endif (MSVC)
 
 #Enable C++11
 set(CMAKE_CXX_FLAGS 
@@ -140,6 +141,7 @@ set(DIRECTORIES
     .
     args
     configfile
+	encodings
     json
     logging
     observer

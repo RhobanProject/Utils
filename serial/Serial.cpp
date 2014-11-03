@@ -513,11 +513,13 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		//if(total < size)
 			//cout << "Receiving " << size << " got total " << total << " this loop " << n << " blocking " << (blocking ? 1 : 0) << endl;
 		if(!blocking) break;
+		/*
 		if(n==0)
 		{
 			//cout << "Received nothing waiting 50 ms" << endl;
 			syst_wait_ms(50);
 		}
+		*/
 	}
 	return total;
 }
@@ -537,12 +539,11 @@ char Serial::receiveChar()
 	char result;
 	int nb = receive(&result,1, true);
 	if(nb < 0)
-		throw string("Wrong stuff when waiting char from device " + deviceName);
-	if(nb == 0)
-		throw string("No char received from device " + deviceName);
-	if(nb >1)
-		throw string("More than one char received from device " + deviceName);
-	return result;
+		throw runtime_error("Error when waiting char from device " + deviceName);
+	else if(nb == 0)
+		throw runtime_error("No char received from device " + deviceName);
+	else
+		return result;
 }
 
 /*
@@ -669,7 +670,7 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 		if(to_wait ++ >= max_chars_wait)
 		{
 			cerr << "seek_pattern: waited too long (" << max_chars_wait << ") for pattern" << endl;
-			throw string("seek_pattern: waited too long for pattern");
+			throw runtime_error("seek_pattern: waited too long for pattern");
 		}
 		//cout <<c;
 	}

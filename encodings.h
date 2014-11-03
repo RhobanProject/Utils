@@ -27,6 +27,8 @@ using namespace std;
 */
 inline void encode_int(int value, char * buf);
 inline void encode_uint(ui32 value, char * buf);
+inline void encode_short(short value, char * buf);
+inline void encode_ushort(unsigned short value, char * buf);
 
 //static float double_coef = 1000.0;
 
@@ -40,6 +42,8 @@ inline void encode_float(float value, char * buf);
 
 inline ui32 decode_uint(const char * buf);
 inline int decode_int(const char * buf);
+inline unsigned short decode_ushort(const char * buf);
+inline short decode_short(const char * buf);
 inline float decode_float(const char * buf);
 
 inline string decode_string(const char * buf);
@@ -69,29 +73,22 @@ inline void encode_uint(ui32 value, char * buf)
 	buf[3] = (char) ((value & 0x000000ff) >>0);
 }
 
+inline void encode_short(short value, char * buf)
+{
+	buf[0] = (char)((value & 0xff00) >> 8);
+	buf[1] = (char)((value & 0x00ff) >> 0);
+}
+
+inline void encode_ushort(unsigned short value, char * buf)
+{
+	buf[0] = (char)((value & 0xff00) >> 8);
+	buf[1] = (char)((value & 0x00ff) >> 0);
+}
+
 //static float double_coef = 1000.0;
 
 inline void encode_float(float value, char * buf)
 {
-	//Hugo: dangerous, plateform dependent
-	/*
-	cout <<"Encoding float \t"<< value <<" \t\t(";
-	for(int j=0;j<4;j++)
-	{
-		ui32 n = *((ui32 *)&value);
-		cout << ((n >> (j*8)) & 0xff)<<" ";
-	}
-	cout <<")NON!!"<<endl;
-	*/
-	//cout << "Dangerous: alignment and format issues"<<endl;
-	//((float *) buf)[0] = value;
-	//ui32 cvalue = (ui32) static_cast<int>(value*double_coef)+0x80000000;
-	/*
-	buf[0] = (char) ((cvalue & 0xff000000) >>24);
-		buf[1] = (char) ((cvalue & 0x00ff0000) >>16);
-		buf[2] = (char) ((cvalue & 0x0000ff00) >>8);
-		buf[3] = (char) ((cvalue & 0x000000ff) >>0);
-	encode_uint(cvalue,buf);*/
 	encode_int((int) (value * 1000), buf);
 }
 
@@ -121,28 +118,34 @@ inline ui32 decode_uint(const char * buf)
 
 inline int decode_int(const char * buf)
 {
-	//return ((ui32 *) buf)[0];
-	//cout << "Decoding int \t"<<((ui32 *) buf)[0]<< "\t\t("<<(int) buf[0]<<" "<< (int) buf[1]<<" "<< (int) buf[2]<<" "<< (int) buf[3]<<")"<<endl;
-
 	ui8* buff = (ui8*) buf;
 	ui32 a = buff[0]<<24;
 	ui32 b = buff[1]<<16;
 	ui32 c = buff[2]<<8;
 	ui32 d = buff[3];
 	return (int) (a | b | c |d);
+}
 
-	//	return  ((ui32)buf[0])<<24 | ((ui32)buf[1])<<16 | ((ui32)buf[2])<<8 | ((ui32)buf[3]);
+inline unsigned short decode_ushort(const char * buf)
+{
+	ui8* buff = (ui8*)buf;
+	unsigned short a = buff[0] << 8;
+	unsigned short b = buff[1] << 0;
+	return a | b;
+}
+
+inline short decode_short(const char * buf)
+{
+	ui8* buff = (ui8*)buf;
+	unsigned short a = buff[0] << 8;
+	unsigned short b = buff[1] << 0;
+	return (short)(a | b);
 }
 
 
 inline float decode_float(const char * buf)
 {
 	//return ldexp( decode_uint(buf+1) ,(int) buf[0]-128);
-	//Hugo: dangerous, plateform dependent
-	//cout << "Decoding float \t"<< ((float *) buf)[0]<< "\t\t("<<(int) buf[0]<<" "<< (int) buf[1]<<" "<< (int) buf[2]<<" "<< (int) buf[3]<<")"<<endl;
-	//cout << "Dangerous: alignment and format issues"<<endl;
-	//return ((float *) buf)[0];
-	//return (static_cast<float>(decode_uint(buf)) -0x80000000)/ double_coef;
 	return decode_int(buf)/1000.0;
 }
 
