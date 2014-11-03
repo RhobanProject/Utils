@@ -1,6 +1,6 @@
 #include <iostream>
 
-#ifdef DARWIN
+#ifndef DARWIN
 #ifdef MSVC
 #else
 #include <sys/types.h>
