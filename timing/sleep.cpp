@@ -9,6 +9,9 @@
 
 #include "sleep.h"
 
+#ifdef WIN32
+#include <thread>
+#endif
 
 void ms_sleep(long ms) {
 #ifdef WIN32
@@ -29,10 +32,10 @@ void ms_sys_wait_ms(long ms)
 #endif
 }
 
-void u_sleep(long us)
+void us_sleep(long us)
 {
 #ifdef WIN32
-    Sleep(us/1000.0);
+	std::this_thread::sleep_for(std::chrono::microseconds(us));
 #else
     usleep(us);
 #endif
