@@ -143,12 +143,6 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
   unlock();						\
   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
-     catch(std::exception & str)				\
-       {						\
-	 unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
-	 throw str;					\
-       }						\
      catch(string & str)				\
        {						\
 	 unlock();					\
@@ -161,6 +155,12 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw e;	\
        } \
+     catch(std::exception & str)				\
+       {						\
+	 unlock();					\
+	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
+	 throw str;					\
+       }						\
 	catch (...)						\
        {						\
 	 unlock();					\

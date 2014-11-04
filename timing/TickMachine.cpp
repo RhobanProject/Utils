@@ -203,8 +203,7 @@ void TickMachine::update_timer()
 {
 	timer_should_be_updated = false;
 	TM_DEBUG_MSG("Updating timer with granularity "<< to_secs(granularity));
-#ifdef WIN32
-#else
+#if 0
 	/*
 	 * Set the real time interval timer
 	 */
@@ -343,7 +342,8 @@ void TickMachine::execute()
 #ifdef WIN32
 		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
 #else
-		wait_signal(SIGALRM);
+		usleep( (granularity.tv_sec*1000000+granularity.tv_usec) / 5);
+		//wait_signal(SIGALRM);
 #endif
 	}
 }
