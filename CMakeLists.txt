@@ -39,11 +39,11 @@ else (MSVC)
 #Check for c++11 support
 if (NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))	
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
-    endif ()
+#    execute_process(
+ #       COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+  #  if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+   #     message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
+    #endif ()
 else ()
     message(FATAL_ERROR "Your C++ compiler is not g++ (unknown support for C++11)")
 endif ()

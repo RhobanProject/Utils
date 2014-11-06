@@ -50,9 +50,9 @@
 using namespace std;
 
 #ifndef WIN32
-Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
+Serial::Serial(string deviceName, int deviceBaudrate): fd(-1), record_stream(""), recording(false)
 #else
-Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
+Serial::Serial(string deviceName, int deviceBaudrate): handle(-1), record_stream(""), recording(false)
 #endif
 {
 	setDevice(deviceName);
@@ -393,6 +393,8 @@ bool Serial::waitForData(int timeout_us)
 #ifdef WIN32
     return true;
 #else
+    if(fd > 0)
+      {
     fd_set read_fds;
     FD_ZERO(&read_fds);
     FD_SET(fd, &read_fds);
@@ -404,6 +406,11 @@ bool Serial::waitForData(int timeout_us)
 
     // Wait for data to be available
     return select(fd + 1, &read_fds, NULL, NULL, &timeout)>0;
+      }
+    else{
+      usleep(timeout_us);
+      return false;
+    }
 #endif
 }
 
