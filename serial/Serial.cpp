@@ -210,7 +210,8 @@ int Serial::connect(bool blocking)
 		memset(&newtio, 0, sizeof(newtio));
 
 		if((fd = open(deviceName.c_str(), flags)) < 0) {
-			// cerr << "device open error: " << deviceName << endl;
+			cerr << "Failed to open serial device: " << deviceName << endl;
+			perror("");
 			goto USART_INIT_ERROR;
 		}
 
@@ -233,7 +234,7 @@ int Serial::connect(bool blocking)
 		fdClose();
 
 		if((fd = open(deviceName.c_str(), flags)) < 0) {
-			// cerr << "device open error: " << deviceName << endl;
+			cerr << "Second device open error (after setting: " << deviceName << endl;
 			goto USART_INIT_ERROR;
 		}
 
