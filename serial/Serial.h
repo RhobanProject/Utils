@@ -109,6 +109,8 @@ class Serial
         string deviceName;
         bool device_is_file;
 
+	int baudrate(){ return deviceBaudrate;}
+
     private:
 
         /**

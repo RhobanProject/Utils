@@ -655,34 +655,22 @@ size_t Serial::send(const char *data, size_t size)
 
 void Serial::seekPattern(string pattern, int max_chars_wait)
 {
-	string buf = "";
-	while(buf.size() < pattern.size())
-		try
-	{
-			char c = receiveChar();
-			buf += c ;
-	}
-	catch(string exc)
-	{
-		Rhoban::chrono t;
-		gettimeofday(&t, 0);
-		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern \n\t" << exc << endl;
-	}
-
 	int to_wait = 0;
-
+	string buf = "";
 	while(buf != pattern)
 	{
 		char c = receiveChar();
-		buf = buf.substr(1,buf.size() - 1) + c;
+		buf +=c;
+		if(buf.size() > pattern.size())
+		   buf = buf.substr( buf.size() - pattern.size(), buf.size() - 1);
 		if(to_wait ++ >= max_chars_wait)
 		{
-			cerr << "seek_pattern: waited too long (" << max_chars_wait << ") for pattern" << endl;
-			throw runtime_error("seek_pattern: waited too long for pattern");
+		  cerr << "seek_pattern: waited too long (" << max_chars_wait;
+		  cout  << ") for pattern" << endl;
+		    disconnect();
+		throw runtime_error("seek_pattern: waited too long for pattern, closing port");
 		}
-		//cout <<c;
 	}
-	//cout << endl;
 	if(to_wait >0)
 		cerr << "seek_pattern: thrown " << to_wait << "chars to garbage" << endl;
 }
