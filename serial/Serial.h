@@ -129,7 +129,7 @@ class Serial
         void fdClose();
 
 #ifdef WIN32
-        HANDLE handle;
+        HANDLE fd;
 	COMMTIMEOUTS Timeouts;
 #else
         int fd;
