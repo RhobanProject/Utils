@@ -70,9 +70,9 @@ Serial::~Serial()
 bool Serial::IsOpen()
 {
 	#ifndef WIN32
-    		return (fd  > 0)?true:false;
+  return (fd  > 0);
 	#else
-	return (handle > 0) ? true : false;
+  return (handle > 0);
 	#endif
 }
 
@@ -408,10 +408,6 @@ bool Serial::waitForData(int timeout_us)
 		// Wait for data to be available
 		return select(fd + 1, &read_fds, NULL, NULL, &timeout) > 0;
 }
-	else
-	{
-
-      }
     else{
       usleep(timeout_us);
       return false;
