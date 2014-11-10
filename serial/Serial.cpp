@@ -49,11 +49,7 @@
 
 using namespace std;
 
-#ifndef WIN32
 Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
-#else
-Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
-#endif
 {
 	setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
@@ -69,11 +65,7 @@ Serial::~Serial()
 
 bool Serial::IsOpen()
 {
-	#ifndef WIN32
   return (fd  > 0);
-	#else
-  return (handle > 0);
-	#endif
 }
 
 void Serial::setRts(int value)
@@ -93,13 +85,7 @@ void Serial::setRts(int value)
 
 void Serial::fdClose()
 {
-#ifndef WIN32
-	if (fd != -1) {
-		close(fd);
-	}
 
-	fd = -1;
-#endif
 }
 
 /**
@@ -110,9 +96,9 @@ int Serial::connect(bool blocking)
 	if(device_is_file)
 	{
 #ifdef WIN32
-		handle = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if(handle == INVALID_HANDLE_VALUE)
-			throw string("Could not open device ") + deviceName;
+		fd = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if(fd == INVALID_HANDLE_VALUE)
+		  return -1;
 #else
 		fd = open(deviceName.c_str(), O_RDONLY);
 		if(fd == -1 || fd==0)
@@ -126,16 +112,16 @@ int Serial::connect(bool blocking)
 		DWORD dwError;
 
 		// Open serial device
-		handle = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
+		fd = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
 
-		if( handle == INVALID_HANDLE_VALUE ) {
+		if( fd == INVALID_HANDLE_VALUE ) {
 			goto USART_INIT_ERROR;
 		}
 
 		// Setting communication property
 		Dcb.DCBlength = sizeof(DCB);
 
-		if( GetCommState( handle, &Dcb ) == FALSE ) {
+		if( GetCommState( fd, &Dcb ) == FALSE ) {
 			goto USART_INIT_ERROR;
 		}
 
@@ -161,22 +147,22 @@ int Serial::connect(bool blocking)
 		Dcb.fOutxDsrFlow            = 0;
 		Dcb.fOutxCtsFlow            = 0;
 
-		if( SetCommState(handle, &Dcb) == FALSE )
+		if( SetCommState(fd, &Dcb) == FALSE )
 			goto USART_INIT_ERROR;
 
-		if( SetCommMask( handle, 0 ) == FALSE )
+		if( SetCommMask( fd, 0 ) == FALSE )
 			goto USART_INIT_ERROR;
 
-		if( SetupComm(handle, 4096, 4096 ) == FALSE )
+		if( SetupComm(fd, 4096, 4096 ) == FALSE )
 			goto USART_INIT_ERROR;
 
-		if( PurgeComm( handle, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR ) == FALSE )
+		if( PurgeComm( fd, PURGE_TXABORT|PURGE_TXCLEAR|PURGE_RXABORT|PURGE_RXCLEAR ) == FALSE )
 			goto USART_INIT_ERROR;
 
-		if( ClearCommError( handle, &dwError, NULL ) == FALSE )
+		if( ClearCommError( fd, &dwError, NULL ) == FALSE )
 			goto USART_INIT_ERROR;
 
-		if( GetCommTimeouts( handle, &Timeouts ) == FALSE )
+		if( GetCommTimeouts( fd, &Timeouts ) == FALSE )
 			goto USART_INIT_ERROR;
 
 		/* from http://msdn.microsoft.com/en-us/library/windows/desktop/aa363190%28v=vs.85%29.aspx
@@ -190,7 +176,7 @@ int Serial::connect(bool blocking)
 		Timeouts.WriteTotalTimeoutMultiplier = 0;
 		Timeouts.WriteTotalTimeoutConstant = 0;
 
-		if( SetCommTimeouts( handle, &Timeouts ) == FALSE )
+		if( SetCommTimeouts( fd, &Timeouts ) == FALSE )
 			goto USART_INIT_ERROR;
 
 		return 0;
@@ -277,14 +263,14 @@ int Serial::connect(bool blocking)
 void Serial::disconnect()
 {
 #ifdef WIN32
-	if(handle != INVALID_HANDLE_VALUE)
+	if(handle > 0)
 	{
-		CloseHandle(handle);
-		handle = 0;
+		CloseHandle(fd);
 	}
 #else
-	fdClose();
+close(fd);
 #endif
+	fd = -1;
 }
 
 void Serial::setDevice(string name)
@@ -424,10 +410,10 @@ size_t Serial::readTimeout(char *destination, size_t size, int timeout_us)
     DWORD dwBytesRead;
 
     Timeouts.ReadTotalTimeoutConstant = timeout_us/1000;
-    if (!SetCommTimeouts(handle, &Timeouts)) {
+    if (!SetCommTimeouts(fd, &Timeouts)) {
         return 0;
     }
-    if (!ReadFile(handle , destination, size, &dwBytesRead, NULL))  {
+    if (!ReadFile(fd , destination, size, &dwBytesRead, NULL))  {
         return 0;
     }
 
@@ -471,7 +457,7 @@ int Serial::doRead(char *destination, size_t size)
 {
 #ifdef WIN32
 	DWORD dwRead;
-    ReadFile(handle, destination, size, &dwRead, NULL );
+    ReadFile(fd, destination, size, &dwRead, NULL );
     int n = dwRead;
 #else
     int n = read(fd, destination, size);
@@ -511,7 +497,7 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		dwToRead = (DWORD)(size - total);
 		dwRead = 0;
 
-		if( ReadFile(handle, destination +  total, dwToRead, &dwRead, NULL ) == FALSE ) {
+		if( ReadFile(fd, destination +  total, dwToRead, &dwRead, NULL ) == FALSE ) {
 			DWORD error_code = GetLastError();
 			stringstream err; err << "Serial Port Error " << error_code;
 			if(blocking)
@@ -590,8 +576,8 @@ int Serial::receiveInt()
 void Serial::flush()
 {
 #ifdef WIN32
-	FlushFileBuffers(handle);
-	PurgeComm(handle, PURGE_RXABORT|PURGE_RXCLEAR);
+	FlushFileBuffers(fd);
+	PurgeComm(fd, PURGE_RXABORT|PURGE_RXCLEAR);
 #else
         tcflush(fd, TCIFLUSH);
 #endif
@@ -613,10 +599,10 @@ size_t Serial::doSend(const char *data, size_t size)
 	DWORD dwToWrite = (DWORD)size;
         DWORD dwWritten = 0;
         //cout << "Sending " << dwToWrite - got << " bytes " << endl;
-        WriteFile(handle, data + got, dwToWrite - got, &dwWritten, NULL);
+        WriteFile(fd, data + got, dwToWrite - got, &dwWritten, NULL);
         got += dwWritten;
         //cout << "Sent " << got <<"/" << size <<  endl;
-	FlushFileBuffers(handle);
+	FlushFileBuffers(fd);
 #else
 #ifdef ROBOARD
 	setRts(1);
@@ -638,12 +624,7 @@ size_t Serial::send(const char *data, size_t size)
 		syst_wait_ms(1 + size / 50);
 		return size;
 	}
-	else
-#ifdef WIN32
- if(handle <=0)
-#else
- if(fd <=0)
-#endif
+	else if(!IsOpen())
 	  {
 	    cout << "Cannot send, port is closed" << endl;
 	    return 0;
@@ -658,12 +639,12 @@ size_t Serial::send(const char *data, size_t size)
 	{
 		DWORD dwWritten = 0;
 		//cout << "Sending " << dwToWrite - got << " bytes " << endl;
-		WriteFile(handle, data + got, dwToWrite - got, &dwWritten, NULL);
+		WriteFile(fd, data + got, dwToWrite - got, &dwWritten, NULL);
 		got += dwWritten;
 		if (dwWritten == 0) Sleep(10);
 		//cout << "Sent " << got <<"/" << size <<  endl;
 	}
-	FlushFileBuffers(handle);
+	FlushFileBuffers(fd);
 #else
 #ifdef ROBOARD
 	setRts(1);
