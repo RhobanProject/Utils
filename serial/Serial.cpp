@@ -50,9 +50,9 @@
 using namespace std;
 
 #ifndef WIN32
-Serial::Serial(string deviceName, int deviceBaudrate): fd(-1), record_stream(""), recording(false)
+Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
 #else
-Serial::Serial(string deviceName, int deviceBaudrate): handle(INVALID_HANDLE_VALUE), record_stream(""), recording(false)
+Serial::Serial(string deviceName, int deviceBaudrate): handle(0), record_stream(""), recording(false)
 #endif
 {
 	setDevice(deviceName);
@@ -280,7 +280,7 @@ void Serial::disconnect()
 	if(handle != INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(handle);
-		handle = INVALID_HANDLE_VALUE;
+		handle = 0;
 	}
 #else
 	fdClose();
@@ -490,6 +490,18 @@ int Serial::doRead(char *destination, size_t size)
  */
 size_t Serial::receive(char *destination, size_t size, bool blocking)
 {
+	if (!IsOpen())
+	{
+		string err = "Cannot read from serial port: disconnected";
+		if (blocking)
+			throw runtime_error(err);
+		else
+		{
+			cerr << err << endl;
+			return 0;
+		}
+	}
+
 	size_t total = 0;
 	//cout << "Receiving " << size << " bytes, blocking " << blocking << endl;
 
@@ -665,14 +677,16 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 	{
 		char c = receiveChar();
 		buf +=c;
-		if(buf.size() > pattern.size())
-		   buf = buf.substr( buf.size() - pattern.size(), buf.size() - 1);
-		if(to_wait ++ >= max_chars_wait)
+		if (buf.size() > pattern.size())
 		{
-		  cerr << "seek_pattern: waited too long (" << max_chars_wait;
-		  cout  << ") for pattern" << endl;
-		    disconnect();
-		throw runtime_error("seek_pattern: waited too long for pattern, closing port");
+			buf = buf.substr(buf.size() - pattern.size(), buf.size() - 1);
+			if (to_wait++ >= max_chars_wait)
+			{
+				cerr << "seek_pattern: waited too long (" << max_chars_wait;
+				cout << ") for pattern" << endl;
+				disconnect();
+				throw runtime_error("seek_pattern: waited too long for pattern, closing port");
+			}
 		}
 	}
 	if(to_wait >0)
