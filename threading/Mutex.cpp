@@ -13,6 +13,7 @@
 #endif
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include "Mutex.h"
 
@@ -32,7 +33,7 @@ Mutex::Mutex(void)
 	int ret = pthread_mutex_init(&_mutex, &Attr);*/
 	int ret = pthread_mutex_init(&_mutex, NULL);
 	if(ret != 0)
-		throw string("Failed to initilize mutex");
+		throw std::runtime_error("Failed to initilize mutex");
 #else
 	InitializeCriticalSection(&_mutex);
 #endif

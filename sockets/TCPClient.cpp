@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 #include "TCPClient.h"
 
@@ -55,7 +56,7 @@ namespace Rhoban
         if (clientSocket == INVALID_SOCKET)
         {   
             connected = false;
-            throw string("Could not create socket");
+            throw std::runtime_error("Could not create socket");
         }   
 
         hostinfo = gethostbyname(address);
@@ -63,7 +64,7 @@ namespace Rhoban
         if (hostinfo == NULL)
         {   
             connected = false;
-            throw string("Unknown host " + string(address));
+            throw std::runtime_error("Unknown host " + string(address));
         }   
 
         sin.sin_addr = *(IN_ADDR *) hostinfo->h_addr;

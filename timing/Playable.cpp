@@ -43,7 +43,7 @@ void Playable::play(double secs)
 void Playable::copy(Playable * src, Playable * dest)
 {
     if( ! src || ! dest)
-        throw string("Cannot copy null playable");
+        throw std::runtime_error("Cannot copy null playable");
     dest->play_state = src->play_state;
     dest->real_time = src->real_time;
     dest->suspend_time = src->suspend_time;

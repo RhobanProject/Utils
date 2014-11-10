@@ -61,7 +61,7 @@ Json::Value JsonServer::process(const Json::Value &request)
                 if (parameters.isArray() && parameters.size() == 2) {
                     return processSub(parameters[0].asString(), parameters[1]);
                 } else {
-                    throw string("Malformed sub request");
+                    throw std::runtime_error("Malformed sub request");
                 }
             } else if (command == "ping") {
                 response[0] = 1;
@@ -70,8 +70,8 @@ Json::Value JsonServer::process(const Json::Value &request)
                 response[1] = handle(command, parameters);
                 response[0] = 1;
             }
-        } catch (string error) {
-            response[1] = error;
+        } catch (const std::runtime_error & error) {
+          response[1] = error.what();
         } catch (...) {
             response[1] = "Error while processing command";
         }

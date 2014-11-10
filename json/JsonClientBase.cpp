@@ -33,11 +33,11 @@ Json::Value JsonClientBase::buildRequest(const string &command, const Json::Valu
 Json::Value JsonClientBase::doInvoke(const Json::Value &request)
 {
     if (parent == this) {
-        throw string("Trying auto-parent");
+        throw std::runtime_error("Trying auto-parent");
     }
 
     if (parent == NULL) {
-        throw string("JsonClient is NULL");
+        throw std::runtime_error("JsonClient is NULL");
     }
 
     if (target == "") {

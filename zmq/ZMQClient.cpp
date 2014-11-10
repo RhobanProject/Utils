@@ -3,6 +3,8 @@
 #include "ZMQClient.h"
 #include "zhelpers.h"
 
+#include <stdexcept>
+
 using std::string;
 
 ZMQClient::ZMQClient(string remote_)
@@ -17,7 +19,7 @@ ZMQClient::ZMQClient(string remote_)
 void ZMQClient::connect()
 {
     if (zmq_connect(client, remote.c_str()) != 0) {
-        throw string("Unable to connect");
+        throw std::runtime_error("Unable to connect");
     }
 
     int timeout = 1000;
@@ -50,7 +52,7 @@ string ZMQClient::process(const string &request)
     char *response = s_recv(client);
 
     if (response == NULL) {
-        throw string("Unable to talk with the server");
+        throw std::runtime_error("Unable to talk with the server");
     }
 
     string resp(response);

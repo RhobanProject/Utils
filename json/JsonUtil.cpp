@@ -10,7 +10,7 @@ using namespace std;
     void JsonUtil::read(Json::Value &json, type &value)          \
     {                                                            \
         if (!json.  testMethod  ()) {                            \
-        throw string("Node should be of type ") + #type;         \
+          throw std::runtime_error("Node should be of type " + string(#type)); \
     }                                                            \
                                                                  \
         value = json.  asMethod  ();                             \
@@ -31,7 +31,7 @@ using namespace std;
     void JsonUtil::read(Json::Value &json, vector< type > &value)  \
     {                                                              \
         if (!json.isArray()) {                                     \
-            throw string("Array excepted");                        \
+            throw std::runtime_error("Array excepted");                        \
         }                                                          \
                                                                    \
         value.resize(json.size());                                 \
@@ -63,7 +63,7 @@ using namespace std;
 void JsonUtil::read(Json::Value &json, vector<bool>::reference value)          
 {
     if (!json.isBool()) {
-        throw string("Node should be of type bool");
+        throw std::runtime_error("Node should be of type bool");
     }                                                            
                                                              
     value = json.asBool();            

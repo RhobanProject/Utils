@@ -26,7 +26,7 @@ void runTests(string message)
 
     try {
         tests.run();
-    } catch (string error) {
+    } catch (std::runtime_error & error) {
         cout << "ERROR: " << error << endl;
     }
 }

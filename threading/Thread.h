@@ -143,7 +143,7 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
   unlock();						\
   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
-     catch(string & str)				\
+     catch (const string & str)				\
        {						\
 	 unlock();					\
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
@@ -165,7 +165,7 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
        {						\
 	 unlock();					\
 	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
-	 throw string("Unknown exception in thread");	\
+	 throw std::runtime_error("Unknown exception in thread");	\
        }
 
 #define END_SAFE(l)					\
@@ -194,14 +194,14 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	 {						\
 	   l.unlock();					\
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
-	   throw string("Unknown exception in thread");	\
+	   throw std::runtime_error("Unknown exception in thread");	\
 	 }
 
 #define END_PSAFE(l)					\
   l->unlock();						\
   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
-       catch(string & str)				\
+       catch (const std::runtime_error & str)				\
 	 {						\
 	   l->unlock();					\
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
@@ -217,7 +217,7 @@ TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critic
 	 {						\
 	   l->unlock();					\
 	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
-	   throw string("Unknown exception in thread");	\
+	   throw std::runtime_error("Unknown exception in thread");	\
 	 }
 
   //		  cout << "Unlocking "<<  #l << endl;

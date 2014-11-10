@@ -36,9 +36,9 @@ void Player::tick()
             else
                 TM_DEBUG_MSG("Player " << (int) this << " at frequency " << frequency << " not running " << (suspended ? " suspended " : ""));
         }
-        catch(string exc)
+        catch (const std::runtime_error & exc)
         {
-            TM_CAUTION_MSG("TickMachine: stopping a player which has thrown the exception: "<<exc);
+          TM_CAUTION_MSG("TickMachine: stopping a player which has thrown the exception: " << exc.what());
             stop();
         }
         catch(...)

@@ -67,8 +67,8 @@ namespace Rhoban
     {
         try {
             loop();
-        } catch (string exception_) {
-            cout << "Closing client (" << exception_ << ")" << endl;
+        } catch (const std::runtime_error & exception_) {
+          cout << "Closing client (" << exception_.what() << ")" << endl;
         }
 
         stop();

@@ -156,7 +156,7 @@ void TickTimer::tick()
 void TickTimer::wait_next_tick()
 {
 	if(!use_locks)
-		throw string("Wait_next_tick is not available for this player");
+		throw std::runtime_error("Wait_next_tick is not available for this player");
 
 	if(relative == 0)
 	{

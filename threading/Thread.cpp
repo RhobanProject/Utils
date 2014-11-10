@@ -51,9 +51,9 @@ Thread::~Thread()
     {
         cerr << "Exception '"<<err<<"' when killing thread "<< this<<endl;
     }
-    catch(string err)
+    catch (const std::string & str)
     {
-        cerr << "Exception '"<<err<<"' when killing thread "<< this<<endl;
+      cerr << "Exception '"<< str <<"' when killing thread "<< this<<endl;
     }
     catch(...)
     {
@@ -225,8 +225,8 @@ void Thread::run(void)
         cerr<<"Exception "<< err.what() << std::endl;
     } catch (int code) {
         cerr<<"Exception "<< code << std::endl;
-    } catch (string exc) {
-        cerr << "Exception in thread " << thread_name <<" :"<< exc<< endl;
+    } catch (const std::string & str) {
+      cerr << "Exception in thread " << thread_name <<" :"<< str << endl;
     }
 
 	cleanup();

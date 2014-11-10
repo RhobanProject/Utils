@@ -9,6 +9,8 @@
  *************************************************/
 #include "anyoption.h"
 
+#include <stdexcept>
+
 
 AnyOption::AnyOption()
 {
@@ -958,7 +960,7 @@ AnyOption::readFile( const char* fname )
 
 	buffer = (char*) malloc(length*sizeof(char) + 1);
 	if (buffer == NULL)
-		throw string("Out of memory");
+		throw std::runtime_error("Out of memory");
 	buffer[0] = 0;
 	is.read (buffer,length);
 	is.close();
@@ -1027,7 +1029,7 @@ AnyOption::processLine( char *theline, int length  )
 	bool found = false;
 	char *pline = (char*) malloc( (length+1)*sizeof(char) );
 	if (pline == NULL)
-		throw string("Out of memory");
+		throw std::runtime_error("Out of memory");
 	for( int i = 0 ; i < length ; i ++ )
 		pline[i]= *(theline++);
 	pline[length] = nullterminate;

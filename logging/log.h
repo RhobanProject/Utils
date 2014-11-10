@@ -47,35 +47,35 @@
 #endif
 
 #ifndef WIN32
-#define LOG_CPP(level, loglevel, component, message)          \
-  {							      \
-    if (level <= loglevel) {				      \
-      ostringstream oss__;				      \
-      oss__ << message;					      \
-      struct tm now__;					      \
-      time_t timestamp__;				      \
-							      \
-      if (TEST_HAVE_COLORS) {				      \
-	if (level < 2) printf(T_COLOR_RED);		      \
-	if (level > 2) printf(T_COLOR_BLUE);		      \
-      }							      \
-      time(&timestamp__);				      \
-      now__ = *localtime(&timestamp__);					\
-      printf("[%02d:%02d:%02d] ",					\
-	     now__.tm_hour, now__.tm_min, now__.tm_sec);		\
-									\
-      if (LOG_DEBUG) {							\
-	printf("[%s:%d] ", (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__), __LINE__); \
-      }									\
-      									\
-      printf("[%s] ", component);					\
-      									\
-      printf("%s\n", oss__.str().c_str());				\
-      if (TEST_HAVE_COLORS) {						\
-	printf(T_COLOR_RESET);						\
-      }									\
-      fflush(stdout);							\
-    }									\
+#define LOG_CPP(level, loglevel, component, message)                    \
+  {                                                                     \
+    if (level <= loglevel) {                                            \
+      ostringstream oss__;                                              \
+      oss__ << message;                                                 \
+      struct tm now__;                                                  \
+      time_t timestamp__;                                               \
+                                                                        \
+      if (TEST_HAVE_COLORS) {                                           \
+        if (level < 2) printf(T_COLOR_RED);                             \
+        if (level > 2) printf(T_COLOR_BLUE);                            \
+      }                                                                 \
+      time(&timestamp__);                                               \
+      now__ = *localtime(&timestamp__);                                 \
+      printf("[%02d:%02d:%02d] ",                                       \
+             now__.tm_hour, now__.tm_min, now__.tm_sec);                \
+                                                                        \
+      if (LOG_DEBUG) {                                                  \
+        printf("[%s:%d] ", (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__), __LINE__); \
+      }                                                                 \
+                                                                        \
+      printf("[%s] ", component);                                       \
+                                                                        \
+      printf("%s\n", oss__.str().c_str());                              \
+      if (TEST_HAVE_COLORS) {                                           \
+        printf(T_COLOR_RESET);                                          \
+      }                                                                 \
+      fflush(stdout);                                                   \
+    }                                                                   \
   }
 
 #define LOG(level, loglevel, component, ...) \

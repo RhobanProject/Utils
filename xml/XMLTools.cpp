@@ -45,7 +45,7 @@ TiXmlNode *XMLTools::get_child(TiXmlNode *node, const char *name)
 }
 
 string XMLTools::get_string_element(TiXmlNode * node, const char * id) {
-    if(!node) throw string("XMLTools getstringelement null node");
+    if(!node) throw std::runtime_error("XMLTools getstringelement null node");
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
@@ -61,7 +61,7 @@ string XMLTools::get_string_element(TiXmlNode * node, const char * id) {
 }
 
 double XMLTools::get_double_element(TiXmlNode * node, const char * id) {
-    if(!node) throw string("XMLTools getdoublelement null node");
+    if(!node) throw std::runtime_error("XMLTools getdoublelement null node");
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
@@ -76,7 +76,7 @@ double XMLTools::get_double_element(TiXmlNode * node, const char * id) {
 }
 
 float XMLTools::get_float_element(TiXmlNode * node, const char * id) {
-    if(!node) throw string("XMLTools getdoublelement null node");
+    if(!node) throw std::runtime_error("XMLTools getdoublelement null node");
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
@@ -95,7 +95,7 @@ float XMLTools::get_float_value(TiXmlNode * node)
 }
 
 int XMLTools::get_int_element(TiXmlNode * node, const char * id) {
-    if(!node) throw string("XMLTools getintelement null node");
+    if(!node) throw std::runtime_error("XMLTools getintelement null node");
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father){
         TiXmlNode* the_child = the_father->FirstChild();
@@ -109,7 +109,7 @@ int XMLTools::get_int_element(TiXmlNode * node, const char * id) {
 }
 
 bool XMLTools::get_bool_element(TiXmlNode * node, const char * id) {
-    if(!node) throw string("XMLTools getintelement null node");
+    if(!node) throw std::runtime_error("XMLTools getintelement null node");
     TiXmlNode * the_father = node->FirstChild( id );
     if(the_father)
     {
@@ -127,7 +127,7 @@ bool XMLTools::get_bool_element(TiXmlNode * node, const char * id) {
 }
 
 float * XMLTools::get_float_array_with_3_element(TiXmlNode * node, const char * array_id) {
-    if(!node) throw string("XMLTools getfloatarray null node");
+    if(!node) throw std::runtime_error("XMLTools getfloatarray null node");
     TiXmlNode * the_values = node->FirstChild( array_id );
     if(the_values){
         float * array = (float *)malloc(3 * sizeof(float));
@@ -166,7 +166,7 @@ string XMLTools::serialize_double_array(vector<double> data)
 
 #ifndef NO_RHOBANMATH
 Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
-    if(!node) throw string("XMLTools extractdoublearray null node");
+    if(!node) throw std::runtime_error("XMLTools extractdoublearray null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<scalar> tmp;
@@ -193,7 +193,7 @@ Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
 
 vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id)
 {
-    if(!node) throw string("XMLTools getstring array null node");
+    if(!node) throw std::runtime_error("XMLTools getstring array null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<string> result;
@@ -221,7 +221,7 @@ vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id
 
 vector<int> XMLTools::get_int_array(TiXmlNode* node, const char * array_id)
 {
-    if(!node) throw string("XMLTools getstringarray null node");
+    if(!node) throw std::runtime_error("XMLTools getstringarray null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<int> result;
@@ -244,7 +244,7 @@ vector<int> XMLTools::get_int_array(TiXmlNode* node, const char * array_id)
 
 vector<double> XMLTools::get_double_array(TiXmlNode* node, const char * array_id)
 {
-    if(!node) throw string("XMLTools getstringarray null node");
+    if(!node) throw std::runtime_error("XMLTools getstringarray null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<double> result;
@@ -268,7 +268,7 @@ vector<double> XMLTools::get_double_array(TiXmlNode* node, const char * array_id
 
 vector<float> XMLTools::get_float_array(TiXmlNode* node, const char * array_id)
 {
-    if(!node) throw string("XMLTools getstringarray null node");
+    if(!node) throw std::runtime_error("XMLTools getstringarray null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
         vector<float> result;
@@ -294,11 +294,11 @@ TiXmlDocument * XMLTools::stream_to_node(const string xml_stream)
     TiXmlDocument * doc = new TiXmlDocument();
 
     if(!doc->Parse(xml_stream.c_str()))
-        throw string("failed to parse xml stream:\n\t") + xml_stream;
+      throw std::runtime_error("failed to parse xml stream:\n\t" + xml_stream);
 
     TiXmlNode* firstnode = doc->FirstChild();
     if(!firstnode)
-        throw string("no child in the stream.");
+        throw std::runtime_error("no child in the stream.");
 
     //we remove the declaration
     if(firstnode->Type() == TiXmlNode::TINYXML_DECLARATION)
@@ -315,16 +315,16 @@ TiXmlDocument * XMLTools::file_to_node(string filename)
     {
         stringstream st;
         st << "failed to parse xml file " << filename << " error " << doc->ErrorDesc() << " line " << doc->ErrorRow() << " column " << doc->ErrorCol();
-        throw string(st.str());
+        throw std::runtime_error(st.str());
     }
 
     TiXmlNode* firstnode = doc->FirstChild();
 
     if(!firstnode)
-        throw string("no child in the stream.");
+        throw std::runtime_error("no child in the stream.");
 
     if(!firstnode->Value())
-        throw string("first node content is empty.");
+        throw std::runtime_error("first node content is empty.");
 
     //we remove the declaration
     if(firstnode->Type() == TiXmlNode::TINYXML_DECLARATION)
@@ -341,7 +341,7 @@ TiXmlDocument * XMLTools::file_to_node(string filename)
 void XMLTools::stream_to_file(string filename, const string stream)
 {
     TiXmlDocument * doc = stream_to_node(stream);
-    if(!doc) throw string("Could not parse stream");
+    if(!doc) throw std::runtime_error("Could not parse stream");
 
     TiXmlDeclaration decl("1.0", "" , "");
     doc->InsertBeforeChild(doc->FirstChild(), decl);
@@ -365,14 +365,14 @@ void XMLTools::stream_to_file(string filename, const string stream)
 
 void XMLTools::node_to_file(string filename, TiXmlDocument * doc)
 {
-    if(!doc) throw string("XMLTools noetofile null doc");
+    if(!doc) throw std::runtime_error("XMLTools noetofile null doc");
 
     if(filename.length()<4 || (filename.substr(filename.length()-4,4)!=".xml"))
         filename += ".xml";
 
     bool ok =  doc->SaveFile(filename.c_str());
 
-    if(!ok) throw string("Could not save xml to file" + filename);
+    if(!ok) throw std::runtime_error("Could not save xml to file" + filename);
 }
 
 
@@ -394,16 +394,16 @@ Serializable::~Serializable()
 void Serializable::load_file(string filename_)
 {
     TiXmlDocument * doc = XMLTools::file_to_node(filename_);
-    if(!doc) throw string("Failed to load file ") + filename_;
+    if(!doc) throw std::runtime_error("Failed to load file " + filename_);
 
     TiXmlNode * node = doc->FirstChild(class_name().c_str());
-    if(!node) throw string("Failed to find node with tag ") + class_name()+ " in xml file " + filename_;
+    if(!node) throw std::runtime_error("Failed to find node with tag " + class_name()+ " in xml file " + filename_);
 
     try
     {
         from_xml(node);
     }
-    catch(string exc)
+    catch (const std::runtime_error exc)
     {
         delete doc;
         throw exc;
@@ -441,18 +441,18 @@ void Serializable::from_xml(string xml_stream)
 	try
 	{
     doc = XMLTools::stream_to_node(xml_stream);
-    if(!doc) throw string("Failed to parse xml stream:\n\t") + xml_stream;
+    if(!doc) throw std::runtime_error("Failed to parse xml stream:\n\t" + xml_stream);
 
     node = doc->FirstChild();
-    if(!node) throw string("Failed to find node in xml stream\n\t") + xml_stream;
+    if(!node) throw std::runtime_error("Failed to find node in xml stream\n\t" + xml_stream);
 
     from_xml(node);
 	}
-	catch(string exc)
+	catch (const std::runtime_error & exc)
 	{
 	    delete doc;
-	    cout << "Failed to extract data from xml stream:\n\t" << exc << endl;
-		throw string("Failed to extract data from xml stream:\n\t") + exc;
+	    cout << "Failed to extract data from xml stream:\n\t" << exc.what() << endl;
+      throw std::runtime_error("Failed to extract data from xml stream:\n\t" + string(exc.what()));
 	}
 
 }

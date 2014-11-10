@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 #include <ctime>
 
 #include <timing/chrono.h>
@@ -31,7 +32,7 @@ Condition::Condition()
 #ifndef MSVC
 	int ret = pthread_cond_init(&condition, 0 );
     if(ret==-1) {
-        throw string("Failed to init condition");
+        throw std::runtime_error("Failed to init condition");
     }
 #else
 	InitializeConditionVariable(&condition);
@@ -73,7 +74,7 @@ int Condition::wait(Mutex * mutex, unsigned int timeout)
     }
 
     if (ret == ETIMEDOUT) {
-        throw string("Timeout while waiting for condition");
+        throw std::runtime_error("Timeout while waiting for condition");
     }
 #else
 	ret =  SleepConditionVariableCS(&condition,&(mutex->_mutex),timeout) ? 0 : -1;
@@ -83,7 +84,7 @@ int Condition::wait(Mutex * mutex, unsigned int timeout)
 	}
 #endif
     if (ret < 0) {
-        throw string("Timeout while waiting for condition");
+        throw std::runtime_error("Timeout while waiting for condition");
     }
 
     return 1;
@@ -108,7 +109,7 @@ void Condition::broadcast()
 #ifndef MSVC
     int ret = pthread_cond_broadcast(&condition);
     if(ret==-1)
-        throw string("Failed to broadcast condition");
+        throw std::runtime_error("Failed to broadcast condition");
 #else
 	WakeConditionVariable(&condition);
 #endif

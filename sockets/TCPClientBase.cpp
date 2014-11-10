@@ -41,7 +41,7 @@ namespace Rhoban
         int n = recv(clientSocket, buffer, size, 0);
 
         if (n == 0) {
-            throw string("Connection closed");
+            throw std::runtime_error("Connection closed");
         }
 
 #ifdef WIN32
@@ -105,9 +105,9 @@ namespace Rhoban
             stop();
 #ifdef _WIN32
             int err = WSAGetLastError();
-            throw string("Client : select error (WSA error code)");
+            throw std::runtime_error("Client : select error (WSA error code)");
 #else
-            throw string ("Client : select error");
+            throw std::runtime_error ("Client : select error");
 #endif
         }
 
@@ -181,7 +181,7 @@ namespace Rhoban
 
         va_start(args, format);
 #ifdef MSVC
-		throw string("TCPClientBase::receiveFormat unimplemented");
+		throw std::runtime_error("TCPClientBase::receiveFormat unimplemented");
 #else
 		vsscanf(str.c_str(), format, args);
 #endif
@@ -247,7 +247,7 @@ namespace Rhoban
         char *p, *np;
 
         if ((p = (char*)malloc(size)) == NULL) {
-            throw string("Error while transmitting message");
+            throw std::runtime_error("Error while transmitting message");
         }
 
         while (true ) {
@@ -265,7 +265,7 @@ namespace Rhoban
                 size *= 2; 
             } if ((np = (char*)realloc(p, size)) == NULL) {
                 free(p);
-                throw string("Error while transmitting message");
+                throw std::runtime_error("Error while transmitting message");
             } else {
                 p = np;
             }

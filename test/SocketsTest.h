@@ -49,7 +49,7 @@ void *run_server(void *data)
     try {
         TCPServer<EchoClient> server;
         server.run(9696);
-    } catch (string error) {
+    } catch (std::runtime_error & error) {
         TEST_LOG("Server error: %s", error.c_str())
     }
 };

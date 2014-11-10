@@ -112,7 +112,7 @@ int Serial::connect(bool blocking)
 #ifdef WIN32
 		handle = CreateFile(deviceName.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if(handle == INVALID_HANDLE_VALUE)
-			throw string("Could not open device ") + deviceName;
+			throw std::runtime_error("Could not open device ") + deviceName;
 #else
 		fd = open(deviceName.c_str(), O_RDONLY);
 		if(fd == -1 || fd==0)
@@ -654,11 +654,11 @@ void Serial::seekPattern(string pattern, int max_chars_wait)
 			char c = receiveChar();
 			buf += c ;
 	}
-	catch(string exc)
+	catch (const std::runtime_error & exc)
 	{
 		Rhoban::chrono t;
 		gettimeofday(&t, 0);
-		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern \n\t" << exc << endl;
+		cerr << "Problem at " << t.tv_sec << ":" << t.tv_usec << " while seeking pattern \n\t" << exc.what() << endl;
 	}
 
 	int to_wait = 0;
@@ -685,6 +685,6 @@ void Serial::record(string filename)
 	if(record_stream.is_open())
 		recording = true;
 	else
-		throw string("Failed to open serial log file ") + filename;
+		throw std::runtime_error("Failed to open serial log file " + filename);
 }
 

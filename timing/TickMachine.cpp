@@ -219,7 +219,7 @@ void TickMachine::update_timer()
 	if(res==-1)
 	{
 		perror("Could not setitimer");
-		throw string("Could not setitimer");
+		throw std::runtime_error("Could not setitimer");
 	}
 	/*	else
         {
@@ -256,9 +256,9 @@ void TickMachine::execute()
 					players.remove(timer);
 					delete timer;
 				}
-				catch(string & exc)
+				catch (const std::runtime_error & exc)
 				{
-					TM_CAUTION_MSG("Failed to delete timer:" + exc)
+					TM_CAUTION_MSG("Failed to delete timer:" + string(exc.what()))
 				}
 			}
 			timers_to_delete.clear();
@@ -285,7 +285,7 @@ void TickMachine::execute()
 					players.push_back(timer);
 					timer->started.broadcast();
 				}
-				catch(string & exc)
+				catch (const std::runtime_error & exc)
 				{
 					TM_CAUTION_MSG("Failed to asynRhoban::chronously  register timer: exc")
 				}
@@ -315,9 +315,9 @@ void TickMachine::execute()
 						}
 					}
 				}
-				catch(string & exc)
+				catch (const std::runtime_error & exc)
 				{
-					TM_CAUTION_MSG("Failed to unregister timer: " << exc)
+					TM_CAUTION_MSG("Failed to unregister timer: " << exc.what())
 				}
 			}
 			timers_to_unregister.clear();

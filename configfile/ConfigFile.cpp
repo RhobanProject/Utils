@@ -29,7 +29,7 @@ void ConfigFile::load(string filename)
         doc = new YAML::Node();
         parser.GetNextDocument(*doc);
     } catch(YAML::ParserException e) {
-        throw string("Failed to parse configuration file " + filename + ":\n\t" + string(e.what()));
+        throw std::runtime_error("Failed to parse configuration file " + filename + ":\n\t" + string(e.what()));
     }
 }
 
@@ -263,7 +263,7 @@ string ConfigFile::readStringIfExists(string node, string name)
     } else if (yaml && (nodeY = yaml->FindValue(name))) {
         *nodeY >> output;
     } else {
-        throw string("Could not find node with path '") + name + "' or '" + fullName + "' in yaml file'";
+      throw std::runtime_error("Could not find node with path '" + name + "' or '" + fullName + "' in yaml file'");
     }
 
     return output;

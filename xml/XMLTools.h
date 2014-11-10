@@ -29,8 +29,8 @@
 
 using namespace std;
 
-#define xml_parse_error(str,...)   { throw string(str); }
-#define interpretor_error(str,...) { throw string(str); }
+#define xml_parse_error(str,...)   { throw std::runtime_error(str); }
+#define interpretor_error(str,...) { throw std::runtime_error(str); }
 
 #define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">" << endl; }
 
@@ -157,11 +157,11 @@ class Serializable
         //deserializes from an xml node
         virtual void from_xml(TiXmlNode *node) {
           (void) node;//Suppress unused warning
-          throw string("from_xml not implemented");
+          throw std::runtime_error("from_xml not implemented");
         };
 
         //serializes to an xml strem excluding class name
-        virtual string to_xml() const { throw string("to_xml not implemented");};
+        virtual string to_xml() const { throw std::runtime_error("to_xml not implemented");};
 
 
         //serializes to an xml strem including class name

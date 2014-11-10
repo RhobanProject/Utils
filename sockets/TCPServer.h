@@ -108,7 +108,7 @@ namespace Rhoban
                     if (socketDescriptor == INVALID_SOCKET)
                     {  
                         perror("socket()");
-                        throw string("Failed to create socket");
+                        throw std::runtime_error("Failed to create socket");
                     } 
 
 #ifdef MSVC
@@ -117,14 +117,14 @@ namespace Rhoban
                     int on = 1;
 #endif
                     if (setsockopt(socketDescriptor, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
-                        throw string("Failed to set socket options");
+                        throw std::runtime_error("Failed to set socket options");
                     }
 
 #ifndef MSVC
                     if (bind(socketDescriptor, (SOCKADDR*) &sinserv, sizeof(sinserv)))
                     {
                         perror("bind()");
-                        throw string("Failed to bind socket");
+                        throw std::runtime_error("Failed to bind socket");
                     }
 #else
 					bind(socketDescriptor, (SOCKADDR*)&sinserv, sizeof(sinserv));
@@ -132,7 +132,7 @@ namespace Rhoban
                     if (listen(socketDescriptor, 32) == SOCKET_ERROR)
                     {
                         perror("listen()");
-                        throw string("Failed to listen incoming connections");
+                        throw std::runtime_error("Failed to listen incoming connections");
                     }
 
                     acceptLoop();
