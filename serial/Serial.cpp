@@ -620,11 +620,23 @@ size_t Serial::doSend(const char *data, size_t size)
 size_t Serial::send(const char *data, size_t size)
 {
 
+
 	if(device_is_file)
 	{
 		syst_wait_ms(1 + size / 50);
 		return size;
 	}
+	else
+#ifdef WIN32
+ if(handle <=0)
+#else
+ if(fd <=0)
+#endif
+	  {
+	    cout << "Cannot send, port is closed" << endl;
+	    return 0;
+	  }
+
 
 	size_t got = 0;
 
