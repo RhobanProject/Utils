@@ -70,9 +70,9 @@ Serial::~Serial()
 bool Serial::IsOpen()
 {
 	#ifndef WIN32
-    		return (fd  > 0)?true:false;
+  return (fd  > 0);
 	#else
-	return (handle > 0) ? true : false;
+  return (handle > 0);
 	#endif
 }
 
@@ -408,10 +408,6 @@ bool Serial::waitForData(int timeout_us)
 		// Wait for data to be available
 		return select(fd + 1, &read_fds, NULL, NULL, &timeout) > 0;
 }
-	else
-	{
-
-      }
     else{
       usleep(timeout_us);
       return false;
@@ -636,11 +632,23 @@ size_t Serial::doSend(const char *data, size_t size)
 size_t Serial::send(const char *data, size_t size)
 {
 
+
 	if(device_is_file)
 	{
 		syst_wait_ms(1 + size / 50);
 		return size;
 	}
+	else
+#ifdef WIN32
+ if(handle <=0)
+#else
+ if(fd <=0)
+#endif
+	  {
+	    cout << "Cannot send, port is closed" << endl;
+	    return 0;
+	  }
+
 
 	size_t got = 0;
 
