@@ -52,7 +52,7 @@ using namespace std;
 #ifndef WIN32
 Serial::Serial(string deviceName, int deviceBaudrate): fd(-1), record_stream(""), recording(false)
 #else
-Serial::Serial(string deviceName, int deviceBaudrate): handle(-1), record_stream(""), recording(false)
+Serial::Serial(string deviceName, int deviceBaudrate): handle(INVALID_HANDLE_VALUE), record_stream(""), recording(false)
 #endif
 {
 	setDevice(deviceName);
@@ -392,7 +392,7 @@ void Serial::setSpeed(int baudrate)
 bool Serial::waitForData(int timeout_us)
 {
 #ifdef WIN32
-    return true;
+	return true;
 #else
     if(fd > 0)
       {
@@ -400,13 +400,17 @@ bool Serial::waitForData(int timeout_us)
     FD_ZERO(&read_fds);
     FD_SET(fd, &read_fds);
 
-    // Set timeout 
-    Rhoban::chrono timeout;
-    timeout.tv_sec = timeout_us/1000000;
-    timeout.tv_usec = timeout_us%1000000;
+		// Set timeout 
+		Rhoban::chrono timeout;
+		timeout.tv_sec = timeout_us/1000000;
+		timeout.tv_usec = timeout_us%1000000;
 
-    // Wait for data to be available
-    return select(fd + 1, &read_fds, NULL, NULL, &timeout)>0;
+		// Wait for data to be available
+		return select(fd + 1, &read_fds, NULL, NULL, &timeout) > 0;
+}
+	else
+	{
+
       }
     else{
       usleep(timeout_us);
