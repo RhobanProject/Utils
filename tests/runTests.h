@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ void runTests(string message)
     try {
         tests.run();
     } catch (std::runtime_error & error) {
-        cout << "ERROR: " << error << endl;
+        cout << "ERROR: " << error.what() << endl;
     }
 }
 
