@@ -39,11 +39,11 @@ else (MSVC)
 #Check for c++11 support
 if (NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))	
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-    execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
-    endif ()
+#    execute_process(
+ #       COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+  #  if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+   #     message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
+    #endif ()
 else ()
     message(FATAL_ERROR "Your C++ compiler is not g++ (unknown support for C++11)")
 endif ()
@@ -170,7 +170,7 @@ if (ENABLE_ZMQ)
 		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq2.2/include"
 			CACHE STRING "ZMQ headers directory")
 		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq2.2")
-        elseif(${ZMQ_VERSION} MATCHES "3.2")
+    elseif(${ZMQ_VERSION} MATCHES "3.2")
 		message("Using ZMQ version 3.2")
 		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq3.2/include"
 			CACHE STRING "ZMQ headers directory")
@@ -182,10 +182,9 @@ if (ENABLE_ZMQ)
 		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq")
 		message("Adding graph directory")
 		set(DIRECTORIES ${DIRECTORIES} graph)
-		set(DIRECTORIES ${DIRECTORIES} zmq)
 	endif()
 
-
+	set(DIRECTORIES ${DIRECTORIES} zmq)
     include_directories ("${ZMQ_HEADERS}")
     set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
 
