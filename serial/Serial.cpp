@@ -263,14 +263,13 @@ int Serial::connect(bool blocking)
 void Serial::disconnect()
 {
 #ifdef WIN32
-	if(handle > 0)
-	{
+	if(fd > 0)
 		CloseHandle(fd);
-	}
+	fd = 0;
 #else
 close(fd);
+fd = -1;
 #endif
-	fd = -1;
 }
 
 void Serial::setDevice(string name)
