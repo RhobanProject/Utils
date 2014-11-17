@@ -39,7 +39,7 @@ namespace Utils {
       current = newB;
     }
 
-    void Benchmark::close(bool print)
+    void Benchmark::close(bool print, int detailLevel)
     {
       if (current == NULL)
         throw std::runtime_error("No active benchmark to close");
@@ -49,7 +49,7 @@ namespace Utils {
 #endif
       current = toClose->father;
       if (print)
-        toClose->print();
+        toClose->print(detailLevel);
       // Suppress Benchmark if the link is lost
       if (current == NULL)
         delete(toClose);
@@ -81,7 +81,7 @@ namespace Utils {
       return std::get<1>(a) < std::get<1>(b);
     }
 
-    void Benchmark::print()
+    void Benchmark::print(int maxDepth)
     {
       // Formatting specifically
       int precision = 3;
@@ -90,14 +90,14 @@ namespace Utils {
       std::cout.precision(precision);
       std::cout.setf(std::ios::fixed, std::ios::floatfield);
 
-      print(0, width);
+      print(0, width, maxDepth);
 
       // Restoring default
       std::cout.precision(oldPrecision);
       std::cout.unsetf(std::ios::floatfield);
     }
 
-    void Benchmark::print(int depth, int width)
+    void Benchmark::print(int depth, int width, int maxDepth)
     {
       // Build and sort printable data
       typedef std::tuple<std::string, double, Benchmark *> printableEntry;
@@ -115,17 +115,19 @@ namespace Utils {
       }
       // Ordering
       std::sort(subFields.begin(), subFields.end(), cmp);
-      // Printing
-      for(auto& f : subFields) {
-        // For Benchmark, print them
-        if (std::get<2>(f) != NULL){
-          std::get<2>(f)->print(depth + 1, width);
-        }
-        // Print entries
-        else {
-          for (int i = 0; i < depth + 1; i++) std::cout << '\t';
-          std::cout << std::setw(width) << (std::get<1>(f) * 1000) << " ms : "
-                    << std::get<0>(f) << std::endl;
+      // Printing if allowed
+      if (maxDepth < 0 || depth < maxDepth) {
+        for(auto& f : subFields) {
+          // For Benchmark, print them
+          if (std::get<2>(f) != NULL){
+            std::get<2>(f)->print(depth + 1, width, maxDepth);
+          }
+          // Print entries
+          else {
+            for (int i = 0; i < depth + 1; i++) std::cout << '\t';
+            std::cout << std::setw(width) << (std::get<1>(f) * 1000) << " ms : "
+                      << std::get<0>(f) << std::endl;
+          }
         }
       }
       for (int i = 0; i < depth; i++) std::cout << '\t';

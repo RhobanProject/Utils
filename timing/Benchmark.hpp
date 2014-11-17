@@ -30,8 +30,8 @@ namespace Utils {
 
       static Benchmark * getCurrent();
 
-      void print();
-      void print(int depth, int width);
+      void print(int maxDepth = -1);
+      void print(int depth, int width , int maxDepth = -1);
 
       double getTime() const;
       double getSubTime() const;
@@ -49,7 +49,7 @@ namespace Utils {
        * Close current benchmark or subBenchmark and return to previous context
        * if needed
        */
-      static void close(bool print = false);
+      static void close(bool print = false, int detailLevel = -1);
     };
   }
 }
