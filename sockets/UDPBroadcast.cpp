@@ -1,15 +1,24 @@
 #include <iostream>
 
 #ifndef DARWIN
-#ifdef MSVC
-#else
 #include <sys/types.h>
+
+#ifndef MSVC
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <ifaddrs.h>
 #include <linux/if.h>
+#else
+#include <winsock2.h>
+#include <Ws2tcpip.h>
+#include <stdio.h>
+#pragma comment(lib, "Ws2_32.lib")
+#ifndef MSG_DONTWAIT
+#define MSG_DONTWAIT 0
+#endif
+#endif
 #include <errno.h>
 #include <string.h>
 
@@ -19,6 +28,11 @@ namespace Rhoban {
 
 UDPBroadcast::UDPBroadcast(int port)
 {
+#ifdef MSVC
+	WSADATA wsaData;
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
+
     _port = port;
 
     //Network initialization
@@ -51,7 +65,15 @@ void UDPBroadcast::openRead()
 
     //Bind socoket to listening port
     SOCKADDR_IN addr;
+#ifndef MSVC
     bzero(&addr, sizeof(addr));
+#else
+	unsigned long ul = 1; 
+	int nRet = ioctlsocket(_readFd, FIONBIO, (unsigned long *)&ul);
+	if (nRet == SOCKET_ERROR)
+		std::cerr << "Failed to put socket in non-bloking mode..." << std::endl;
+	ZeroMemory(&addr, sizeof(addr));
+#endif
     addr.sin_family = AF_INET;
     addr.sin_port = htons(_port);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -79,9 +101,9 @@ void UDPBroadcast::openWrite()
     }
 
     //Set broadcats permission
-    int opt = 1;
-    int error = setsockopt(_writeFd, SOL_SOCKET, 
-        SO_BROADCAST, &opt, sizeof(opt));
+	int opt = 1;
+	int error = setsockopt(_writeFd, SOL_SOCKET, 
+		SO_BROADCAST, (const char *)  &opt, sizeof(opt));
     if (error == -1) {
         std::cout << 
             "ERROR: UDPBroadcast: Unable to configure write socket" << std::endl;
@@ -94,15 +116,23 @@ void UDPBroadcast::openWrite()
 void UDPBroadcast::closeRead()
 {
     if (_readFd != -1) {
+#ifndef MSVC
         close(_readFd);
+#else
+		closesocket(_readFd);
+#endif
         _readFd = -1;
     }
 }
 void UDPBroadcast::closeWrite()
 {
     if (_writeFd != -1) {
-        close(_writeFd);
-        _writeFd = -1;
+#ifndef MSVC
+		close(_writeFd);
+#else
+		closesocket(_writeFd);
+#endif
+		_writeFd = -1;
     }
 }
         
@@ -124,12 +154,16 @@ void UDPBroadcast::broadcastMessage(unsigned char* data, size_t len)
     //Send message to all broadcast address
     for (size_t i=0;i<_broadcastAddr.size();i++) {
         struct sockaddr_in addr;
+#ifndef MSVC
         bzero(&addr, sizeof(addr));
+#else
+		ZeroMemory(&addr, sizeof(addr));
+#endif
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = _broadcastAddr[i];
         addr.sin_port = htons(_port);
           
-        int error = sendto(_writeFd, data, len, 0,
+        int error = sendto(_writeFd, (const char *) data, len, 0,
             (struct sockaddr*)&addr, sizeof(addr));
 
         if (error == -1) {
@@ -154,7 +188,7 @@ bool UDPBroadcast::checkMessage(unsigned char* data, size_t& len)
     }
    
 
-    int size = recvfrom(_readFd, data, len, MSG_DONTWAIT, NULL, NULL);
+    int size = recvfrom(_readFd, (char *) data, len, MSG_DONTWAIT, NULL, NULL);
     if (size == -1) {
         if (errno != EAGAIN && errno != EWOULDBLOCK) {
             std::cout << 
@@ -172,6 +206,7 @@ void UDPBroadcast::retrieveBroadcastAddress()
 {
     _broadcastAddr.clear();
         
+#ifndef MSVC
     struct ifaddrs* ifap;
     if (getifaddrs(&ifap) == -1) {
         std::cout << 
@@ -193,10 +228,12 @@ void UDPBroadcast::retrieveBroadcastAddress()
         }
         ifap = ifap->ifa_next;
     }
-}
-
-}
-
-
+#else
+	//todo: adapter sous win si ça a un intérêt
 #endif
+}
+
+}
+
+
 #endif

@@ -109,6 +109,8 @@ class Serial
         string deviceName;
         bool device_is_file;
 
+	int baudrate(){ return deviceBaudrate;}
+
     private:
 
         /**
@@ -127,7 +129,7 @@ class Serial
         void fdClose();
 
 #ifdef WIN32
-        HANDLE handle;
+        HANDLE fd;
 	COMMTIMEOUTS Timeouts;
 #else
         int fd;
