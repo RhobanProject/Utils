@@ -152,6 +152,7 @@ set(DIRECTORIES
     threading
     timing
     xml
+    zmq
     )
 
 
