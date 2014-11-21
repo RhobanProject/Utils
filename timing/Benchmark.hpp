@@ -38,6 +38,8 @@ namespace Utils {
 
     public:
       Benchmark(Benchmark * father, const std::string & name);
+      ~Benchmark();
+      //TODO fix memory leak due to destruction of children
 
       /**
        * Open a new benchmark or subBenchmark

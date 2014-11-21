@@ -30,6 +30,13 @@ namespace Utils {
       return current;
     }
 
+    Benchmark::~Benchmark()
+    {
+      for (auto& c : children) {
+        delete(c.second);
+      }
+    }
+
     void Benchmark::open(const std::string& benchmarkName)
     {
       Benchmark * newB = new Benchmark(current, benchmarkName);
