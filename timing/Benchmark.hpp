@@ -51,7 +51,7 @@ namespace Utils {
        * Close current benchmark or subBenchmark and return to previous context
        * if needed
        */
-      static void close(bool print = false, int detailLevel = -1);
+      static double close(bool print = false, int detailLevel = -1);
     };
   }
 }

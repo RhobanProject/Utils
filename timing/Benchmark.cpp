@@ -46,7 +46,7 @@ namespace Utils {
       current = newB;
     }
 
-    void Benchmark::close(bool print, int detailLevel)
+    double Benchmark::close(bool print, int detailLevel)
     {
       if (current == NULL)
         throw std::runtime_error("No active benchmark to close");
@@ -57,9 +57,12 @@ namespace Utils {
       current = toClose->father;
       if (print)
         toClose->print(detailLevel);
+      
+      double elapsedTime = toClose->getTime();
       // Suppress Benchmark if the link is lost
       if (current == NULL)
         delete(toClose);
+      return elapsedTime;
     }
 
     double Benchmark::getTime() const
