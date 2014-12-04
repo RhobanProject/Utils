@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <vector>
+#include <stdexcept>
 
 #ifndef NO_RHOBANMATH
 #include "linear_algebra.h"
