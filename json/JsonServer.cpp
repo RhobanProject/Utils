@@ -72,6 +72,8 @@ Json::Value JsonServer::process(const Json::Value &request)
             }
         } catch (string error) {
             response[1] = error;
+        } catch (std::runtime_error e) {
+            response[1] = e.what();
         } catch (...) {
             response[1] = "Error while processing command";
         }
