@@ -500,7 +500,7 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 			DWORD error_code = GetLastError();
 			stringstream err; err << "Serial Port Error " << error_code;
 			if(blocking)
-				throw "Failed to read from serial port:\n\t" + err.str();
+				throw runtime_error("Failed to read from serial port:\n\t" + err.str());
 			else
 			{
 				cerr << err.str() << endl;
