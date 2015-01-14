@@ -171,9 +171,9 @@ void SlowTimedThread::execute()
 	//not yet thread_state = Dead;
 }
 
-void TimedThread::init_suspended(double hertz)
+void TimedThread::init_suspended(double hertz, bool animate)
 {
-    Player::init(hertz,true);
+    Player::init(hertz, animate);
     gettimeofday( &suspend_start , 0);
     forever = true;
 

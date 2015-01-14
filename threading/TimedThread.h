@@ -82,7 +82,7 @@ public:
 
 	/*
 	Sae as init but the thread is suspended on startup, use Playable::pplay() to start it */
-	void init_suspended(double hertz);
+	void init_suspended(double hertz, bool animate = true);
 
 	/*
 	 * This constructor avoid to use init(frequency)
