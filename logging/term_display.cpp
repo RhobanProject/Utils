@@ -10,13 +10,12 @@
 
 Rhoban::chrono tt_chr;
 
-bool colorsAllowed = false;
-
-
 #ifdef WIN32
 COORD coordScreen;
 HANDLE hConsole = NULL;
+bool colorsAllowed = false;
 #else
+bool colorsAllowed = true;
 #endif
 
 #ifdef _MSC_VER
@@ -98,7 +97,7 @@ void term_disable_colors() {
 void term_set_color(const char * c, char * out){
 	if (colorsAllowed && term_color_enabled){
 #ifndef WIN32
-		if (out == NULL)
+		if (out == NULL) 
 			printf("\033[%sm", c);
 		else
 			sprintf(out, "\033[%sm", c);

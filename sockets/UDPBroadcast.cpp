@@ -1,6 +1,6 @@
 #include <iostream>
 
-#ifndef DARWIN
+#ifndef MACOSX
 #include <sys/types.h>
 
 #ifndef MSVC
