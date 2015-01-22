@@ -152,7 +152,8 @@ set(DIRECTORIES
     threading
     timing
     xml
-    zmq
+# DISABLING zmq, if flag ENABLE_ZMQ is not ON!!!
+#    zmq
     )
 
 
