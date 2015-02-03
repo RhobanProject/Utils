@@ -46,7 +46,7 @@ namespace Utils {
       current = newB;
     }
 
-    double Benchmark::close(bool print, int detailLevel)
+    double Benchmark::close(bool print, int detailLevel, std::ostream & out)
     {
       if (current == NULL)
         throw std::runtime_error("No active benchmark to close");
@@ -56,7 +56,7 @@ namespace Utils {
 #endif
       current = toClose->father;
       if (print)
-        toClose->print(detailLevel);
+        toClose->print(out, detailLevel);
       
       double elapsedTime = toClose->getTime();
       // Suppress Benchmark if the link is lost
@@ -91,23 +91,24 @@ namespace Utils {
       return std::get<1>(a) < std::get<1>(b);
     }
 
-    void Benchmark::print(int maxDepth)
+    void Benchmark::print(std::ostream & out, int maxDepth)
     {
       // Formatting specifically
       int precision = 3;
       int width = 8;
-      int oldPrecision = std::cout.precision();
-      std::cout.precision(precision);
-      std::cout.setf(std::ios::fixed, std::ios::floatfield);
+      int oldPrecision = out.precision();
+      out.precision(precision);
+      out.setf(std::ios::fixed, std::ios::floatfield);
 
-      print(0, width, maxDepth);
+      print(out, 0, width, maxDepth);
 
       // Restoring default
-      std::cout.precision(oldPrecision);
-      std::cout.unsetf(std::ios::floatfield);
+      out.precision(oldPrecision);
+      out.unsetf(std::ios::floatfield);
     }
 
-    void Benchmark::print(int depth, int width, int maxDepth)
+    void Benchmark::print(std::ostream & out, int depth, int width,
+                          int maxDepth)
     {
       // Build and sort printable data
       typedef std::tuple<std::string, double, Benchmark *> printableEntry;
@@ -130,19 +131,19 @@ namespace Utils {
         for(auto& f : subFields) {
           // For Benchmark, print them
           if (std::get<2>(f) != NULL){
-            std::get<2>(f)->print(depth + 1, width, maxDepth);
+            std::get<2>(f)->print(out, depth + 1, width, maxDepth);
           }
           // Print entries
           else {
-            for (int i = 0; i < depth + 1; i++) std::cout << '\t';
-            std::cout << std::setw(width) << (std::get<1>(f) * 1000) << " ms : "
-                      << std::get<0>(f) << std::endl;
+            for (int i = 0; i < depth + 1; i++) out << '\t';
+            out << std::setw(width) << (std::get<1>(f) * 1000) << " ms : "
+                << std::get<0>(f) << std::endl;
           }
         }
       }
-      for (int i = 0; i < depth; i++) std::cout << '\t';
-      std::cout << std::setw(width) << getTime() * 1000 << " ms : "
-                << name << std::endl;
+      for (int i = 0; i < depth; i++) out << '\t';
+      out << std::setw(width) << getTime() * 1000 << " ms : "
+          << name << std::endl;
     }
   }
 }
