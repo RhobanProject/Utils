@@ -71,6 +71,9 @@ option (COMPILE_UTILS_TESTS
 option (ENABLE_YAML
     "Enable the YAML support" ON)
 
+option (ENABLE_JSON
+    "Enable the JSON support" ON)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    SET(SYSTEM_OS "MACOSX")
@@ -129,19 +132,19 @@ message("-- Adding Eigen support")
 set (EIGEN_HEADERS "${PROJECT_SOURCE_DIR}/eigen-3.2" CACHE STRING "")
 include_directories ("${EIGEN_HEADERS}")
 
+if(ENABLE_JSON)
 message("-- Adding JSON support")
 add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
 set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
     CACHE STRING "")
 include_directories ("${JSON_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} json)
+endif()
 
 # Sources
 set(DIRECTORIES
     .
     args
-    configfile
-    json
     logging
     observer
     scoring
@@ -153,6 +156,14 @@ set(DIRECTORIES
     timing
     xml
     )
+
+if(ENABLE_JSON)
+set(DIRECTORIES
+    ${DIRECTORIES}
+	configfile
+	json
+)
+	endif()
 
 
 if (COMPILE_UTILS_TESTS)
