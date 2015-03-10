@@ -51,7 +51,10 @@ using namespace std;
 
 Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
 {
-	setDevice(deviceName);
+	if (deviceBaudrate == -1)
+		setFileDevice(deviceName);
+	else
+		setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
 }
 
@@ -112,7 +115,7 @@ int Serial::connect(bool blocking)
 		DWORD dwError;
 
 		// Open serial device
-		fd = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
+		fd = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0/*FILE_FLAG_WRITE_THROUGH*/, NULL );
 
 		if( fd == INVALID_HANDLE_VALUE ) {
 			goto USART_INIT_ERROR;
@@ -169,7 +172,7 @@ int Serial::connect(bool blocking)
 		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value                  * greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
                  * If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
                  * If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
-                 * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. */
+                 * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. 
 		Timeouts.ReadIntervalTimeout = MAXDWORD;
 		Timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
 		Timeouts.ReadTotalTimeoutConstant = 10;
@@ -178,6 +181,7 @@ int Serial::connect(bool blocking)
 
 		if( SetCommTimeouts( fd, &Timeouts ) == FALSE )
 			goto USART_INIT_ERROR;
+			*/
 
 		return 0;
 
@@ -498,17 +502,19 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 
 		if( ReadFile(fd, destination +  total, dwToRead, &dwRead, NULL ) == FALSE ) {
 			DWORD error_code = GetLastError();
-			stringstream err; err << "Serial Port Error " << error_code;
-			if(blocking)
-				throw runtime_error("Failed to read from serial port:\n\t" + err.str());
-			else
+			if (error_code != CE_OVERRUN)
 			{
-				cerr << err.str() << endl;
-				dwRead = 0;
+				string err = "Serial Port Error " + to_string(error_code);
+				if (blocking)
+					throw runtime_error("Failed to read from serial port:\n\t" + err);
+				else
+				{
+					cerr << err << endl;
+					dwRead = 0;
+				}
 			}
 		}
 		int n = dwRead;
-
 #else
 		int n = read(fd, destination, size);
 #endif
@@ -518,13 +524,11 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		//if(total < size)
 			//cout << "Receiving " << size << " got total " << total << " this loop " << n << " blocking " << (blocking ? 1 : 0) << endl;
 		if(!blocking) break;
-		/*
 		if(n==0)
 		{
 			//cout << "Received nothing waiting 50 ms" << endl;
-			syst_wait_ms(50);
+			syst_wait_ms(10);
 		}
-		*/
 	}
 	return total;
 }
@@ -640,7 +644,8 @@ size_t Serial::send(const char *data, size_t size)
 		//cout << "Sending " << dwToWrite - got << " bytes " << endl;
 		WriteFile(fd, data + got, dwToWrite - got, &dwWritten, NULL);
 		got += dwWritten;
-		if (dwWritten == 0) Sleep(10);
+		if (dwWritten == 0) 
+			Sleep(10);
 		//cout << "Sent " << got <<"/" << size <<  endl;
 	}
 	FlushFileBuffers(fd);

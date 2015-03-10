@@ -62,14 +62,28 @@ if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)
 
+option(ENABLE_JSON "Compile and enable JSON" ON)
+if(ENABLE_JSON)
+    add_definitions (-DUSE_JSON)
+endif()
+
 option (ENABLE_ZMQ
-    "Compile and use ZMQ?" OFF)
+    "Compile and use ZMQ?" ON)
+
+option (ENABLE_XML
+    "Compile and use TinyXML" ON)
 
 option (COMPILE_UTILS_TESTS
     "Compile utils tests?" OFF)
 
 option (ENABLE_YAML
-    "Enable the YAML support" ON)
+    "Compile and use YAML" ON)
+
+option (ENABLE_CONFIG
+    "Compile and use args and config" ON)
+
+option (ENABLE_SOCKETS
+    "Compile and use sockets and http" ON)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -129,32 +143,39 @@ message("-- Adding Eigen support")
 set (EIGEN_HEADERS "${PROJECT_SOURCE_DIR}/eigen-3.2" CACHE STRING "")
 include_directories ("${EIGEN_HEADERS}")
 
-message("-- Adding JSON support")
-add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
-set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
-    CACHE STRING "")
-include_directories ("${JSON_HEADERS}")
-set (EXTRA_LIBS ${EXTRA_LIBS} json)
+if(ENABLE_JSON)
+	message("-- Adding JSON support")
+	add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
+	set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
+	    CACHE STRING "")
+	include_directories ("${JSON_HEADERS}")
+	set (EXTRA_LIBS ${EXTRA_LIBS} json)
+endif()
 
 # Sources
 set(DIRECTORIES
     .
-    args
-    configfile
-    json
     logging
     observer
-    scoring
     serial
-    sockets
-    http
     tests
+	scoring
     threading
     timing
-    xml
-    zmq
     )
 
+if(ENABLE_JSON)
+ set(DIRECTORIES ${DIRECTORIES} json)
+endif()
+if(ENABLE_XML)
+ set(DIRECTORIES ${DIRECTORIES} xml)
+endif()
+if(ENABLE_SOCKETS)
+ set(DIRECTORIES ${DIRECTORIES} sockets http)
+endif()
+if(ENABLE_CONFIG)
+ set(DIRECTORIES ${DIRECTORIES}  args configfile)
+endif()
 
 if (COMPILE_UTILS_TESTS)
   include_directories ("test")
@@ -162,6 +183,8 @@ endif (COMPILE_UTILS_TESTS)
 
 if (ENABLE_ZMQ)
 	message("-- Adding ZMQ support")
+
+	set(DIRECTORIES ${DIRECTORIES} zmq)
 
     add_definitions (-DHAVE_ZMQ)
 	set (ZMQ_VERSION "3.0" CACHE STRING  "ZMQ Version")

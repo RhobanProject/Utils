@@ -92,6 +92,7 @@ class Serial
          * Sends some data, but not all of it
          */
         size_t doSend(const char *data, size_t size);
+		size_t doSend(string data){ return doSend(data.c_str(), data.size()); };
 
     	/*!
     	 * read characters until the pattern is found
