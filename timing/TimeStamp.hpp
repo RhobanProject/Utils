@@ -12,6 +12,8 @@ namespace Utils {
 
     public:
       static TimeStamp now();
+
+      double getTimeMS() const;
     };
 
   }
