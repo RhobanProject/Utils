@@ -12,6 +12,11 @@ namespace Utils {
       return TimeStamp(steady_clock::now());
     }
 
+    double TimeStamp::getTimeMS() const
+    {
+      return duration_cast<std::chrono::nanoseconds>(time_since_epoch()).count() / 1000000.0;
+    }
+
   }
 }
 

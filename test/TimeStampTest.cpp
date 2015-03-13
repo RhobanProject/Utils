@@ -17,5 +17,8 @@ void  TimeStampTest::_run(){
   usleep(sleepingTime);
   TimeStamp end = TimeStamp::now();
   double elapsedTime = diffSec(start, end);
-  assertEqualsDelta(elapsedTime, sleepingTime / 1000000.0, 100 / 1000000.0);
+  double diff2 = (end.getTimeMS() - start.getTimeMS()) / 1000;
+  assertEqualsDelta(elapsedTime, sleepingTime / 1000000.0, 0.2 / 1000.0);
+  assertEqualsDelta(diff2      , sleepingTime / 1000000.0, 0.2 / 1000.0);
+  assertEqualsDelta(elapsedTime, diff2, 1.0 / 1000000000);
 }
