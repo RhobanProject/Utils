@@ -7,10 +7,9 @@ namespace Utils {
   namespace Timing {
 
     class TimeStamp : public std::chrono::time_point<std::chrono::steady_clock> {
-    private:
-      TimeStamp(const std::chrono::time_point<std::chrono::steady_clock> & timePoint);
-
     public:
+      TimeStamp();
+      TimeStamp(const std::chrono::time_point<std::chrono::steady_clock> & timePoint);
       static TimeStamp now();
 
       double getTimeMS() const;

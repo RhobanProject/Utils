@@ -5,6 +5,7 @@ using namespace std::chrono;
 namespace Utils {
   namespace Timing {
       
+    TimeStamp::TimeStamp(){}
     TimeStamp::TimeStamp(const time_point<steady_clock> & timePoint)
       : time_point<steady_clock>(timePoint) {}
 
