@@ -5,6 +5,7 @@ set(SOURCES
     Player.cpp
     TickMachine.cpp
     TickTimer.cpp
+    TimeStamp.cpp
     chrono.cpp
     sleep.cpp
     )
