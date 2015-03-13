@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <iostream>
 // TODO: create an example tests for this class
 
 namespace Utils {
@@ -30,8 +31,8 @@ namespace Utils {
 
       static Benchmark * getCurrent();
 
-      void print(int maxDepth = -1);
-      void print(int depth, int width , int maxDepth = -1);
+      void print(std::ostream & out, int maxDepth = -1);
+      void print(std::ostream & out, int depth, int width , int maxDepth = -1);
 
       double getTime() const;
       double getSubTime() const;
@@ -51,7 +52,8 @@ namespace Utils {
        * Close current benchmark or subBenchmark and return to previous context
        * if needed
        */
-      static void close(bool print = false, int detailLevel = -1);
+      static double close(bool print = false, int detailLevel = -1,
+                          std::ostream & out = std::cout);
     };
   }
 }
