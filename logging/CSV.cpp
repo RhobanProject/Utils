@@ -9,6 +9,7 @@ namespace Rhoban
     void CSV::open(std::string filename)
     {
         ofs.open(filename.c_str());
+        ofs.precision(10);
         header = false;
     }
 
