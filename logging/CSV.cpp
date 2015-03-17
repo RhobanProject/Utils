@@ -31,7 +31,7 @@ namespace Rhoban
             header = true;
         }
 
-        for (int index=0; index<columns.size(); index++) {
+        for (unsigned int index=0; index<columns.size(); index++) {
             ofs << values[index] << " ";
         }
         ofs << std::endl;
@@ -40,7 +40,7 @@ namespace Rhoban
 
     void CSV::produceHeader()
     {
-        for (int index=0; index<columnIndexes.size(); index++) {
+        for (unsigned int index=0; index<columnIndexes.size(); index++) {
             ofs << "# " << index << ": " << columnIndexes[index] << std::endl;
         }
     }

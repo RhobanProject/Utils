@@ -9,8 +9,14 @@ namespace Utils {
     TimeStamp::TimeStamp(const time_point<steady_clock> & timePoint)
       : time_point<steady_clock>(timePoint) {}
 
-    TimeStamp TimeStamp::now() {
+    TimeStamp TimeStamp::now()
+    {
       return TimeStamp(steady_clock::now());
+    }
+
+    TimeStamp TimeStamp::fromMS(unsigned long msSinceEpoch)
+    {
+      return TimeStamp(time_point<steady_clock>(milliseconds(msSinceEpoch)));
     }
 
     double TimeStamp::getTimeMS() const
@@ -32,4 +38,16 @@ double diffMs(const Utils::Timing::TimeStamp & src,
               const Utils::Timing::TimeStamp & dst)
 {
   return diffSec(src, dst) * 1000;
+}
+
+
+bool operator<(const Utils::Timing::TimeStamp & ts1,
+               const Utils::Timing::TimeStamp & ts2)
+{
+  return diffMs(ts1, ts2) > 0;
+}
+bool operator>(const Utils::Timing::TimeStamp & ts1,
+               const Utils::Timing::TimeStamp & ts2)
+{
+  return diffMs(ts1, ts2) < 0;
 }
