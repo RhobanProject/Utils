@@ -67,23 +67,23 @@ if(ENABLE_JSON)
     add_definitions (-DUSE_JSON)
 endif()
 
-option (ENABLE_ZMQ
-    "Compile and use ZMQ?" ON)
+option (UTILS_USES_ZMQ
+    "Utils includes ZMQ?" ON)
 
-option (ENABLE_XML
-    "Compile and use TinyXML" ON)
+option (UTILS_USES_XML
+    "Utils includes TinyXML" ON)
 
 option (COMPILE_UTILS_TESTS
     "Compile utils tests?" OFF)
 
-option (ENABLE_YAML
-    "Compile and use YAML" ON)
+option (UTILS_USES_YAML
+    "Utils includes YAML" ON)
 
-option (ENABLE_CONFIG
-    "Compile and use args and config" ON)
+option (UTILS_USES_CONFIG
+    "Utils uses Compile and use args and config" ON)
 
-option (ENABLE_SOCKETS
-    "Compile and use sockets and http" ON)
+option (UTILS_USES_SOCKETS
+    "UTils includes sockets and http" ON)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -129,7 +129,7 @@ if (WIN32)
     set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif (WIN32)
 
-if (ENABLE_YAML)
+if (UTILS_USES_YAML)
     message("-- Adding YAML support")
     option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
     add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
@@ -167,13 +167,13 @@ set(DIRECTORIES
 if(ENABLE_JSON)
  set(DIRECTORIES ${DIRECTORIES} json)
 endif()
-if(ENABLE_XML)
+if(UTILS_USES_XML)
  set(DIRECTORIES ${DIRECTORIES} xml)
 endif()
-if(ENABLE_SOCKETS)
+if(UTILS_USES_SOCKETS)
  set(DIRECTORIES ${DIRECTORIES} sockets http)
 endif()
-if(ENABLE_CONFIG)
+if(UTILS_USES_CONFIG)
  set(DIRECTORIES ${DIRECTORIES}  args configfile)
 endif()
 
@@ -181,7 +181,7 @@ if (COMPILE_UTILS_TESTS)
   include_directories ("test")
 endif (COMPILE_UTILS_TESTS)
 
-if (ENABLE_ZMQ)
+if (UTILS_USES_ZMQ)
 	message("-- Adding ZMQ support")
 
 	set(DIRECTORIES ${DIRECTORIES} zmq)
@@ -216,7 +216,7 @@ if (ENABLE_ZMQ)
     if(UNIX AND NOT APPLE)
         set (EXTRA_LIBS ${EXTRA_LIBS} rt)
     endif(UNIX AND NOT APPLE)
-endif (ENABLE_ZMQ)
+endif (UTILS_USES_ZMQ)
 
 set (SOURCES)
 set (ALL_SOURCES)

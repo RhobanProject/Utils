@@ -64,6 +64,8 @@ Serial::~Serial()
 	if(recording)
           record_stream.close();
 	recording = false;
+	if (IsOpen())
+		disconnect();
 }
 
 bool Serial::IsOpen()
@@ -173,6 +175,7 @@ int Serial::connect(bool blocking)
                  * If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
                  * If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
                  * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. 
+				 */
 		Timeouts.ReadIntervalTimeout = MAXDWORD;
 		Timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
 		Timeouts.ReadTotalTimeoutConstant = 10;
@@ -181,7 +184,6 @@ int Serial::connect(bool blocking)
 
 		if( SetCommTimeouts( fd, &Timeouts ) == FALSE )
 			goto USART_INIT_ERROR;
-			*/
 
 		return 0;
 
@@ -303,7 +305,21 @@ int Serial::getSpeed()
 void Serial::setSpeed(int baudrate)
 {
 #ifdef WIN32
-	fprintf(stderr, "usart_set_channel_speed not implemented for WIN32\n");
+	cout << "Changing serial speed of port " << deviceName << " from " << deviceBaudrate << " to " << baudrate << "..." << endl;
+	bool isConnected = IsOpen();
+	if (isConnected)
+	{
+		cout << " disconnecting..." << std::flush;
+		disconnect();
+	}
+	sleep_ms(1000);
+	deviceBaudrate = baudrate;
+	if (isConnected)
+	{
+		cout << "reconnecting..." << std::flush;
+		connect();
+		cout << "done" << endl;
+	}
 #elif LINUX
         struct serial_struct serinfo;
 
