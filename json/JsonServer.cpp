@@ -1,6 +1,8 @@
 #include <sstream>
 #include "JsonServer.h"
 
+#include <stdexcept>
+
 using std::string;
 using std::ostringstream;
         
