@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include <ticks.h>
-
+#include <sleep.h>
 #ifdef MSVC
 #undef LINUX
 #endif 
@@ -117,7 +117,14 @@ int Serial::connect(bool blocking)
 		DWORD dwError;
 
 		// Open serial device
-		fd = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0/*FILE_FLAG_WRITE_THROUGH*/, NULL );
+		fd = CreateFile(
+			deviceName.c_str(),
+			GENERIC_READ|GENERIC_WRITE,
+			0, //dont share the port
+			NULL, //no security
+			OPEN_EXISTING,
+			FILE_FLAG_OVERLAPPED,
+			NULL);
 
 		if( fd == INVALID_HANDLE_VALUE ) {
 			goto USART_INIT_ERROR;
@@ -177,8 +184,8 @@ int Serial::connect(bool blocking)
                  * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. 
 				 */
 		Timeouts.ReadIntervalTimeout = MAXDWORD;
-		Timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
-		Timeouts.ReadTotalTimeoutConstant = 10;
+		Timeouts.ReadTotalTimeoutMultiplier = 0;
+		Timeouts.ReadTotalTimeoutConstant = 0;
 		Timeouts.WriteTotalTimeoutMultiplier = 0;
 		Timeouts.WriteTotalTimeoutConstant = 0;
 
@@ -477,12 +484,10 @@ int Serial::doRead(char *destination, size_t size)
 #ifdef WIN32
 	DWORD dwRead;
     ReadFile(fd, destination, size, &dwRead, NULL );
-    int n = dwRead;
+    return dwRead;
 #else
-    int n = read(fd, destination, size);
+   return read(fd, destination, size);
 #endif
-
-    return n;
 }
 
 
@@ -711,3 +716,74 @@ void Serial::record(string filename)
 		throw string("Failed to open serial log file ") + filename;
 }
 
+MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
+{
+	if (ports.size() != baudrates.size())
+		throw runtime_error("parameter slength mismatch");
+
+	for (uint i = 0; i < ports.size(); i++)
+	{
+		if (ports_pathes[i] != "")
+		{
+			this->ports.push_back(new Serial(ports_pathes[i], baudrates[i]));
+			int res = this->ports[i]->connect();
+			if (res == -1)
+				throw runtime_error("Failed to connect to port '" + ports_pathes[i] + "'");
+		}
+	}
+	start();
+	wait_started();
+}
+
+/* return how many chars were sent, -1 in case of error */
+int MultiSerial::Send(int port_id, const string & data)
+{
+	int res = -1;
+	if (port_id >= ports.size())
+		throw runtime_error("No port with this id");
+	auto & port = ports[port_id];
+	BEGIN_SAFE(mutex)
+		res = port->send(data);
+	END_SAFE(mutex)
+	return res;
+}
+
+void MultiSerial::execute()
+{
+	char buffer[8192];
+	/* todo use select under LINUX*/
+	while (is_alive())
+	{
+		bool wait = true;
+		for (int i = 0; i < ports.size(); i++)
+		{
+			auto port = ports[i];
+			int total = 0;
+			int received = 0;
+			do
+			{
+				received = port->doRead(buffer + total, 8192 - total);
+				total += received;
+			}
+			while (received > 0 && total < 8192);
+			wait &= (total == 0);
+			if (total > 0)
+				MultiSerialReceived(i, string(buffer, total));
+		}
+		if (wait)
+			syst_wait_ms(10);
+	}
+}
+
+MultiSerial::~MultiSerial()
+{
+	for (auto & port : ports)
+	{
+		if (port)
+		{
+			port->disconnect();
+			port = NULL;
+		}
+	}
+	ports.clear();
+}
