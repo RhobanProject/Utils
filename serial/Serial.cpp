@@ -280,21 +280,7 @@ int Serial::connect2()
 	connect();
 #else
 	struct termios tio;
-	struct termios stdio;
-	struct termios old_stdio;
-	int tty_fd, flags;
-	unsigned char c = 'D';
-	tcgetattr(STDOUT_FILENO, &old_stdio);
-	memset(&stdio, 0, sizeof(stdio));
-	stdio.c_iflag = 0;
-	stdio.c_oflag = 0;
-	stdio.c_cflag = 0;
-	stdio.c_lflag = 0;
-	stdio.c_cc[VMIN] = 1;
-	stdio.c_cc[VTIME] = 0;
-	tcsetattr(STDOUT_FILENO, TCSANOW, &stdio);
-	tcsetattr(STDOUT_FILENO, TCSAFLUSH, &stdio);
-	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);       // make the reads non-blocking
+	int flags;
 	memset(&tio, 0, sizeof(tio));
 	tio.c_iflag = 0;
 	tio.c_oflag = 0;
@@ -302,7 +288,7 @@ int Serial::connect2()
 	tio.c_lflag = 0;
 	tio.c_cc[VMIN] = 1;
 	tio.c_cc[VTIME] = 5;
-	if ((tty_fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK)) == -1){
+	if ((fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK)) == -1){
 		printf("Error while opening\n"); // Just if you want user interface error control
 		return -1;
 	}
@@ -335,7 +321,7 @@ int Serial::connect2()
 	}
 	cfsetospeed(&tio, baudrate_code);
 	cfsetispeed(&tio, baudrate_code);            // baudrate is declarated above
-	tcsetattr(tty_fd, TCSANOW, &tio);
+	tcsetattr(fd, TCSANOW, &tio);
 #endif
 	return 0;
 }
