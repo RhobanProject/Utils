@@ -178,7 +178,8 @@ int Serial::connect(bool blocking)
 			goto USART_INIT_ERROR;
 
 		/* from http://msdn.microsoft.com/en-us/library/windows/desktop/aa363190%28v=vs.85%29.aspx
-		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value                  * greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
+		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value 
+		 * greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
                  * If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
                  * If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
                  * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. 
@@ -267,6 +268,75 @@ int Serial::connect(bool blocking)
 		return -1;
 #endif
 	}
+	return 0;
+}
+
+/**
+* Initializes the usart device
+*/
+int Serial::connect2()
+{
+#ifdef WIN32
+	connect();
+#else
+	struct termios tio;
+	struct termios stdio;
+	struct termios old_stdio;
+	int tty_fd, flags;
+	unsigned char c = 'D';
+	tcgetattr(STDOUT_FILENO, &old_stdio);
+	memset(&stdio, 0, sizeof(stdio));
+	stdio.c_iflag = 0;
+	stdio.c_oflag = 0;
+	stdio.c_cflag = 0;
+	stdio.c_lflag = 0;
+	stdio.c_cc[VMIN] = 1;
+	stdio.c_cc[VTIME] = 0;
+	tcsetattr(STDOUT_FILENO, TCSANOW, &stdio);
+	tcsetattr(STDOUT_FILENO, TCSAFLUSH, &stdio);
+	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);       // make the reads non-blocking
+	memset(&tio, 0, sizeof(tio));
+	tio.c_iflag = 0;
+	tio.c_oflag = 0;
+	tio.c_cflag = CS8 | CREAD | CLOCAL;           // 8n1, see termios.h for more information
+	tio.c_lflag = 0;
+	tio.c_cc[VMIN] = 1;
+	tio.c_cc[VTIME] = 5;
+	if ((tty_fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK)) == -1){
+		printf("Error while opening\n"); // Just if you want user interface error control
+		return -1;
+	}
+
+	int baudrate_code;
+	switch (baudrate) {
+	case 1200: baudrate_code = B1200; break;
+	case 1800: baudrate_code = B1800; break;
+	case 2400: baudrate_code = B2400; break;
+	case 9600: baudrate_code = B9600; break;
+	case 19200: baudrate_code = B19200; break;
+	case 38400: baudrate_code = B38400; break;
+	case 57600: baudrate_code = B57600; break;
+	case 115200: baudrate_code = B115200; break;
+	case 230400: baudrate_code = B230400; break;
+	case 460800: baudrate_code = B460800; break;
+	case 500000: baudrate_code = B500000; break;
+	case 576000: baudrate_code = B576000; break;
+	case 921600: baudrate_code = B921600; break;
+	case 1000000: baudrate_code = B1000000; break;
+	case 1152000: baudrate_code = B1152000; break;
+	case 1500000: baudrate_code = B1500000; break;
+	case 2000000: baudrate_code = B2000000; break;
+	case 2500000: baudrate_code = B2500000; break;
+	case 3000000: baudrate_code = B3000000; break;
+	case 3500000: baudrate_code = B3500000; break;
+	case 4000000: baudrate_code = B4000000; break;
+	default:
+		throw "Serial::setSpeed: unknown baudrate";
+	}
+	cfsetospeed(&tio, baudrate_code);
+	cfsetispeed(&tio, baudrate_code);            // baudrate is declarated above
+	tcsetattr(tty_fd, TCSANOW, &tio);
+#endif
 	return 0;
 }
 
@@ -730,7 +800,7 @@ MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 		{
 			auto port = new Serial(ports_pathes[i], baudrates[i]);
 			this->ports.push_back(port);
-			int res = port->connect();
+			int res = port->connect2();
 			if (res == -1)
 				throw runtime_error("Failed to connect to port '" + ports_pathes[i] + "'");
 		}

@@ -40,6 +40,9 @@ class Serial
          */
         int connect(bool blocking = false);
 
+		/* another connect function for USBtoTTL on FitPC3i*/
+		int connect2();
+
         /**
          * Closes the device
          */
