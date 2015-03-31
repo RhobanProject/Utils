@@ -308,7 +308,7 @@ int Serial::connect2()
 	}
 
 	int baudrate_code;
-	switch (baudrate) {
+	switch (deviceBaudrate) {
 	case 1200: baudrate_code = B1200; break;
 	case 1800: baudrate_code = B1800; break;
 	case 2400: baudrate_code = B2400; break;
