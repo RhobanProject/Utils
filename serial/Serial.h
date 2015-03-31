@@ -89,14 +89,14 @@ class Serial
         /**
          * Sends some data
          */
-        size_t send(const char *data, size_t size);
-        size_t send(string);
+        size_t send(const char *data, size_t size, bool blocking = false);
+		size_t send(const string &, bool blocking = false);
         
         /**
          * Sends some data, but not all of it
          */
         size_t doSend(const char *data, size_t size);
-		size_t doSend(string data){ return doSend(data.c_str(), data.size()); };
+		size_t doSend(const string & data){ return doSend(data.c_str(), data.size()); };
 
     	/*!
     	 * read characters until the pattern is found

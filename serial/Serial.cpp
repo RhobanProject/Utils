@@ -119,11 +119,11 @@ int Serial::connect(bool blocking)
 		// Open serial device
 		fd = CreateFile(
 			deviceName.c_str(),
-			GENERIC_READ|GENERIC_WRITE,
+			GENERIC_READ | GENERIC_WRITE,
 			0, //dont share the port
 			NULL, //no security
 			OPEN_EXISTING,
-			FILE_FLAG_OVERLAPPED,
+			FILE_FLAG_WRITE_THROUGH,// | FILE_FLAG_OVERLAPPED,
 			NULL);
 
 		if( fd == INVALID_HANDLE_VALUE ) {
@@ -610,9 +610,9 @@ void Serial::flush()
 /**
  * Sends
  */
-size_t Serial::send(string data)
+size_t Serial::send(const string & data, bool blocking)
 {
-	return send(data.c_str(), data.size());
+	return send(data.c_str(), data.size(), blocking);
 }
 
 size_t Serial::doSend(const char *data, size_t size)
@@ -639,7 +639,7 @@ size_t Serial::doSend(const char *data, size_t size)
 	return got;
 }
 
-size_t Serial::send(const char *data, size_t size)
+size_t Serial::send(const char *data, size_t size, bool blocking)
 {
 
 
@@ -659,15 +659,18 @@ size_t Serial::send(const char *data, size_t size)
 
 #ifdef WIN32
 	DWORD dwToWrite = (DWORD)size;
-	while(got < size)
+	int max_tries = 100;
+	while(got < size && max_tries-->0)
 	{
-		DWORD dwWritten = 0;
-		//cout << "Sending " << dwToWrite - got << " bytes " << endl;
-		WriteFile(fd, data + got, dwToWrite - got, &dwWritten, NULL);
-		got += dwWritten;
-		if (dwWritten == 0) 
+		int sent = doSend(data, size);
+		if (sent < 0)
+			return sent;
+		else if (sent == 0)
 			Sleep(10);
-		//cout << "Sent " << got <<"/" << size <<  endl;
+		else
+			got += sent;
+		if (!blocking)
+			break;
 	}
 	FlushFileBuffers(fd);
 #else
@@ -718,15 +721,16 @@ void Serial::record(string filename)
 
 MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 {
-	if (ports.size() != baudrates.size())
-		throw runtime_error("parameter slength mismatch");
+	if (ports_pathes.size() != baudrates.size())
+		throw runtime_error("parameters length mismatch");
 
-	for (uint i = 0; i < ports.size(); i++)
+	for (uint i = 0; i < ports_pathes.size(); i++)
 	{
 		if (ports_pathes[i] != "")
 		{
-			this->ports.push_back(new Serial(ports_pathes[i], baudrates[i]));
-			int res = this->ports[i]->connect();
+			auto port = new Serial(ports_pathes[i], baudrates[i]);
+			this->ports.push_back(port);
+			int res = port->connect();
 			if (res == -1)
 				throw runtime_error("Failed to connect to port '" + ports_pathes[i] + "'");
 		}
@@ -740,7 +744,8 @@ int MultiSerial::Send(int port_id, const string & data)
 {
 	int res = -1;
 	if (port_id >= ports.size())
-		throw runtime_error("No port with this id");
+		return -1;
+//		throw runtime_error("No port with this id");
 	auto & port = ports[port_id];
 	BEGIN_SAFE(mutex)
 		res = port->send(data);
