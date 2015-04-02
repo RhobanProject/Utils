@@ -779,12 +779,11 @@ MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 {
 	if (ports_pathes.size() != baudrates.size())
 		throw runtime_error("parameters length mismatch");
-
 	for (uint i = 0; i < ports_pathes.size(); i++)
 	{
 		if (ports_pathes[i] != "")
 		{
-			auto port = new Serial(ports_pathes[i], baudrates[i]);
+			auto port = new Serial( ports_pathes[i], baudrates[i] );
 			this->ports.push_back(port);
 			int res = port->connect2();
 			if (res == -1)
@@ -813,26 +812,39 @@ void MultiSerial::execute()
 {
 	char buffer[8192];
 	/* todo use select under LINUX*/
+	fd_set read_fds;
+
+
+	// Set timeout
+	Rhoban::chrono timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 10000;
+
+	
+
 	while (is_alive())
 	{
-		bool wait = true;
+	  int m = 0;
+	  FD_ZERO(&read_fds);
+	  for(int i = 0 ; i < ports.size(); i++)
+	  {
+	    auto port = ports[i];
+	    FD_SET(port->fd, &read_fds);
+	    m = max(port->fd, m);
+	  }	  // Wait for data to be available
+	  auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
+	  if(ret > 0)
+	    {
 		for (int i = 0; i < ports.size(); i++)
 		{
 			auto port = ports[i];
-			int total = 0;
-			int received = 0;
-			do
-			{
-				received = port->doRead(buffer + total, 8192 - total);
-				total += received;
-			}
-			while (received > 0 && total < 8192);
-			wait &= (total == 0);
-			if (total > 0)
-				MultiSerialReceived(i, string(buffer, total));
+			if( FD_ISSET(port->fd, &read_fds) )
+			  {
+				int total = port->doRead(buffer, 8192);
+				MultiSerialReceived(i, string(buffer, total));				
+			  }
 		}
-		if (wait)
-			syst_wait_ms(10);
+	}
 	}
 }
 

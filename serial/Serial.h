@@ -136,13 +136,14 @@ class Serial
          */
         void fdClose();
 
+ public:
 #ifdef WIN32
         HANDLE fd;
 	COMMTIMEOUTS Timeouts;
 #else
         int fd;
 #endif
-
+ private:
         /*
          * Logging
          */
