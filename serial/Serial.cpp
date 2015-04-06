@@ -286,21 +286,7 @@ int Serial::connect2()
 	connect();
 #else
 	struct termios tio;
-	struct termios stdio;
-	struct termios old_stdio;
-	int tty_fd, flags;
-	unsigned char c = 'D';
-	tcgetattr(STDOUT_FILENO, &old_stdio);
-	memset(&stdio, 0, sizeof(stdio));
-	stdio.c_iflag = 0;
-	stdio.c_oflag = 0;
-	stdio.c_cflag = 0;
-	stdio.c_lflag = 0;
-	stdio.c_cc[VMIN] = 1;
-	stdio.c_cc[VTIME] = 0;
-	tcsetattr(STDOUT_FILENO, TCSANOW, &stdio);
-	tcsetattr(STDOUT_FILENO, TCSAFLUSH, &stdio);
-	fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);       // make the reads non-blocking
+	int flags;
 	memset(&tio, 0, sizeof(tio));
 	tio.c_iflag = 0;
 	tio.c_oflag = 0;
@@ -308,13 +294,13 @@ int Serial::connect2()
 	tio.c_lflag = 0;
 	tio.c_cc[VMIN] = 1;
 	tio.c_cc[VTIME] = 5;
-	if ((tty_fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK)) == -1){
+	if ((fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK)) == -1){
 		printf("Error while opening\n"); // Just if you want user interface error control
 		return -1;
 	}
 
 	int baudrate_code;
-	switch (baudrate) {
+	switch (deviceBaudrate) {
 	case 1200: baudrate_code = B1200; break;
 	case 1800: baudrate_code = B1800; break;
 	case 2400: baudrate_code = B2400; break;
@@ -341,7 +327,7 @@ int Serial::connect2()
 	}
 	cfsetospeed(&tio, baudrate_code);
 	cfsetispeed(&tio, baudrate_code);            // baudrate is declarated above
-	tcsetattr(tty_fd, TCSANOW, &tio);
+	tcsetattr(fd, TCSANOW, &tio);
 #endif
 	return 0;
 }
@@ -799,12 +785,11 @@ MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 {
 	if (ports_pathes.size() != baudrates.size())
 		throw runtime_error("parameters length mismatch");
-
 	for (uint i = 0; i < ports_pathes.size(); i++)
 	{
 		if (ports_pathes[i] != "")
 		{
-			auto port = new Serial(ports_pathes[i], baudrates[i]);
+			auto port = new Serial( ports_pathes[i], baudrates[i] );
 			this->ports.push_back(port);
 			int res = port->connect2();
 			if (res == -1)
@@ -833,26 +818,39 @@ void MultiSerial::execute()
 {
 	char buffer[8192];
 	/* todo use select under LINUX*/
+	fd_set read_fds;
+
+
+	// Set timeout
+	Rhoban::chrono timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 10000;
+
+	
+
 	while (is_alive())
 	{
-		bool wait = true;
+	  int m = 0;
+	  FD_ZERO(&read_fds);
+	  for(int i = 0 ; i < ports.size(); i++)
+	  {
+	    auto port = ports[i];
+	    FD_SET(port->fd, &read_fds);
+	    m = max(port->fd, m);
+	  }	  // Wait for data to be available
+	  auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
+	  if(ret > 0)
+	    {
 		for (int i = 0; i < ports.size(); i++)
 		{
 			auto port = ports[i];
-			int total = 0;
-			int received = 0;
-			do
-			{
-				received = port->doRead(buffer + total, 8192 - total);
-				total += received;
-			}
-			while (received > 0 && total < 8192);
-			wait &= (total == 0);
-			if (total > 0)
-				MultiSerialReceived(i, string(buffer, total));
+			if( FD_ISSET(port->fd, &read_fds) )
+			  {
+				int total = port->doRead(buffer, 8192);
+				MultiSerialReceived(i, string(buffer, total));				
+			  }
 		}
-		if (wait)
-			syst_wait_ms(10);
+	}
 	}
 }
 
