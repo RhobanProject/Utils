@@ -271,6 +271,12 @@ int Serial::connect(bool blocking)
 	return 0;
 }
 
+/* returns the file descriptor */
+int Serial::get_fd()
+{
+	return (int) fd;
+}
+
 /**
 * Initializes the usart device
 */

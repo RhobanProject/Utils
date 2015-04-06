@@ -117,6 +117,9 @@ class Serial
         string deviceName;
         bool device_is_file;
 
+		/* returns the file descriptor */
+		int get_fd();
+
 	int baudrate(){ return deviceBaudrate;}
 
     private:
