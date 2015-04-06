@@ -614,6 +614,8 @@ string Serial::receive(size_t size, bool blocking)
 {
 	char * result = (char *) malloc(size);
 	int nb = receive(result, size, blocking);
+	if(nb < 0)
+	  throw runtime_error("Failed to receive data on port " + deviceName);
 	string res = string(result, nb);
 	free(result);
 	
