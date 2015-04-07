@@ -297,7 +297,7 @@ int Serial::connect2()
 	if((tcgetattr(fd, &tio) == -1))
 	  goto error;
 
-	tio.c_iflag &= ~IGNBRK;
+	//	tio.c_iflag &= ~IGNBRK;
 	tio.c_lflag = 0;
 	tio.c_oflag = 0;
 	tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8 | B57600;           // 8n1, see termios.h for more information
