@@ -288,22 +288,40 @@ int Serial::connect2()
 	struct termios tio;
 	int flags;
 	memset(&tio, 0, sizeof(tio));
-	tio.c_iflag = 0;
-	tio.c_oflag = 0;
-	tio.c_cflag = CS8 | CREAD | CLOCAL;           // 8n1, see termios.h for more information
-	tio.c_lflag = 0;
-	tio.c_cc[VMIN] = 1;
-	tio.c_cc[VTIME] = 5;
-	if ((fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK)) == -1){
+
+	if ((fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK |O_NOCTTY)) == -1){
 		printf("Error while opening\n"); // Just if you want user interface error control
 		return -1;
 	}
+
+	if((tcgetattr(fd, &tio) == -1))
+	  goto error;
+
+	tio.c_iflag &= ~IGNBRK;
+	tio.c_lflag = 0;
+	tio.c_oflag = 0;
+	tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8 | B57600;           // 8n1, see termios.h for more information
+
+	tio.c_cc[VMIN] = 0;
+	tio.c_cc[VTIME] = 5;
+
+	tio.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+	tio.c_cflag |= (CLOCAL | CREAD);
+
+	tio.c_cflag &= ~(PARENB | PARODD);  
+	tio.c_cflag &= ~CSTOPB;
+        tio.c_cflag &= ~CRTSCTS;
+
+	tcflush(fd, TCIFLUSH);
+	if (tcsetattr (fd, TCSANOW, &tio) != 0)
+	  goto error;
 
 	int baudrate_code;
 	switch (deviceBaudrate) {
 	case 1200: baudrate_code = B1200; break;
 	case 1800: baudrate_code = B1800; break;
 	case 2400: baudrate_code = B2400; break;
+	case 4800: baudrate_code = B4800; break;
 	case 9600: baudrate_code = B9600; break;
 	case 19200: baudrate_code = B19200; break;
 	case 38400: baudrate_code = B38400; break;
@@ -323,13 +341,22 @@ int Serial::connect2()
 	case 3500000: baudrate_code = B3500000; break;
 	case 4000000: baudrate_code = B4000000; break;
 	default:
-		throw "Serial::setSpeed: unknown baudrate";
+	  throw runtime_error("Serial::setSpeed: unknown baudrate");
 	}
-	cfsetospeed(&tio, baudrate_code);
-	cfsetispeed(&tio, baudrate_code);            // baudrate is declarated above
-	tcsetattr(fd, TCSANOW, &tio);
+	tcflush(fd, TCIFLUSH);
+	if(
+	   (cfsetospeed(&tio, baudrate_code) == -1)
+	   || (cfsetispeed(&tio, baudrate_code) == -1)
+	   || (tcsetattr(fd, TCSANOW, &tio) == -1)
+	  )
+	  goto error;
+
 #endif
 	return 0;
+ error:
+	    perror("Error setting serial baudrate");
+	    close(fd);
+	return -1;
 }
 
 /**
@@ -620,9 +647,12 @@ string Serial::receive(size_t size, bool blocking)
 {
 	char * result = (char *) malloc(size);
 	int nb = receive(result, size, blocking);
-	if(nb < 0)
-	  throw runtime_error("Failed to receive data on port " + deviceName);
-	string res = string(result, nb);
+	if(nb < 0 && errno != EAGAIN)
+	  {
+	    cout<< "Failed to receive data on port " + deviceName << " error " << errno << endl;
+	    perror("Error");
+	  }
+	string res = string(result, (nb >= 0) ? nb : 0);
 	free(result);
 	
         return res;
