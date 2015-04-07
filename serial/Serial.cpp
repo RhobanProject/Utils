@@ -821,6 +821,7 @@ MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 	{
 		if (ports_pathes[i] != "")
 		{
+		  cout << "MultiSerial connecting to " << ports_pathes[i] << " at " << baudrates[i] << "bauds." <<endl;
 			auto port = new Serial( ports_pathes[i], baudrates[i] );
 			this->ports.push_back(port);
 			int res = port->connect2();
@@ -879,7 +880,8 @@ void MultiSerial::execute()
 			if( FD_ISSET(port->fd, &read_fds) )
 			  {
 				int total = port->doRead(buffer, 8192);
-				MultiSerialReceived(i, string(buffer, total));				
+				if(total > 0)
+				  MultiSerialReceived(i, string(buffer, total));				
 			  }
 		}
 	}
