@@ -297,7 +297,7 @@ int Serial::connect2()
 	if((tcgetattr(fd, &tio) == -1))
 	  goto error;
 
-	tio.c_iflag &= ~IGNBRK;
+	//	tio.c_iflag &= ~IGNBRK;
 	tio.c_lflag = 0;
 	tio.c_oflag = 0;
 	tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8 | B57600;           // 8n1, see termios.h for more information
@@ -823,6 +823,7 @@ MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 	{
 		if (ports_pathes[i] != "")
 		{
+		  cout << "MultiSerial connecting to " << ports_pathes[i] << " at " << baudrates[i] << "bauds." <<endl;
 			auto port = new Serial( ports_pathes[i], baudrates[i] );
 			this->ports.push_back(port);
 			int res = port->connect2();
@@ -881,8 +882,9 @@ void MultiSerial::execute()
 			  auto port = ports[i];
 			  if (FD_ISSET(port->fd, &read_fds))
 			  {
-				  int total = port->doRead(buffer, 8192);
-				  MultiSerialReceived(i, string(buffer, total));
+				int total = port->doRead(buffer, 8192);
+				if(total > 0)
+				  MultiSerialReceived(i, string(buffer, total));				
 			  }
 		  }
 	  }
