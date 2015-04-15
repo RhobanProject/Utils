@@ -815,6 +815,7 @@ void Serial::record(string filename)
 
 MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 {
+  multiserial_received.resize(ports_pathes.size());
 	if (ports_pathes.size() != baudrates.size())
 		throw runtime_error("parameters length mismatch");
 	for (uint i = 0; i < ports_pathes.size(); i++)
@@ -881,7 +882,8 @@ void MultiSerial::execute()
 			  {
 				int total = port->doRead(buffer, 8192);
 				if(total > 0)
-				  MultiSerialReceived(i, string(buffer, total));				
+				  MultiSerialReceived(i, string(buffer, total));
+				multiserial_received[i] += total;
 			  }
 		}
 	}

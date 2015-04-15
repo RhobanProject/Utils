@@ -174,8 +174,11 @@ public:
 	/* return how many chars were sent, -1 in case of error */
 	int Send(int port_id, const string & data);
 
+
+
 protected:
 	vector<Serial *> ports;
+	vector<int> multiserial_received;
 
 	void execute();
 
