@@ -887,7 +887,8 @@ void MultiSerial::execute()
 				  MultiSerialReceived(i, string(buffer, total));				
 			  }
 		  }
-	  }
+#else
+	  ms_sleep(1000);
 #endif
 	}
 }
