@@ -1,3 +1,4 @@
+
 /*************************************************
  * Publicly released by Rhoban System, August 2012
  *             www.rhoban-system.fr
@@ -297,7 +298,7 @@ int Serial::connect2()
 	if((tcgetattr(fd, &tio) == -1))
 	  goto error;
 
-	//	tio.c_iflag &= ~IGNBRK;
+
 	tio.c_lflag = 0;
 	tio.c_oflag = 0;
 	tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8 | B57600;           // 8n1, see termios.h for more information
@@ -305,6 +306,7 @@ int Serial::connect2()
 	tio.c_cc[VMIN] = 0;
 	tio.c_cc[VTIME] = 5;
 
+	tio.c_iflag &= ~IGNBRK & ~IGNCR & ~ICRNL & ~INLCR;//dont mess up with carriage return
 	tio.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
 	tio.c_cflag |= (CLOCAL | CREAD);
 
@@ -353,9 +355,11 @@ int Serial::connect2()
 
 #endif
 	return 0;
- error:
+error:
+#ifndef WIN32
 	    perror("Error setting serial baudrate");
 	    close(fd);
+#endif
 	return -1;
 }
 
@@ -865,6 +869,7 @@ void MultiSerial::execute()
 	while (is_alive())
 	{
 	  int m = 0;
+#ifndef WIN32
 	  FD_ZERO(&read_fds);
 	  for(int i = 0 ; i < ports.size(); i++)
 	  {
@@ -873,20 +878,21 @@ void MultiSerial::execute()
 	    m = max(port->fd, m);
 	  }	  // Wait for data to be available
 	  auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
-	  if(ret > 0)
-	    {
-		for (int i = 0; i < ports.size(); i++)
-		{
-			auto port = ports[i];
-			if( FD_ISSET(port->fd, &read_fds) )
+	  if (ret > 0)
+	  {
+		  for (int i = 0; i < ports.size(); i++)
+		  {
+			  auto port = ports[i];
+			  if (FD_ISSET(port->fd, &read_fds))
 			  {
 				int total = port->doRead(buffer, 8192);
 				if(total > 0)
 				  MultiSerialReceived(i, string(buffer, total));
 				multiserial_received[i] += total;
 			  }
-		}
-	}
+		  }
+	  }
+#endif
 	}
 }
 
