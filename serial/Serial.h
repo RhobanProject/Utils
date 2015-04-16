@@ -161,6 +161,7 @@ class MultiSerial : private Rhoban::Thread
 {
 public:
 	MultiSerial();
+	virtual ~MultiSerial();
 
 	//ports with empty name are ignored
 	MultiSerial(
@@ -168,7 +169,7 @@ public:
 		vector<int> baudrates
 		);
 
-	virtual ~MultiSerial();
+
 
 	/* called when data is received */
 	virtual void MultiSerialReceived(int port, const string & data){};
