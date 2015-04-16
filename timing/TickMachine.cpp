@@ -377,11 +377,11 @@ void TickMachine::tick_players()
 			if(tt == timer)
 				continue;
 
-#ifndef WIN32
-		if(timer->relative > 0)
-			if(--(timer->tick_counter) <= 0)
-				timer->tick();
-#else
+//#ifndef WIN32
+//		if(timer->relative > 0)
+//			if(--(timer->tick_counter) <= 0)
+//				timer->tick();
+//#else
 		//We cannot trust tick counter because we dont have a precise timing signal like SIGALARM is (to be checked)
 		TM_DEBUG_MSG("Cheking whether timer " << (long long int) timer << " is tickable");
 		if(timer->is_tickable(now))
@@ -395,7 +395,7 @@ void TickMachine::tick_players()
 			gettimeofday(&now, NULL);
 			TM_DEBUG_MSG("Skipping timer " << (long long int) timer << " with diff counter " << (to_secs(now ) - to_secs(timer->start_time) ) * timer->frequency << " " << timer->ticks_elapsed);
 		}
-#endif
+//#endif
 	}
 }
 /*!
@@ -423,7 +423,5 @@ void TickMachine::update_granularity_and_players(double max_relative_error)
 	//sets the new values for the timer
 	set_granularity(new_gran);
 	TM_DEBUG_MSG("Done update_granularity_and_players");
-
-
 }
 

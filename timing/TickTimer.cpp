@@ -106,6 +106,13 @@ void TickTimer::set_relative(Rhoban::chrono granularity)
 
 bool TickTimer::is_tickable(Rhoban::chrono now)
 {
+    /*
+    float now_secs = to_secs(now);
+    float start_secs = to_secs(start_time);
+    float elapsed = now_secs-start_secs;
+    int elapsed_ticks = elapsed*frequency;
+    int missed_ticks = elapsed_ticks - ticks_elapsed;
+    */
 	return (relative > 0) && ( (to_secs(now ) - to_secs(start_time) ) * frequency - ticks_elapsed >= 0);
 }
 
