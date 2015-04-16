@@ -160,6 +160,8 @@ class Serial
 class MultiSerial : private Rhoban::Thread
 {
 public:
+	MultiSerial();
+
 	//ports with empty name are ignored
 	MultiSerial(
 		vector<string> ports,
@@ -174,6 +176,11 @@ public:
 	/* return how many chars were sent, -1 in case of error */
 	int Send(int port_id, const string & data);
 
+	void Disconnect();
+	void Connect(
+		vector<string> ports,
+		vector<int> baudrates
+		);
 
 
 protected:

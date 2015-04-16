@@ -817,25 +817,61 @@ void Serial::record(string filename)
 		throw string("Failed to open serial log file ") + filename;
 }
 
+MultiSerial::MultiSerial()
+{
+
+}
+
 MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 {
-  multiserial_received.resize(ports_pathes.size());
-	if (ports_pathes.size() != baudrates.size())
-		throw runtime_error("parameters length mismatch");
-	for (uint i = 0; i < ports_pathes.size(); i++)
+  Connect(ports_pathes, baudrates);
+}
+
+void MultiSerial::Disconnect()
+{
+	if (Thread::thread_state == Thread::ThreadState::Running)
+		Thread::kill();
+	for (auto & port : ports)
 	{
-		if (ports_pathes[i] != "")
+		if (port)
 		{
-		  cout << "MultiSerial connecting to " << ports_pathes[i] << " at " << baudrates[i] << "bauds." <<endl;
-			auto port = new Serial( ports_pathes[i], baudrates[i] );
+			port->disconnect();
+			port = NULL;
+		}
+	}
+	ports.clear();
+}
+
+void MultiSerial::Connect(
+	vector<string> ports,
+	vector<int> baudrates
+	)
+{
+
+	if (ports.size() != baudrates.size())
+		throw runtime_error("parameters length mismatch");
+
+	multiserial_received.clear();
+	multiserial_received.resize(ports.size());
+
+	if (Thread::thread_state == Thread::ThreadState::Running)
+		Thread::kill();
+
+	for (uint i = 0; i < ports.size(); i++)
+	{
+		if (ports[i] != "")
+		{
+			cout << "MultiSerial connecting to " << ports[i] << " at " << baudrates[i] << "bauds." << endl;
+			auto port = new Serial(ports[i], baudrates[i]);
 			this->ports.push_back(port);
 			int res = port->connect2();
 			if (res == -1)
-				throw runtime_error("Failed to connect to port '" + ports_pathes[i] + "'");
+				throw runtime_error("Failed to connect to port '" + ports[i] + "'");
 		}
 	}
-	start();
-	wait_started();
+
+	Thread::start();
+	Thread::wait_started();
 }
 
 /* return how many chars were sent, -1 in case of error */
@@ -899,13 +935,5 @@ void MultiSerial::execute()
 
 MultiSerial::~MultiSerial()
 {
-	for (auto & port : ports)
-	{
-		if (port)
-		{
-			port->disconnect();
-			port = NULL;
-		}
-	}
-	ports.clear();
+	Disconnect();
 }
