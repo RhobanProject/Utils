@@ -829,7 +829,7 @@ MultiSerial::MultiSerial(vector<string> ports_pathes, vector<int> baudrates)
 
 void MultiSerial::Disconnect()
 {
-	if (Thread::thread_state == Thread::ThreadState::Running)
+  if (Thread::is_alive())
 		Thread::kill();
 	for (auto & port : ports)
 	{
@@ -854,14 +854,19 @@ void MultiSerial::Connect(
 	multiserial_received.clear();
 	multiserial_received.resize(ports.size());
 
-	if (Thread::thread_state == Thread::ThreadState::Running)
+	if (Thread::is_alive())
+	  {
+	cout << "MultiSerial killing main thread..." << flush;
 		Thread::kill();
+	Thread::wait_dead();
+	cout << "...done!";
+	  }
 
 	for (uint i = 0; i < ports.size(); i++)
 	{
 		if (ports[i] != "")
 		{
-			cout << "MultiSerial connecting to " << ports[i] << " at " << baudrates[i] << "bauds." << endl;
+			cout << "MultiSerial connecting to '" << ports[i] << "' at " << baudrates[i] << "bauds." << endl;
 			auto port = new Serial(ports[i], baudrates[i]);
 			this->ports.push_back(port);
 			int res = port->connect2();
@@ -870,8 +875,13 @@ void MultiSerial::Connect(
 		}
 	}
 
+	if(!Thread::is_alive())
+	  {
+	cout << "MultiSerial starting main thread..." << flush;
 	Thread::start();
 	Thread::wait_started();
+	cout << "...done!";
+	  }
 }
 
 /* return how many chars were sent, -1 in case of error */
@@ -894,12 +904,10 @@ void MultiSerial::execute()
 	/* todo use select under LINUX*/
 	fd_set read_fds;
 
-
 	// Set timeout
 	Rhoban::chrono timeout;
 	timeout.tv_sec = 0;
 	timeout.tv_usec = 10000;
-
 	
 
 	while (is_alive())
@@ -913,11 +921,14 @@ void MultiSerial::execute()
 	    FD_SET(port->fd, &read_fds);
 	    m = max(port->fd, m);
 	  }	  // Wait for data to be available
+	  //      cout << "Multiserial performing select " << endl;
 	  auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
 	  if (ret > 0)
 	  {
+	    //cout << "Multiserial got select " << ret << endl;
 		  for (int i = 0; i < ports.size(); i++)
 		  {
+		    //cout << "Multiserial checking port " << i << endl;
 			  auto port = ports[i];
 			  if (FD_ISSET(port->fd, &read_fds))
 			  {
@@ -926,8 +937,18 @@ void MultiSerial::execute()
 				  MultiSerialReceived(i, string(buffer, total));
 				multiserial_received[i] += total;
 			  }
+			  else
+			    {
+			      //	      cout << "Nothing received on port " << i << endl;
+			    }
 		  }
 	  }
+	  else
+	    {
+	      //	      cout << "Multiserial failed to perfom select " << endl;
+	      //perror("MultiSerial");
+	      ms_sleep(1000);
+	    }
 #else
 	  ms_sleep(1000);
 #endif
