@@ -284,7 +284,6 @@ void Thread::setup(void)
  */
 void Thread::wait_started()
 {
-	//Hugo: We should use a condion instead
 #ifdef WIN32
 	started.lock();
 	if(thread_state == Unborn || thread_state == Starting)
@@ -292,7 +291,7 @@ void Thread::wait_started()
 	started.unlock();
 #else
 	while (thread_state == Unborn || thread_state == Starting)
-        usleep(1000);
+	  usleep(1000);
 #endif
 }
 

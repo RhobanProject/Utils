@@ -880,7 +880,7 @@ void MultiSerial::Connect(
 	cout << "MultiSerial starting main thread..." << flush;
 	Thread::start();
 	Thread::wait_started();
-	cout << "...done!";
+	cout << "...done!" << endl;;
 	  }
 }
 
