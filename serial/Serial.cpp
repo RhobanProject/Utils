@@ -853,6 +853,8 @@ void MultiSerial::Connect(
 
 	multiserial_received.clear();
 	multiserial_received.resize(ports.size());
+	multiserial_sent.clear();
+	multiserial_sent.resize(ports.size());
 
 	if (Thread::is_alive())
 	  {
@@ -895,6 +897,7 @@ int MultiSerial::Send(int port_id, const string & data)
 	BEGIN_SAFE(mutex)
 		res = port->send(data);
 	END_SAFE(mutex)
+	  multiserial_sent[port_id] += (res >=0) ? res : 0;
 	return res;
 }
 
