@@ -912,45 +912,58 @@ void MultiSerial::execute()
 
 	while (is_alive())
 	{
-	  int m = 0;
+		int m = 0;
 #ifndef WIN32
-	  FD_ZERO(&read_fds);
-	  for(int i = 0 ; i < ports.size(); i++)
-	  {
-	    auto port = ports[i];
-	    FD_SET(port->fd, &read_fds);
-	    m = max(port->fd, m);
-	  }	  // Wait for data to be available
-	  //      cout << "Multiserial performing select " << endl;
-	  auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
-	  if (ret > 0)
-	  {
-	    //cout << "Multiserial got select " << ret << endl;
-		  for (int i = 0; i < ports.size(); i++)
-		  {
-		    //cout << "Multiserial checking port " << i << endl;
-			  auto port = ports[i];
-			  if (FD_ISSET(port->fd, &read_fds))
-			  {
-				int total = port->doRead(buffer, 8192);
-				if(total > 0)
-				  MultiSerialReceived(i, string(buffer, total));
-				multiserial_received[i] += total;
-			  }
-			  else
-			    {
-			      //	      cout << "Nothing received on port " << i << endl;
-			    }
-		  }
-	  }
-	  else
-	    {
-	      //	      cout << "Multiserial failed to perfom select " << endl;
-	      //perror("MultiSerial");
-	      ms_sleep(1000);
-	    }
+		FD_ZERO(&read_fds);
+		for(int i = 0 ; i < ports.size(); i++)
+		{
+			auto port = ports[i];
+			FD_SET(port->fd, &read_fds);
+			m = max(port->fd, m);
+		}	  // Wait for data to be available
+		//      cout << "Multiserial performing select " << endl;
+		auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
+		if (ret > 0)
+		{
+			//cout << "Multiserial got select " << ret << endl;
+			for (int i = 0; i < ports.size(); i++)
+			{
+				//cout << "Multiserial checking port " << i << endl;
+				auto port = ports[i];
+				if (FD_ISSET(port->fd, &read_fds))
+				{
+					int total = port->doRead(buffer, 8192);
+					if(total > 0)
+					{
+						MultiSerialReceived(i, string(buffer, total));
+						multiserial_received[i] += total;
+					}
+				}
+			}
+		}
+		else if(ret < 0)
+		{
+			cout << "Multiserial failed to perfom select " << endl;
+			perror("MultiSerial");
+			ms_sleep(500);
+		}
 #else
-	  ms_sleep(1000);
+		for (int i = 0; i < ports.size(); i++)
+		{
+			bool stalled = true;
+			if (ports[i])
+			{
+				auto chunk = ports[i]->receive(8192);
+				if (chunk.size() > 0)
+				{
+					stalled = false;
+					MultiSerialReceived(i, chunk);
+					multiserial_received[i] += chunk.size();
+				}
+			}
+			if (stalled)
+				ms_sleep(50);
+		}
 #endif
 	}
 }

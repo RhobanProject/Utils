@@ -84,8 +84,8 @@ class Chrono
     public:
         Chrono();
         double getTime();
-		double getTimeMsec();
-		double getTimeUsec();
+		long getTimeMsec();
+		long getTimeUsec();
 		void reset();
 
 		Chrono& operator+=(const Chrono& chr){

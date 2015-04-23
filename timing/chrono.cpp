@@ -105,12 +105,12 @@ double Chrono::getTime()
     return Rhoban::chrono_usec(&chr)*0.000001;
 }
 
-double Chrono::getTimeUsec()
+long Chrono::getTimeUsec()
 {
 	return Rhoban::chrono_usec(&chr);
 }
 
-double Chrono::getTimeMsec()
+long Chrono::getTimeMsec()
 {
 	return Rhoban::chrono_msec(&chr);
 }
