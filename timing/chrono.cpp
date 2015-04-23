@@ -25,8 +25,8 @@
 
 
 /*!\brief compute tv0-tv1 and put it into dtv */
-void compute_tv_diff(Rhoban::chrono *tv0,
-		     Rhoban::chrono *tv1,
+void compute_tv_diff(const Rhoban::chrono *tv0,
+		     const Rhoban::chrono *tv1,
 		     Rhoban::chrono *dtv) {
   if (tv0->tv_sec == tv1->tv_sec) {
     dtv->tv_sec = 0;
@@ -71,21 +71,21 @@ void Rhoban::delete_chrono(Rhoban::chrono * chr) {
   free(chr);
 }
 
-long int Rhoban::chrono_sec(Rhoban::chrono * chr) {
+long int Rhoban::chrono_sec(const Rhoban::chrono * chr) {
   Rhoban::chrono tv, tv_diff;
   gettimeofday(&tv,NULL);
   compute_tv_diff(&tv, chr, &tv_diff);
   return tv_diff.tv_sec;
 }
 
-long int Rhoban::chrono_msec(Rhoban::chrono * chr) {
+long int Rhoban::chrono_msec(const Rhoban::chrono * chr) {
   Rhoban::chrono tv, tv_diff;
   gettimeofday(&tv,NULL);
   compute_tv_diff(&tv, chr, &tv_diff);
   return tv_diff.tv_sec * 1000 + tv_diff.tv_usec / 1000;
 }
 
-long int Rhoban::chrono_usec(Rhoban::chrono * chr) {
+long int Rhoban::chrono_usec(const Rhoban::chrono * chr) {
   Rhoban::chrono tv, tv_diff;
   gettimeofday(&tv,NULL);
   compute_tv_diff(&tv, chr, &tv_diff);
@@ -100,17 +100,17 @@ Chrono::Chrono()
     reset();
 }
         
-double Chrono::getTime()
+double Chrono::getTime() const
 {
     return Rhoban::chrono_usec(&chr)*0.000001;
 }
 
-long Chrono::getTimeUsec()
+long Chrono::getTimeUsec() const
 {
 	return Rhoban::chrono_usec(&chr);
 }
 
-long Chrono::getTimeMsec()
+long Chrono::getTimeMsec() const
 {
 	return Rhoban::chrono_msec(&chr);
 }
