@@ -65,17 +65,17 @@ namespace Rhoban
 	/*****************************************************************************/
 	/*!\brief Gives the number of second elapsed from the last timer reset.
 	 *****************************************************************************/
-	long int chrono_sec(Rhoban::chrono * chr);
+	long int chrono_sec(const Rhoban::chrono * chr);
 
 	/*****************************************************************************/
 	/*!\brief Gives the number of milli second elapsed from the last timer reset.
 	 *****************************************************************************/
-	long int chrono_msec(Rhoban::chrono * chr);
+	long int chrono_msec(const Rhoban::chrono * chr);
 
 	/*****************************************************************************/
 	/*!\brief Gives the number of micro second elapsed from the last timer reset.
 	 *****************************************************************************/
-	long int chrono_usec(Rhoban::chrono * chr);
+	long int chrono_usec(const Rhoban::chrono * chr);
 
 }
 
@@ -83,9 +83,9 @@ class Chrono
 {
     public:
         Chrono();
-        double getTime();
-		double getTimeMsec();
-		double getTimeUsec();
+        double getTime() const;
+		double getTimeMsec() const;
+		double getTimeUsec() const;
 		void reset();
 
 		Chrono& operator+=(const Chrono& chr){
