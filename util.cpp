@@ -210,7 +210,7 @@ std::string camelize(std::string input)
     std::string output;
     bool caps = false;
 
-    for (int k=0; k<input.size(); k++) {
+    for (unsigned int k=0; k<input.size(); k++) {
         if (std::isspace(input[k])) {
             caps = true;
         } else {
