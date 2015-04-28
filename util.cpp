@@ -215,6 +215,7 @@ std::string camelize(std::string input)
             caps = true;
         } else {
             if (caps) {
+                caps = false;
                 output += toupper(input[k]);
             } else {
                 output += input[k];
