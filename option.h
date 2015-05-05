@@ -58,6 +58,11 @@ public:
       throw OptionNoValueExc();
     return & stored;
   }
+
+  void clear()
+  {
+	  isSome = false;
+  }
 };
 
 #endif /* OPTION_HH */

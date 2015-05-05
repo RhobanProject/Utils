@@ -49,8 +49,8 @@ void wait_n_ticks(ui32 tick_nb);
 /* compute a string containing hour and date and which can be used in a filename */
 string date_to_filename();
 
-void sleep_ms_ticks(ui32 ms);
-void sleep_ticks(Rhoban::chrono duration);
+//void sleep_ms_ticks(ui32 ms);
+//void sleep_ticks(Rhoban::chrono duration);
 
 inline void syst_wait_ms(int ms)
 {
