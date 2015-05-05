@@ -950,6 +950,10 @@ void MultiSerial::execute()
 			perror("MultiSerial");
 			ms_sleep(500);
 		}
+		else
+		  {
+		    ms_sleep(20);
+		  }
 #else
 		for (int i = 0; i < ports.size(); i++)
 		{

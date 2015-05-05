@@ -343,7 +343,8 @@ void TickMachine::execute()
 		Sleep( (granularity.tv_sec*1000+granularity.tv_usec/1000) / 5);
 #else
 		usleep( (granularity.tv_sec*1000000+granularity.tv_usec) / 5);
-		//wait_signal(SIGALRM);
+		usleep(10000);
+//wait_signal(SIGALRM);
 #endif
 	}
 }
