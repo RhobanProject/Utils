@@ -2,7 +2,10 @@
 #include <cstdlib>
 #include <cstdio>
 #include <json/json.h>
+#include <logging/Logger.h>
 #include "Function.h"
+
+static Rhoban::Logger out("function");
 
 #define POINT_X(n) points[2*(n)]
 #define POINT_Y(n) points[2*(n)+1]
@@ -50,6 +53,8 @@ std::map<std::string, Function> Function::fromFile(std::string filename)
                 result[name] = f;
             }
         }
+    } else {
+        out.error("Malformed file %s:\n %s", filename.c_str(), reader.getFormatedErrorMessages().c_str());
     }
 
     return result;
