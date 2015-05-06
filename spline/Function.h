@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+#include <map>
+#include <string>
+
 #ifndef FUNCTION_DEFAULT_POINTS
 #define FUNCTION_DEFAULT_POINTS 16
 #endif
@@ -8,7 +12,6 @@ class Function
 {
     public:
         Function();
-        ~Function();
 
         /**
          * Add a point (x, y) to the function
@@ -35,27 +38,30 @@ class Function
          */
         void checkSize();
 
+        /**
+         * Clear the spline
+         */
         void clear();
+
+        /**
+         * Load a JSON file
+         */
+        static std::map<std::string, Function> fromFile(std::string filename);
 
     protected:
         /**
          * Function points
          */
-        double *points;
-
-        /**
-         * Number of points
-         */
-        int nbPoints;
-
-        /**
-         * Array size
-         */
-        int size;
+        std::vector<double> points;
 
         /**
          * The nth item of this array is the slope between the nth point and the
          * n+1th point
          */
-        double *ds;
+        std::vector<double> ds;
+
+        /**
+         * Number of points
+         */
+        int nbPoints;
 };

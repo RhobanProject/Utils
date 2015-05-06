@@ -208,6 +208,8 @@ endforeach (DIRECTORY)
 if (COMPILE_UTILS_TESTS)
   add_executable (scoringTest test/ScoringTest.cpp scoring/Score.cpp scoring/Mark.cpp tests/TestCase.cpp logging/term_display.cpp)
   add_executable (timeStampTest test/TimeStampTest.cpp timing/TimeStamp.cpp tests/TestCase.cpp )
+  add_executable (splineTest test/SplineTest.cpp)
+  target_link_libraries (splineTest RhobanUtils)
 endif (COMPILE_UTILS_TESTS)
 
 # Adding TinyXml
