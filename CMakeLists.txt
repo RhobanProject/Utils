@@ -2,11 +2,6 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
 
-option (32BIT "Compilation 32 bit" OFF)
-IF(32BIT)
-	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
-ENDIF(32BIT)
-
 option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
 
 if (MSVC)
@@ -152,8 +147,7 @@ set(DIRECTORIES
     threading
     timing
     xml
-# DISABLING zmq, if flag ENABLE_ZMQ is not ON!!!
-#    zmq
+    spline
     )
 
 
