@@ -40,18 +40,22 @@ class ZMQServer : public Rhoban::Thread
 
         void run()
         {
+	      zmq_msg_t message;
+	      zmq_msg_init (&message);
+
             while (processor.isRunning()) {
-                char *request = s_recv(server);
-                std::string response = processor.process(std::string(request));
+	      int size = zmq_msg_recv (&message, server, 0);
+	      if (size != -1)
+		{
+
+		  std::string response = processor.process(std::string( (char *) zmq_msg_data (&message), size) );
                 
-                zmq_msg_t message;
                 zmq_msg_init_size (&message, response.size());
                 memcpy(zmq_msg_data(&message), response.c_str(), response.size());
                 zmq_msg_send (&message, server, 0);
-                zmq_msg_close(&message);
-
-                free(request);
-            }
+		}
+ 
+             }
         }
 
         void execute()
