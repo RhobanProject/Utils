@@ -183,11 +183,11 @@ public:
 		vector<int> baudrates
 		);
 
+	vector<int> multiserial_received;
+	vector<int> multiserial_sent;
 
 protected:
 	vector<Serial *> ports;
-	vector<int> multiserial_received;
-	vector<int> multiserial_sent;
 
 	void execute();
 

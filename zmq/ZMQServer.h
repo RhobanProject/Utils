@@ -12,8 +12,8 @@ template<typename T>
 class ZMQServer : public Rhoban::Thread
 {
 public:
-	ZMQServer(int port, T &processor_, bool new_context = true)
-		: context(NULL), server(NULL), processor(processor_)
+	ZMQServer(int port, T &processor_, bool create_context = true)
+		: context(NULL), server(NULL), processor(processor_), create_context(create_context)
 	{
 		if (new_context)
 			context = zmq_ctx_new();
@@ -22,25 +22,22 @@ public:
 
 		server = zmq_socket(context, ZMQ_REP);
 
-		std::ostringstream oss;
-		oss << "tcp://*:" << port;
-		std::string addr = oss.str();
+		std::string addr = "tcp://*:" + to_string(port);
 
-		if (zmq_bind(server, addr.c_str()) != 0) {
-			throw std::string("Unable to bind server");
-		}
+		if (zmq_bind(server, addr.c_str()) != 0)
+			throw runtime_error("Unable to bind server");
 	}
 
 	virtual ~ZMQServer()
 	{
-		if (server != NULL) {
+		if (server != NULL)
 			zmq_close(server);
-			server = NULL;
-		}
-		if (context != NULL) {
+
+		if (create_context && (context != NULL))
 			zmq_ctx_destroy(context);
-			context = NULL;
-		}
+
+		server = NULL;
+		context = NULL;
 	}
 
 	void run()
@@ -69,6 +66,7 @@ protected:
 	void *context;
 	void *server;
 	T &processor;
+	bool create_context;
 };
 
 #endif

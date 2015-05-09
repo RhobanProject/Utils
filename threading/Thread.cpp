@@ -162,7 +162,6 @@ void Thread::kill(void)
 	    if(!is_alive()) return;
     wait_started();
     thread_state = Dying;
-	cleanup();
 
 #ifndef MSVC
 #ifndef WIN32
