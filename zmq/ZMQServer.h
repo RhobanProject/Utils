@@ -6,15 +6,20 @@
 #include <string>
 #include <threading/Thread.h>
 #include "zhelpers.h"
+#include <zmq/ZMQContext.h>
 
 template<typename T>
 class ZMQServer : public Rhoban::Thread
 {
 public:
-	ZMQServer(int port, T &processor_)
+	ZMQServer(int port, T &processor_, bool new_context = true)
 		: context(NULL), server(NULL), processor(processor_)
 	{
-		context = zmq_ctx_new();
+		if (new_context)
+			context = zmq_ctx_new();
+		else
+			context = Rhoban::get_zmq_context();
+
 		server = zmq_socket(context, ZMQ_REP);
 
 		std::ostringstream oss;
