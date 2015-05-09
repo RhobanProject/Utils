@@ -20,6 +20,12 @@ class CommandArgs
         bool hasFlag(char flag);
         bool hasOption(string option);
 
+		void setFlag(string flag);
+		void setOption(string name, string value);
+		void setOptionInt(string name, int value);
+		void setOptionDouble(string name, double value);
+		void setOptionFloat(string name, float value);
+
         // Getting a n option
         string getOption(string name, string fallback="");
         int getOptionInt(string name, int fallback=0);
