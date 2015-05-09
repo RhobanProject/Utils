@@ -15,7 +15,7 @@ public:
 	ZMQServer(int port, T &processor_, bool create_context = true)
 		: context(NULL), server(NULL), processor(processor_), create_context(create_context)
 	{
-		if (new_context)
+		if (create_context)
 			context = zmq_ctx_new();
 		else
 			context = Rhoban::get_zmq_context();
