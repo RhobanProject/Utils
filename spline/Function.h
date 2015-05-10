@@ -52,7 +52,8 @@ class Function
         /**
          * Function points
          */
-        std::vector<double> points;
+        std::vector<double> points_x;
+        std::vector<double> points_y;
 
         /**
          * The nth item of this array is the slope between the nth point and the

@@ -7,9 +7,6 @@
 
 static Rhoban::Logger out("function");
 
-#define POINT_X(n) points[2*(n)]
-#define POINT_Y(n) points[2*(n)+1]
-
 Function::Function()
     : nbPoints(0)
 {
@@ -17,7 +14,8 @@ Function::Function()
 
 void Function::clear()
 {
-    points.clear();
+    points_x.clear();
+    points_y.clear();
     ds.clear();
     nbPoints = 0;
 }
@@ -66,17 +64,17 @@ double Function::getXMax()
         return 0.0;
     }
 
-    return POINT_X(nbPoints-1);
+    return points_x[nbPoints-1];
 }
 
 void Function::addPoint(double x, double y)
 {
-    points.push_back(x);
-    points.push_back(y);
+    points_x.push_back(x);
+    points_y.push_back(y);
 
     if (nbPoints > 0) {
-        float d = POINT_Y(nbPoints) - POINT_Y(nbPoints-1);
-        d /= POINT_X(nbPoints) - POINT_X(nbPoints-1);
+        float d = points_y[nbPoints] - points_y[nbPoints-1];
+        d /= points_x[nbPoints] - points_x[nbPoints-1];
         ds.push_back(d);
     }
 
@@ -84,27 +82,39 @@ void Function::addPoint(double x, double y)
 }
 
 double Function::get(double x)
-{
-    int i;
-    
+{ 
     if (nbPoints == 0) {
         return 0.0;
     }
 
-    for (i=0; i<nbPoints; i++) {
-        if (POINT_X(i) >= x) {
-            break;
+    if (points_x[0] >= x) {
+        return points_y[0];
+    }
+    if (points_x[nbPoints-1] <= x) {
+        return points_y[nbPoints-1];
+    }
+
+    int a = 0, b = nbPoints-1;
+    int i = (a+b)/2;
+    while (a != b) {
+        if (points_x[i] >= x) {
+            if (i == 0 || points_x[i-1] <= x) {
+                a = b;
+            } else {
+                b = i;
+                i = (a+b)/2;
+            }
+        } else {
+            if (a == i) {
+                a++;
+            } else {
+                a = i;
+            }
+            i = (a+b)/2;
         }
     }
 
-    if (i == 0) {
-        return POINT_Y(0);
-    }
-    if (i == nbPoints) {
-        return POINT_Y(nbPoints-1);
-    }
-
-    return POINT_Y(i-1)+ds[i-1]*(x-POINT_X(i-1));
+    return points_y[i-1]+ds[i-1]*(x-points_x[i-1]);
 }
 
 double Function::getMod(double x)
@@ -117,7 +127,3 @@ double Function::getMod(double x)
 
     return get(x);
 }
-
-
-#undef POINT_X
-#undef POINT_Y
