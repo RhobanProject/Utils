@@ -26,6 +26,7 @@ public:
 
 		if (zmq_bind(server, addr.c_str()) != 0)
 			throw runtime_error("Unable to bind server");
+
 	}
 
 	virtual ~ZMQServer()

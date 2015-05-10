@@ -11,7 +11,7 @@ class ZMQClient
 
         void setTimeout(double timeout_);
         void connect();
-        std::string process(const std::string &request);
+        virtual std::string process(const std::string &request);
 
     protected:
         std::string remote;

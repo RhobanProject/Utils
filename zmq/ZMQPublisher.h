@@ -21,6 +21,8 @@ public:
 
 		if (zmq_bind(server, addr.c_str()) != 0)
 			throw runtime_error("Unable to bind publish server to '" + addr + "'");
+		else
+		  cout << "Created publisher on port " << port << endl;
 	}
 
 	virtual ~ZMQPublisher()

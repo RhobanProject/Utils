@@ -52,8 +52,9 @@ public:
 
   /*! \brief Get the address of the value if present, throw a dirty exception
    *  otherwise */
-  T * getValueAddr()
+  T * getValueAddr(bool force = false)
   {
+    if(force) isSome = true;
     if (!isSome)
       throw OptionNoValueExc();
     return & stored;

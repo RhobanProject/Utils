@@ -3,12 +3,14 @@
 #include "ZMQClient.h"
 #include "zhelpers.h"
 
-using std::string;
+#include <stdexcept>
+
+using namespace std;
 
 ZMQClient::ZMQClient(string remote_)
     : context(NULL), client(NULL)
 {
-    remote = remote_;
+  remote = remote_;
     context = zmq_ctx_new();
     client = zmq_socket(context, ZMQ_REQ);
     connect();
@@ -17,7 +19,7 @@ ZMQClient::ZMQClient(string remote_)
 void ZMQClient::connect()
 {
     if (zmq_connect(client, remote.c_str()) != 0) {
-        throw string("Unable to connect");
+        throw runtime_error("Unable to connect");
     }
 
     int timeout = 1000;
@@ -46,15 +48,17 @@ ZMQClient::~ZMQClient()
 
 string ZMQClient::process(const string &request)
 {
-    s_send(client, request.c_str());
-    char *response = s_recv(client);
+  zmq_msg_t message;
+  zmq_msg_init(&message);
 
-    if (response == NULL) {
-        throw string("Unable to talk with the server");
+  zmq_msg_init_size(&message, request.size());
+  memcpy(zmq_msg_data(&message), request.c_str(), request.size());
+  zmq_msg_send(&message, client, 0);
+  int size = zmq_msg_recv(&message, client, 0);
+    if (size == -1) {
+        throw runtime_error("Unable to get reponse from the server");
     }
-
-    string resp(response);
-    free(response);
-
-    return resp;
+    string response((char *)zmq_msg_data(&message), size);
+    zmq_msg_close(&message);
+    return response;
 }
