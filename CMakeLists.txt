@@ -213,8 +213,7 @@ if (COMPILE_UTILS_TESTS)
 endif (COMPILE_UTILS_TESTS)
 
 # Adding TinyXml
-add_subdirectory (xml/TinyXml)
-set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
+set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
 
 set (ALL_HEADERS)
 # ADD HEADERS FILES 
