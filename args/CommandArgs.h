@@ -13,7 +13,7 @@ class CommandArgs
     public:
         CommandArgs();
         CommandArgs(int argc, char *argv[]);
-        void process(int argc, char *argv[]);
+        virtual void process(int argc, char *argv[]);
 
         // Testing if a flag or an option is present
         bool hasFlag(string flag);

@@ -907,10 +907,6 @@ void MultiSerial::execute()
 	/* todo use select under LINUX*/
 	fd_set read_fds;
 
-	// Set timeout
-	Rhoban::chrono timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 10000;
 	
 
 	while (is_alive())
@@ -924,18 +920,25 @@ void MultiSerial::execute()
 			FD_SET(port->fd, &read_fds);
 			m = max(port->fd, m);
 		}	  // Wait for data to be available
-		//      cout << "Multiserial performing select " << endl;
+		//		cout << "Multiserial performing select " << endl;
+		
+		// Set timeout
+		Rhoban::chrono timeout;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 10000;
+
 		auto ret =  select(m + 1, &read_fds, NULL, NULL, &timeout);
 		if (ret > 0)
 		{
-			//cout << "Multiserial got select " << ret << endl;
+		  //			cout << "Multiserial got select " << ret << endl;
 			for (int i = 0; i < ports.size(); i++)
 			{
-				//cout << "Multiserial checking port " << i << endl;
 				auto port = ports[i];
+				//		cout << "Multiserial checking port " << i << " '" << port->deviceName << "'" << endl;
 				if (FD_ISSET(port->fd, &read_fds))
 				{
 					int total = port->doRead(buffer, 8192);
+					//	cout << "Multiserial has " << total << " on port " << i << endl;
 					if(total > 0)
 					{
 						MultiSerialReceived(i, string(buffer, total));
@@ -948,12 +951,7 @@ void MultiSerial::execute()
 		{
 			cout << "Multiserial failed to perfom select " << endl;
 			perror("MultiSerial");
-			ms_sleep(500);
 		}
-		else
-		  {
-		    ms_sleep(20);
-		  }
 #else
 		for (int i = 0; i < ports.size(); i++)
 		{

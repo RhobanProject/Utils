@@ -41,7 +41,7 @@ public:
 		context = NULL;
 	}
 
-	void run()
+	void execute()
 	{
 		zmq_msg_t message;
 		zmq_msg_init(&message);
@@ -56,11 +56,6 @@ public:
 				zmq_msg_send(&message, server, 0);
 			}
 		}
-	}
-
-	void execute()
-	{
-		run();
 	}
 
 protected:
