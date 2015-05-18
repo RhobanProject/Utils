@@ -292,9 +292,13 @@ vector<float> XMLTools::get_float_array(TiXmlNode* node, const char * array_id)
 TiXmlDocument * XMLTools::stream_to_node(const string xml_stream)
 {
     TiXmlDocument * doc = new TiXmlDocument();
-
-    if(!doc->Parse(xml_stream.c_str()))
-      throw std::runtime_error("failed to parse xml stream:\n\t" + xml_stream);
+    doc->Parse(xml_stream.c_str());
+    if(doc->Error()){
+      std::ostringstream oss;
+      oss << "failed to parse xml stream: '" << doc->ErrorDesc() << "'\n"
+          << xml_stream;
+      throw std::runtime_error(oss.str());
+    }
 
     TiXmlNode* firstnode = doc->FirstChild();
     if(!firstnode)
