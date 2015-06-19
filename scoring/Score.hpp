@@ -21,6 +21,8 @@ protected:
 
 public:
 
+  Score() {}
+
   Score(std::string name,
         double weight = 1.0,
         double value = 0.0) : Mark(name, "", weight, value) {};
@@ -43,7 +45,7 @@ public:
   void showMarks(int detailLevel = 0) const;
   
   /* weights are relative,
-   * if value is less than min_value, then score will be 0 (note eliminatoire)
+   * if value is less than min_value, then score will be 0 (eliminatory mark)
    * value is in [0,1] */
   void mark(std::string mark_name,
             std::string note,
