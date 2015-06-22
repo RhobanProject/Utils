@@ -12,13 +12,17 @@ ZMQClient::ZMQClient(string remote_)
 {
   remote = remote_;
     context = zmq_ctx_new();
-    client = zmq_socket(context, ZMQ_REQ);
     connect();
 }
 
 void ZMQClient::connect()
 {
-    if (zmq_connect(client, remote.c_str()) != 0) {
+	if (client)
+		zmq_close(client);
+
+	client = zmq_socket(context, ZMQ_REQ);
+	
+	if (zmq_connect(client, remote.c_str()) != 0) {
         throw runtime_error("Unable to connect");
     }
 
