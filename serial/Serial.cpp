@@ -597,7 +597,8 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		else
 		{
 			cerr << err << endl;
-			return 0;
+			ms_sleep(1000);
+			return -1;
 		}
 	}
 
