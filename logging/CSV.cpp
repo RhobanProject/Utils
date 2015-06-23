@@ -49,6 +49,9 @@ namespace Rhoban
             if (index != columnIndexes.size() - 1) {
                 ofs << " ";
             }
+            else {
+                ofs << std::endl;
+            }
         }
     }
     
