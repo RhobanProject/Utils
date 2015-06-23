@@ -44,6 +44,12 @@ namespace Rhoban
         for (unsigned int index=0; index<columnIndexes.size(); index++) {
             ofs << "# " << index << ": " << columnIndexes[index] << std::endl;
         }
+        for (unsigned int index=0; index<columnIndexes.size(); index++) {
+            ofs << columnIndexes[index];
+            if (index != columnIndexes.size() - 1) {
+                ofs << " ";
+            }
+        }
     }
     
     void CSV::close()
