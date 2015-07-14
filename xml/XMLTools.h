@@ -29,8 +29,8 @@
 
 using namespace std;
 
-#define xml_parse_error(str,...)   { throw string(str); }
-#define interpretor_error(str,...) { throw string(str); }
+#define xml_parse_error(str,...)   { throw runtime_error(str); }
+#define interpretor_error(str,...) { throw runtime_error(str); }
 
 #define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">" << endl; }
 
@@ -79,7 +79,7 @@ using namespace std;
 namespace XMLTools
 {
 	float get_float_value(TiXmlNode * node);
-	
+
     string get_string_element(TiXmlNode * node, const char * id);
 
     vector<string> get_string_array(TiXmlNode * node, const char * id);
