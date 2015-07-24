@@ -144,6 +144,7 @@ public:
 	/*
 	 * the effective calling freauency of the timed thread
 	 */
+public:
 	double measured_frequency;
 	double max_frequency;
 
