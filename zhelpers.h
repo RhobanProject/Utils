@@ -60,7 +60,7 @@ s_recv_options (void *socket, int flags, char *more) {
         int64_t multi;
         size_t more_size = sizeof (multi);
         zmq_getsockopt (socket, ZMQ_RCVMORE, &multi, &more_size);
-        *more = multi;
+        *more = (char) multi;
     }
     zmq_msg_close (&message);
     string [size] = 0;

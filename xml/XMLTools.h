@@ -17,8 +17,6 @@
 #include <fstream>
 #include <vector>
 
-#include <stdexcept>
-
 #ifndef NO_RHOBANMATH
 #include "linear_algebra.h"
 #endif
@@ -31,8 +29,8 @@
 
 using namespace std;
 
-#define xml_parse_error(str,...)   { throw runtime_error(str); }
-#define interpretor_error(str,...) { throw runtime_error(str); }
+#define xml_parse_error(str,...)   { throw string(str); }
+#define interpretor_error(str,...) { throw string(str); }
 
 #define XML_WRITE_GENERIC(result, value, label ){ result << "<" << # label << ">" << value << "</" <<  # label << ">" << endl; }
 
@@ -43,10 +41,11 @@ using namespace std;
 #define XML_WRITE_DOUBLE(result, truc)  result.precision(100); XML_WRITE(result, truc)
 #define XML_WRITE_STRING(result, truc ) XML_WRITE(result, truc )
 
-#define XML_WRITE_STRING_ARRAY(result, truc){ \
+#define XML_WRITE_ARRAY(result, truc){ \
+	result.precision(100); \
 	result << "<" << # truc << ">"; \
 	for(int i = 0 ; i < truc.size(); i++) \
-		result << "<string>" << truc[i] << "</string>"; \
+		result << "<v>" << truc[i] << "</v>"; \
 	result << "</" << # truc << ">"; \
 }
 
@@ -81,7 +80,7 @@ using namespace std;
 namespace XMLTools
 {
 	float get_float_value(TiXmlNode * node);
-
+	
     string get_string_element(TiXmlNode * node, const char * id);
 
     vector<string> get_string_array(TiXmlNode * node, const char * id);
