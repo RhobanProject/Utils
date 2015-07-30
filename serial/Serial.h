@@ -156,43 +156,4 @@ class Serial
 };
 
 
-/* Handles asynchronous reading and writing in several serial ports */
-class MultiSerial : private Rhoban::Thread
-{
-public:
-	MultiSerial();
-	virtual ~MultiSerial();
-
-	//ports with empty name are ignored
-	MultiSerial(
-		vector<string> ports,
-		vector<int> baudrates
-		);
-
-
-
-	/* called when data is received */
-	virtual void MultiSerialReceived(int port, const string & data){};
-
-	/* return how many chars were sent, -1 in case of error */
-	int Send(int port_id, const string & data);
-
-	void Disconnect();
-	void Connect(
-		vector<string> ports,
-		vector<int> baudrates
-		);
-
-	vector<int> multiserial_received;
-	vector<int> multiserial_sent;
-
-protected:
-	vector<Serial *> ports;
-
-	void execute();
-
-	/* prevents concurrent calls to ports */
-	Rhoban::Mutex mutex;
-
-};
 #endif // UTILS_SERIAL_H
