@@ -15,8 +15,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <threading/Thread.h>
-#include <threading/Mutex.h>
 
 #ifdef WIN32
 #include <windows.h>

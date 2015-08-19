@@ -14,7 +14,6 @@
 #include <string>
 #include <string.h>
 
-#include <ticks.h>
 #include <sleep.h>
 #ifdef MSVC
 #undef LINUX
@@ -412,7 +411,7 @@ void Serial::setSpeed(int baudrate)
 		cout << " disconnecting..." << std::flush;
 		disconnect();
 	}
-	sleep_ms(1000);
+	ms_sleep(1000);
 	deviceBaudrate = baudrate;
 	if (isConnected)
 	{
@@ -642,7 +641,7 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		if(n==0)
 		{
 			//cout << "Received nothing waiting 50 ms" << endl;
-			syst_wait_ms(10);
+			ms_sleep(10);
 		}
 	}
 	return total;
@@ -744,7 +743,7 @@ size_t Serial::send(const char *data, size_t size, bool blocking)
 
 	if(device_is_file)
 	{
-		syst_wait_ms(1 + size / 50);
+		ms_sleep(1 + size / 50);
 		return size;
 	}
 	else if(!IsOpen())
