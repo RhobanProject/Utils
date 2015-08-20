@@ -144,5 +144,7 @@ bool endsWith(std::string const &fullString, std::string const &ending);
 
 vector<string> getLines(const string &header);
 
+std::string camelize(std::string input);
+
 /*@}*/
 #endif

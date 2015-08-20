@@ -2,11 +2,6 @@ cmake_minimum_required (VERSION 2.6)
 project (RhobanUtils)
 find_package (Threads)
 
-option (32BIT "Compilation 32 bit" OFF)
-IF(32BIT)
-	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
-ENDIF(32BIT)
-
 option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
 
 if (MSVC)
@@ -42,10 +37,10 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
 #    execute_process(
  #       COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
   #  if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-   #     message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
+   #     message(WARNING "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
     #endif ()
 else ()
-    message(FATAL_ERROR "Your C++ compiler is not g++ (unknown support for C++11)")
+    message(WARNING "Your C++ compiler is not g++ (unknown support for C++11)")
 endif ()
 endif ()
 
@@ -155,6 +150,7 @@ set(DIRECTORIES
     threading
     timing
     xml
+    spline
     )
 
 if(ENABLE_JSON)
@@ -222,11 +218,13 @@ endforeach (DIRECTORY)
 
 if (COMPILE_UTILS_TESTS)
   add_executable (scoringTest test/ScoringTest.cpp scoring/Score.cpp scoring/Mark.cpp tests/TestCase.cpp logging/term_display.cpp)
+  add_executable (timeStampTest test/TimeStampTest.cpp timing/TimeStamp.cpp tests/TestCase.cpp )
+  add_executable (splineTest test/SplineTest.cpp)
+  target_link_libraries (splineTest RhobanUtils)
 endif (COMPILE_UTILS_TESTS)
 
 # Adding TinyXml
-add_subdirectory (xml/TinyXml)
-set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
+set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
 
 set (ALL_HEADERS)
 # ADD HEADERS FILES 

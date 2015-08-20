@@ -1,8 +1,16 @@
 cmake_minimum_required (VERSION 2.6)
 project (ZeroMQ)
 
+option (32BIT
+    "Compile for a 32bit target" OFF)
+
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "")
+endif ()
+if (32BIT)
+    set (CMAKE_SYSTEM_PROCESSOR "i386" CACHE STRING "arch")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32" CACHE STRING "c++ flags")
+    set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -m32" CACHE STRING "c flags")
 endif ()
 
 IF(DEFINED WIN32)

@@ -204,3 +204,24 @@ vector<string> getLines(const string &header)
     }
     return lines;
 }
+
+std::string camelize(std::string input)
+{
+    std::string output;
+    bool caps = false;
+
+    for (unsigned int k=0; k<input.size(); k++) {
+        if (std::isspace(input[k])) {
+            caps = true;
+        } else {
+            if (caps) {
+                caps = false;
+                output += toupper(input[k]);
+            } else {
+                output += input[k];
+            }
+        }
+    }
+
+    return output;
+}

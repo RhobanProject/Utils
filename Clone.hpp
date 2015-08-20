@@ -10,15 +10,15 @@ namespace Rhoban {
   }
 
   // Specific functions for base types
-  template<>
+  template<> inline
   int * clone<int>(const int * i){
     return new int(*i);
   }
-  template<>
+  template<> inline
   float * clone<float>(const float * i){
     return new float(*i);
   }
-  template<>
+  template<> inline
   double * clone<double>(const double * i){
     return new double(*i);
   }

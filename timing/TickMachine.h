@@ -45,7 +45,8 @@ using namespace std;
 #define TM_CAUTION_MSG(msg) { cerr << "TM CAUTION: " << msg << endl << flush; }
 #define TM_DEBUG 0
 #if TM_DEBUG==1
-#define TM_DEBUG_MSG(msg) { Rhoban::chrono now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
+#define TM_DEBUG_MSG(msg) { cout << "TM DEBUG: " << msg << endl << flush; }
+// #define TM_DEBUG_MSG(msg) { Rhoban::chrono now; gettimeofday(&now,0); cout << "TM DEBUG " <<to_secs(now) - to_secs(TickMachine::start_time)<< " :"<< msg << endl << flush;  }
 #else
 #define TM_DEBUG_MSG(msg) {}
 #endif

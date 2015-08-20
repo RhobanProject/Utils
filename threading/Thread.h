@@ -115,108 +115,87 @@ public:
   /* Attention, il ne faut pas imbriquer les sections critiques
    * l'utilisation de mutex récursifs résoudrait le problème mais ils sont buggués sur la mmnet
    */
+
 #define BEGIN_THREAD_SAFE			\
   try						\
     {						\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
   lock(); \
-  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section");
 
 
 #define BEGIN_SAFE(l)							\
   try									\
   {									\
-    TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
     l.lock();								\
-    TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
  
 #define BEGIN_PSAFE(l)				\
   try						\
     {									\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " entering critical section") \
 l->lock(); \
-TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has entered critical section")
-
-  //	  cout << "Locking " << #l << endl;
 
 #define END_THREAD_SAFE					\
   unlock();						\
-  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
      catch (const string & str)				\
        {						\
 	 unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
-     catch(runtime_error & e)						\
+     catch(const std::runtime_error & e)        \
        {						\
 	 unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw e;	\
        } \
-     catch(std::exception & str)				\
+     catch(const std::exception & str)				\
        {						\
 	 unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
 	catch (...)						\
        {						\
 	 unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw std::runtime_error("Unknown exception in thread");	\
        }
 
 #define END_SAFE(l)					\
   l.unlock();						\
-  TH_DEBUG("Thread " << Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
      catch(const std::runtime_error & str)				\
        {						\
 	 l.unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
      catch(const std::exception & str)				\
        {						\
 	 l.unlock();					\
-	  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	 throw str;					\
        }						\
        catch(const string & str)				\
 	 {						\
 	   l.unlock();					\
-	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
        catch(...)					\
 	 {						\
 	   l.unlock();					\
-	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw std::runtime_error("Unknown exception in thread");	\
 	 }
 
 #define END_PSAFE(l)					\
   l->unlock();						\
-  TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 }							\
        catch (const std::runtime_error & str)				\
 	 {						\
 	   l->unlock();					\
-	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw str;					\
 	 }						\
-	 catch (exception & e)				\
+	 catch (const exception & e)				\
 	   {						\
 	   l->unlock();					\
-	   TH_DEBUG("Thread " << Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw e;					\
 	 }						\
 	 catch (...)					\
 	 {						\
 	   l->unlock();					\
-	   TH_DEBUG("Thread " <<  Rhoban::Thread::currentThreadId() << " has left critical section") \
 	   throw std::runtime_error("Unknown exception in thread");	\
 	 }
 
