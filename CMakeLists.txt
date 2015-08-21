@@ -69,6 +69,11 @@ option (ENABLE_YAML
 option (ENABLE_JSON
     "Enable the JSON support" ON)
 
+if(MSVC)
+option (ENABLE_XML
+    "Enable the XML support" ON)
+endif(MSVC)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    SET(SYSTEM_OS "MACOSX")
@@ -121,6 +126,13 @@ if (ENABLE_YAML)
         CACHE STRING "")
     include_directories ("${YAML_HEADERS}")
     set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
+endif ()
+
+if (DEFINED ENABLE_XML)
+    message("-- Adding XML support")
+    add_subdirectory ("${PROJECT_SOURCE_DIR}/xml/TinyXml")
+    include_directories ("${PROJECT_SOURCE_DIR}/xml/TinyXml")
+    set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml)
 endif ()
 
 message("-- Adding Eigen support")
@@ -223,8 +235,10 @@ if (COMPILE_UTILS_TESTS)
   target_link_libraries (splineTest RhobanUtils)
 endif (COMPILE_UTILS_TESTS)
 
+if(NOT MSVC)
 # Adding TinyXml
 set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 set (ALL_HEADERS)
 # ADD HEADERS FILES 
