@@ -106,7 +106,7 @@ public:
 		zmq_msg_t message;
 		zmq_msg_init(&message);
 
-		vector<uchar> buffer;
+		std::vector<unsigned char> buffer;
 		while (processor.isRunning()) {
 			int size = zmq_msg_recv(&message, server, 0);
 			if (size != -1)

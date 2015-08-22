@@ -39,9 +39,7 @@
 #include <serial.h>
 #endif
 
-#ifdef WIN32
 #include <timing/chrono.h>
-#endif
 
 #include <logging/log.h>
 

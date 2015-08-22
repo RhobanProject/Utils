@@ -102,7 +102,7 @@ void MultiSerial::Connect(
 int MultiSerial::Send(int port_id, const string & data)
 {
 	int res = -1;
-	if (port_id >= ports.size())
+	if (port_id >= (int) ports.size())
 		return -1;
 //		throw runtime_error("No port with this id");
 	auto & port = ports[port_id];
@@ -126,7 +126,7 @@ void MultiSerial::execute()
 		int m = 0;
 #ifndef WIN32
 		FD_ZERO(&read_fds);
-		for(int i = 0 ; i < ports.size(); i++)
+		for(unsigned int i = 0 ; i < ports.size(); i++)
 		{
 			auto port = ports[i];
 			FD_SET(port->fd, &read_fds);
@@ -143,7 +143,7 @@ void MultiSerial::execute()
 		if (ret > 0)
 		{
 		  //	     		cout << "Multiserial got select " << ret << endl;
-			for (int i = 0; i < ports.size(); i++)
+			for (unsigned int i = 0; i < ports.size(); i++)
 			{
 				auto port = ports[i];
 				//		cout << "Multiserial checking port " << i << " '" << port->deviceName << "'" << endl;
