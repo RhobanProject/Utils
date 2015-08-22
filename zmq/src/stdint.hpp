@@ -30,7 +30,7 @@
 #elif defined _MSC_VER
 
 #ifndef int8_t
-typedef __int8 int8_t;
+//typedef __int8 int8_t;
 #endif
 #ifndef int16_t
 typedef __int16 int16_t;
