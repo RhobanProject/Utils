@@ -13,12 +13,18 @@ class CommandArgs
     public:
         CommandArgs();
         CommandArgs(int argc, char *argv[]);
-        void process(int argc, char *argv[]);
+        virtual void process(int argc, char *argv[]);
 
         // Testing if a flag or an option is present
         bool hasFlag(string flag);
         bool hasFlag(char flag);
         bool hasOption(string option);
+
+		void setFlag(string flag);
+		void setOption(string name, string value);
+		void setOptionInt(string name, int value);
+		void setOptionDouble(string name, double value);
+		void setOptionFloat(string name, float value);
 
         // Getting a n option
         string getOption(string name, string fallback="");

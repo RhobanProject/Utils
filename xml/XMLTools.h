@@ -41,10 +41,11 @@ using namespace std;
 #define XML_WRITE_DOUBLE(result, truc)  result.precision(100); XML_WRITE(result, truc)
 #define XML_WRITE_STRING(result, truc ) XML_WRITE(result, truc )
 
-#define XML_WRITE_STRING_ARRAY(result, truc){ \
+#define XML_WRITE_ARRAY(result, truc){ \
+	result.precision(100); \
 	result << "<" << # truc << ">"; \
 	for(int i = 0 ; i < truc.size(); i++) \
-		result << "<string>" << truc[i] << "</string>"; \
+		result << "<v>" << truc[i] << "</v>"; \
 	result << "</" << # truc << ">"; \
 }
 

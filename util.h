@@ -21,6 +21,7 @@ typedef unsigned int uint;
 #include <list>
 #include <list>
 #include <stdexcept>
+#include <ctime>
 
 using namespace std;
 
@@ -41,9 +42,7 @@ vector<T> v_extract_subvector(vector<T> & lst, int i0, int i1) {
       i0 > ((int) lst.size()-1) ||
       i1 > ((int) lst.size()-1) ||
       i0 > i1) return result;
-  for (int i=0; i < i1-i0+1; i++)
-    result.push_back(lst[i0+i]);
-  return result;
+  return vector<T>(lst.begin() + i0, lst.begin() + i1);
 }
 
 inline string my_itoa(int i)
@@ -143,6 +142,8 @@ string system_time();
 bool endsWith(std::string const &fullString, std::string const &ending);
 
 vector<string> getLines(const string &header);
+
+string today();
 
 std::string camelize(std::string input);
 

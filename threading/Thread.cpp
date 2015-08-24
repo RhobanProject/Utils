@@ -162,7 +162,6 @@ void Thread::kill(void)
 	    if(!is_alive()) return;
     wait_started();
     thread_state = Dying;
-	cleanup();
 
 #ifndef MSVC
 #ifndef WIN32
@@ -284,7 +283,6 @@ void Thread::setup(void)
  */
 void Thread::wait_started()
 {
-	//Hugo: We should use a condion instead
 #ifdef WIN32
 	started.lock();
 	if(thread_state == Unborn || thread_state == Starting)
@@ -292,7 +290,7 @@ void Thread::wait_started()
 	started.unlock();
 #else
 	while (thread_state == Unborn || thread_state == Starting)
-        usleep(1000);
+	  usleep(1000);
 #endif
 }
 

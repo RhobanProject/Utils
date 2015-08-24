@@ -95,7 +95,7 @@ inline void encode_float(float value, char * buf)
 
 inline void encode_double(double value, char * buf)
 {
-	encode_float(value, buf);
+	encode_float((float) value, buf);
 }
 /*!
 * todo: find a better encoding,

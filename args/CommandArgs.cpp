@@ -44,10 +44,28 @@ bool CommandArgs::hasFlag(string flag)
 
 bool CommandArgs::hasFlag(char flagChar)
 {
-    string flag;
-    flag = flagChar;
+	return hasFlag(string({ flagChar }));
+}
 
-    return hasFlag(flag);
+void CommandArgs::setFlag(string flag)
+{
+	flags.insert(flag);
+}
+void CommandArgs::setOption(string name, string value)
+{
+	options[name] = value;
+}
+void CommandArgs::setOptionInt(string name, int value)
+{
+	options[name] = to_string(value);
+}
+void CommandArgs::setOptionDouble(string name, double value)
+{
+	options[name] = to_string(value);
+}
+void CommandArgs::setOptionFloat(string name, float value)
+{
+	options[name] = to_string(value);
 }
 
 bool CommandArgs::hasOption(string option)

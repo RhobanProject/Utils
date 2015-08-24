@@ -9,34 +9,17 @@ if (MSVC)
 	add_definitions(-DMSVC)
 	add_definitions(-D_WINSOCKAPI_)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
-
 else (MSVC) 
   IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
      set(CMAKE_CXX_FLAGS " -Wall -g -Wno-overloaded-virtual")
   ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")  
   ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
-
-#Check for c++11 support
-if (NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))	
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-#    execute_process(
- #       COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-  #  if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
-   #     message(WARNING "${PROJECT_NAME} requires g++ 4.7 or greater (C++11 support)")
-    #endif ()
-else ()
-    message(WARNING "Your C++ compiler is not g++ (unknown support for C++11)")
-endif ()
-endif ()
+set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} -std=c++11")
 
 endif (MSVC)
 
-#Enable C++11
-set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -std=c++11")
 
 option (HAVE_COLORS 
     "Have terminal colors" ON)
@@ -45,14 +28,22 @@ if (HAVE_COLORS)
     add_definitions (-DHAVE_COLORS)
 endif (HAVE_COLORS)
 
-option (ENABLE_ZMQ
-    "Compile and use ZMQ?" OFF)
+option(ENABLE_JSON "Compile and enable JSON" ON)
+if(ENABLE_JSON)
+    add_definitions (-DUSE_JSON)
+endif()
+
+option (UTILS_USES_ZMQ
+    "Utils includes ZMQ?" ON)
+
+option (UTILS_USES_XML
+    "Utils includes TinyXML" ON)
 
 option (COMPILE_UTILS_TESTS
     "Compile utils tests?" OFF)
 
-option (ENABLE_YAML
-    "Enable the YAML support" ON)
+option (UTILS_USES_YAML
+    "Utils includes YAML" ON)
 
 option (ENABLE_JSON
     "Enable the JSON support" ON)
@@ -61,6 +52,12 @@ if(MSVC)
 option (ENABLE_XML
     "Enable the XML support" ON)
 endif(MSVC)
+
+option (UTILS_USES_CONFIG
+    "Utils uses Compile and use args and config" ON)
+
+option (UTILS_USES_SOCKETS
+    "UTils includes sockets and http" ON)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
@@ -106,7 +103,7 @@ if (WIN32)
     set (EXTRA_LIBS ${EXTRA_LIBS} ws2_32)
 endif (WIN32)
 
-if (ENABLE_YAML)
+if (UTILS_USES_YAML)
     message("-- Adding YAML support")
     option(YAML_CPP_BUILD_TOOLS "Enable testing and parse tools" OFF)
     add_subdirectory ("${PROJECT_SOURCE_DIR}/yaml-cpp")
@@ -128,46 +125,49 @@ set (EIGEN_HEADERS "${PROJECT_SOURCE_DIR}/eigen-3.2" CACHE STRING "")
 include_directories ("${EIGEN_HEADERS}")
 
 if(ENABLE_JSON)
-message("-- Adding JSON support")
-add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
-set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
-    CACHE STRING "")
-include_directories ("${JSON_HEADERS}")
-set (EXTRA_LIBS ${EXTRA_LIBS} json)
+	message("-- Adding JSON support")
+	add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
+	set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
+	    CACHE STRING "")
+	include_directories ("${JSON_HEADERS}")
+	set (EXTRA_LIBS ${EXTRA_LIBS} json)
 endif()
 
 # Sources
 set(DIRECTORIES
     .
-    args
     logging
     observer
-    scoring
     serial
-    sockets
-    http
     tests
+	scoring
     threading
     timing
-    xml
     spline
     )
 
 if(ENABLE_JSON)
-set(DIRECTORIES
-    ${DIRECTORIES}
-	configfile
-	json
-)
-	endif()
+ set(DIRECTORIES ${DIRECTORIES} configfile json)
+endif()
+if(UTILS_USES_XML)
+ set(DIRECTORIES ${DIRECTORIES} xml)
+endif()
+if(UTILS_USES_SOCKETS)
+ set(DIRECTORIES ${DIRECTORIES} sockets http)
+endif()
+if(UTILS_USES_CONFIG)
+ set(DIRECTORIES ${DIRECTORIES}  args configfile)
+endif()
 
 
 if (COMPILE_UTILS_TESTS)
   include_directories ("test")
 endif (COMPILE_UTILS_TESTS)
 
-if (ENABLE_ZMQ)
+if (UTILS_USES_ZMQ)
 	message("-- Adding ZMQ support")
+
+	set(DIRECTORIES ${DIRECTORIES} zmq)
 
     add_definitions (-DHAVE_ZMQ)
 	set (ZMQ_VERSION "3.0" CACHE STRING  "ZMQ Version")
@@ -198,7 +198,7 @@ if (ENABLE_ZMQ)
     if(UNIX AND NOT APPLE)
         set (EXTRA_LIBS ${EXTRA_LIBS} rt)
     endif(UNIX AND NOT APPLE)
-endif (ENABLE_ZMQ)
+endif (UTILS_USES_ZMQ)
 
 set (SOURCES)
 set (ALL_SOURCES)
@@ -225,6 +225,10 @@ endif (COMPILE_UTILS_TESTS)
 
 if(NOT MSVC)
 # Adding TinyXml
+if (NOT TARGET TinyXml)
+  add_subdirectory (xml/TinyXml)
+  set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
+endif()
 set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
 endif()
 

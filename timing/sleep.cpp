@@ -15,7 +15,7 @@
 
 void ms_sleep(long ms) {
 #ifdef WIN32
-	Sleep(ms);
+	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 #else
   #ifndef DARWIN
 	usleep(1000 * ms);
@@ -26,7 +26,7 @@ void ms_sleep(long ms) {
 void ms_sys_wait_ms(long ms)
 {
 #ifdef WIN32
-    Sleep(ms);
+	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 #else
     usleep(1000 * ms);
 #endif

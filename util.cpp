@@ -230,3 +230,13 @@ std::string camelize(std::string input)
 	throw std::exception("Unimplemented");
 #endif
 }
+
+string today()
+{
+	time_t tt;
+	time(&tt);
+	auto ttt = localtime(&tt);
+	char result[80];
+	strftime(result, 80, "%Y_%m_%d", ttt);
+	return string(result);
+}

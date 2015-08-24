@@ -13,6 +13,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <map>
+#include <vector>
 
 #ifdef WIN32
 #include <windows.h>
@@ -35,6 +37,9 @@ class Serial
          * Connects the serial device
          */
         int connect(bool blocking = false);
+
+		/* another connect function for USBtoTTL on FitPC3i*/
+		int connect2();
 
         /**
          * Closes the device
@@ -85,13 +90,14 @@ class Serial
         /**
          * Sends some data
          */
-        size_t send(const char *data, size_t size);
-        size_t send(string);
+        size_t send(const char *data, size_t size, bool blocking = false);
+		size_t send(const string &, bool blocking = false);
         
         /**
          * Sends some data, but not all of it
          */
         size_t doSend(const char *data, size_t size);
+		size_t doSend(const string & data){ return doSend(data.c_str(), data.size()); };
 
     	/*!
     	 * read characters until the pattern is found
@@ -108,6 +114,9 @@ class Serial
          */
         string deviceName;
         bool device_is_file;
+
+		/* returns the file descriptor */
+		int get_fd();
 
 	int baudrate(){ return deviceBaudrate;}
 
@@ -128,13 +137,14 @@ class Serial
          */
         void fdClose();
 
+ public:
 #ifdef WIN32
         HANDLE fd;
 	COMMTIMEOUTS Timeouts;
 #else
         int fd;
 #endif
-
+ private:
         /*
          * Logging
          */
@@ -142,5 +152,6 @@ class Serial
         bool recording;
 
 };
+
 
 #endif // UTILS_SERIAL_H

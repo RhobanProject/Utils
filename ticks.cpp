@@ -148,10 +148,12 @@ void wait_n_ticks(ui32 tick_nb){
 #endif
 }
 
+/*
 void sleep_ticks(Rhoban::chrono duration)
 {
 	sleep_ms_ticks(duration.tv_sec*1000 + duration.tv_usec/1000);
 }
+*/
 
 void sleep_ms_ticks(ui32 ms) {
 #ifdef _WIN32
@@ -210,7 +212,8 @@ void wait_ms(int ms)
 
 void sleep_ms(Rhoban::chrono duration)
 {
-  sleep_ticks(duration);
+	syst_wait_ms(duration.tv_sec * 1000 + duration.tv_usec / 1000);
+//  sleep_ticks(duration);
 }
 
 void decrease(Rhoban::chrono & chronoo, Rhoban::chrono & duration)

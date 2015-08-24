@@ -7,20 +7,25 @@
 
 using std::string;
 
+using namespace std;
+
 ZMQClient::ZMQClient(string remote_)
     : context(NULL), client(NULL)
 {
-    remote = remote_;
+  remote = remote_;
     context = zmq_ctx_new();
-    client = zmq_socket(context, ZMQ_REQ);
     connect();
 }
 
 void ZMQClient::connect()
 {
-    if (zmq_connect(client, remote.c_str()) != 0) {
-        throw std::runtime_error("Unable to connect");
-    }
+	if (client)
+		zmq_close(client);
+
+	client = zmq_socket(context, ZMQ_REQ);
+	
+	if (zmq_connect(client, remote.c_str()) != 0)
+        throw runtime_error("Unable to connect");
 
     int timeout = 1000;
     zmq_setsockopt(client, ZMQ_RCVTIMEO, &timeout, sizeof(timeout));
@@ -48,15 +53,19 @@ ZMQClient::~ZMQClient()
 
 string ZMQClient::process(const string &request)
 {
-    s_send(client, request.c_str());
-    char *response = s_recv(client);
+  zmq_msg_t message;
+  zmq_msg_init(&message);
 
-    if (response == NULL) {
-        throw std::runtime_error("Unable to talk with the server");
-    }
-
-    string resp(response);
-    free(response);
-
-    return resp;
+  zmq_msg_init_size(&message, request.size());
+  memcpy(zmq_msg_data(&message), request.c_str(), request.size());
+  int sent = zmq_msg_send(&message, client, 0);
+//  if (sent == -1)
+//	  throw runtime_error("Unable to send message to the server");
+  int size = zmq_msg_recv(&message, client, 0);
+    if (size == -1)
+        throw runtime_error("Unable to get reponse from the server");
+    
+    string response((char *)zmq_msg_data(&message), size);
+    zmq_msg_close(&message);
+    return response;
 }

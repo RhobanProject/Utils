@@ -63,31 +63,6 @@ add_library (ZeroMQ ${ALL_SOURCES})
 
 option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
 
-if(MSVC)
-	option(MSVC_SHARED_RT "MSVC: Build with shared runtime libs (/MD)" OFF)
-	option(MSVC_STHREADED_RT "MSVC: Build with single-threaded static runtime libs (/ML until VS .NET 2003)" OFF)
-
-			IF(NOT MSVC_SHARED_RT)
-	foreach(flag_var
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${flag_var} MATCHES "/MD")
-      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-	endif(${flag_var} MATCHES "/MD")
-	endforeach(flag_var)
-	ENDIF(NOT MSVC_SHARED_RT)
-
-	if(NOT BUILD_SHARED_LIBS)
-		# correct library names
-		set_target_properties(ZeroMQ PROPERTIES
-			DEBUG_POSTFIX "${LIB_TARGET_SUFFIX}d"
-			RELEASE_POSTFIX "${LIB_TARGET_SUFFIX}"
-			MINSIZEREL_POSTFIX "${LIB_TARGET_SUFFIX}"
-			RELWITHDEBINFO_POSTFIX "${LIB_TARGET_SUFFIX}"
-		)
-	endif()
-endif()
-
 if (DEFINED WIN32)
 	target_link_libraries (ZeroMQ wsock32 ws2_32)
 endif (DEFINED WIN32)

@@ -46,7 +46,9 @@ class Parameter(object):
             load = ''
             if self.typing == 'string':
                 load += 'obj->%s = string(value);\n' % (self.propertyName)
-            if self.typing == 'float' or self.typing == 'double':
+            if self.typing == 'float':
+                load += 'obj->%s = (float) atof(value);\n' % (self.propertyName)
+            if self.typing == 'double':
                 load += 'obj->%s = atof(value);\n' % (self.propertyName)
             if self.typing == 'int':
                 load += 'obj->%s = atoi(value);\n' % (self.propertyName)

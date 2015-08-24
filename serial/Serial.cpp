@@ -1,3 +1,4 @@
+
 /*************************************************
  * Publicly released by Rhoban System, August 2012
  *             www.rhoban-system.fr
@@ -13,8 +14,7 @@
 #include <string>
 #include <string.h>
 
-#include <ticks.h>
-
+#include <sleep.h>
 #ifdef MSVC
 #undef LINUX
 #endif 
@@ -39,9 +39,7 @@
 #include <serial.h>
 #endif
 
-#ifdef WIN32
 #include <timing/chrono.h>
-#endif
 
 #include <logging/log.h>
 
@@ -51,7 +49,10 @@ using namespace std;
 
 Serial::Serial(string deviceName, int deviceBaudrate): fd(0), record_stream(""), recording(false)
 {
-	setDevice(deviceName);
+	if (deviceBaudrate == -1)
+		setFileDevice(deviceName);
+	else
+		setDevice(deviceName);
 	this->deviceBaudrate = deviceBaudrate;
 }
 
@@ -61,6 +62,8 @@ Serial::~Serial()
 	if(recording)
           record_stream.close();
 	recording = false;
+	if (IsOpen())
+		disconnect();
 }
 
 bool Serial::IsOpen()
@@ -112,7 +115,14 @@ int Serial::connect(bool blocking)
 		DWORD dwError;
 
 		// Open serial device
-		fd = CreateFile(deviceName.c_str(), GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_WRITE_THROUGH, NULL );
+		fd = CreateFile(
+			deviceName.c_str(),
+			GENERIC_READ | GENERIC_WRITE,
+			0, //dont share the port
+			NULL, //no security
+			OPEN_EXISTING,
+			FILE_FLAG_WRITE_THROUGH,// | FILE_FLAG_OVERLAPPED,
+			NULL);
 
 		if( fd == INVALID_HANDLE_VALUE ) {
 			goto USART_INIT_ERROR;
@@ -166,13 +176,15 @@ int Serial::connect(bool blocking)
 			goto USART_INIT_ERROR;
 
 		/* from http://msdn.microsoft.com/en-us/library/windows/desktop/aa363190%28v=vs.85%29.aspx
-		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value                  * greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
+		 * If an application sets ReadIntervalTimeout and ReadTotalTimeoutMultiplier to MAXDWORD and sets ReadTotalTimeoutConstant to a value 
+		 * greater than zero and less than MAXDWORD, one of the following occurs when the ReadFile function is called:
                  * If there are any bytes in the input buffer, ReadFile returns immediately with the bytes in the buffer.
                  * If there are no bytes in the input buffer, ReadFile waits until a byte arrives and then returns immediately.
-                 * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. */
+                 * If no bytes arrive within the time specified by ReadTotalTimeoutConstant, ReadFile times out. 
+				 */
 		Timeouts.ReadIntervalTimeout = MAXDWORD;
-		Timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
-		Timeouts.ReadTotalTimeoutConstant = 10;
+		Timeouts.ReadTotalTimeoutMultiplier = 0;
+		Timeouts.ReadTotalTimeoutConstant = 0;
 		Timeouts.WriteTotalTimeoutMultiplier = 0;
 		Timeouts.WriteTotalTimeoutConstant = 0;
 
@@ -257,6 +269,97 @@ int Serial::connect(bool blocking)
 	return 0;
 }
 
+/* returns the file descriptor */
+int Serial::get_fd()
+{
+	return (int) fd;
+}
+
+/**
+* Initializes the usart device
+*/
+int Serial::connect2()
+{
+#ifdef WIN32
+	connect();
+#else
+	struct termios tio;
+	int flags;
+	memset(&tio, 0, sizeof(tio));
+
+	if ((fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK |O_NOCTTY)) == -1){
+		printf("Error while opening\n"); // Just if you want user interface error control
+		return -1;
+	}
+
+	if((tcgetattr(fd, &tio) == -1))
+	  goto error;
+
+
+	tio.c_lflag = 0;
+	tio.c_oflag = 0;
+	tio.c_cflag = (tio.c_cflag & ~CSIZE) | CS8 | B57600;           // 8n1, see termios.h for more information
+
+	tio.c_cc[VMIN] = 0;
+	tio.c_cc[VTIME] = 5;
+
+	tio.c_iflag &= ~IGNBRK & ~IGNCR & ~ICRNL & ~INLCR;//dont mess up with carriage return
+	tio.c_iflag &= ~(IXON | IXOFF | IXANY); // shut off xon/xoff ctrl
+	tio.c_cflag |= (CLOCAL | CREAD);
+
+	tio.c_cflag &= ~(PARENB | PARODD);  
+	tio.c_cflag &= ~CSTOPB;
+        tio.c_cflag &= ~CRTSCTS;
+
+	tcflush(fd, TCIFLUSH);
+	if (tcsetattr (fd, TCSANOW, &tio) != 0)
+	  goto error;
+
+	int baudrate_code;
+	switch (deviceBaudrate) {
+	case 1200: baudrate_code = B1200; break;
+	case 1800: baudrate_code = B1800; break;
+	case 2400: baudrate_code = B2400; break;
+	case 4800: baudrate_code = B4800; break;
+	case 9600: baudrate_code = B9600; break;
+	case 19200: baudrate_code = B19200; break;
+	case 38400: baudrate_code = B38400; break;
+	case 57600: baudrate_code = B57600; break;
+	case 115200: baudrate_code = B115200; break;
+	case 230400: baudrate_code = B230400; break;
+	case 460800: baudrate_code = B460800; break;
+	case 500000: baudrate_code = B500000; break;
+	case 576000: baudrate_code = B576000; break;
+	case 921600: baudrate_code = B921600; break;
+	case 1000000: baudrate_code = B1000000; break;
+	case 1152000: baudrate_code = B1152000; break;
+	case 1500000: baudrate_code = B1500000; break;
+	case 2000000: baudrate_code = B2000000; break;
+	case 2500000: baudrate_code = B2500000; break;
+	case 3000000: baudrate_code = B3000000; break;
+	case 3500000: baudrate_code = B3500000; break;
+	case 4000000: baudrate_code = B4000000; break;
+	default:
+	  throw runtime_error("Serial::setSpeed: unknown baudrate");
+	}
+	tcflush(fd, TCIFLUSH);
+	if(
+	   (cfsetospeed(&tio, baudrate_code) == -1)
+	   || (cfsetispeed(&tio, baudrate_code) == -1)
+	   || (tcsetattr(fd, TCSANOW, &tio) == -1)
+	  )
+	  goto error;
+
+#endif
+	return 0;
+error:
+#ifndef WIN32
+	    perror("Error setting serial baudrate");
+	    close(fd);
+#endif
+	return -1;
+}
+
 /**
  * Closes the device
  */
@@ -299,7 +402,21 @@ int Serial::getSpeed()
 void Serial::setSpeed(int baudrate)
 {
 #ifdef WIN32
-	fprintf(stderr, "usart_set_channel_speed not implemented for WIN32\n");
+	cout << "Changing serial speed of port " << deviceName << " from " << deviceBaudrate << " to " << baudrate << "..." << endl;
+	bool isConnected = IsOpen();
+	if (isConnected)
+	{
+		cout << " disconnecting..." << std::flush;
+		disconnect();
+	}
+	ms_sleep(1000);
+	deviceBaudrate = baudrate;
+	if (isConnected)
+	{
+		cout << "reconnecting..." << std::flush;
+		connect();
+		cout << "done" << endl;
+	}
 #elif LINUX
         struct serial_struct serinfo;
 
@@ -457,12 +574,10 @@ int Serial::doRead(char *destination, size_t size)
 #ifdef WIN32
 	DWORD dwRead;
     ReadFile(fd, destination, size, &dwRead, NULL );
-    int n = dwRead;
+    return dwRead;
 #else
-    int n = read(fd, destination, size);
+   return read(fd, destination, size);
 #endif
-
-    return n;
 }
 
 
@@ -479,7 +594,8 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		else
 		{
 			cerr << err << endl;
-			return 0;
+			ms_sleep(1000);
+			return -1;
 		}
 	}
 
@@ -498,17 +614,19 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 
 		if( ReadFile(fd, destination +  total, dwToRead, &dwRead, NULL ) == FALSE ) {
 			DWORD error_code = GetLastError();
-			stringstream err; err << "Serial Port Error " << error_code;
-			if(blocking)
-				throw runtime_error("Failed to read from serial port:\n\t" + err.str());
-			else
+			if (error_code != CE_OVERRUN)
 			{
-				cerr << err.str() << endl;
-				dwRead = 0;
+				string err = "Serial Port Error " + to_string(error_code);
+				if (blocking)
+					throw runtime_error("Failed to read from serial port:\n\t" + err);
+				else
+				{
+					cerr << err << endl;
+					dwRead = 0;
+				}
 			}
 		}
 		int n = dwRead;
-
 #else
 		int n = read(fd, destination, size);
 #endif
@@ -518,13 +636,11 @@ size_t Serial::receive(char *destination, size_t size, bool blocking)
 		//if(total < size)
 			//cout << "Receiving " << size << " got total " << total << " this loop " << n << " blocking " << (blocking ? 1 : 0) << endl;
 		if(!blocking) break;
-		/*
 		if(n==0)
 		{
 			//cout << "Received nothing waiting 50 ms" << endl;
-			syst_wait_ms(50);
+			ms_sleep(10);
 		}
-		*/
 	}
 	return total;
 }
@@ -533,7 +649,12 @@ string Serial::receive(size_t size, bool blocking)
 {
 	char * result = (char *) malloc(size);
 	int nb = receive(result, size, blocking);
-	string res = string(result, nb);
+	if(nb < 0 && errno != EAGAIN)
+	  {
+	    cout<< "Failed to receive data on port " + deviceName << " error " << errno << endl;
+	    perror("Error");
+	  }
+	string res = string(result, (nb >= 0) ? nb : 0);
 	free(result);
 	
         return res;
@@ -585,9 +706,9 @@ void Serial::flush()
 /**
  * Sends
  */
-size_t Serial::send(string data)
+size_t Serial::send(const string & data, bool blocking)
 {
-	return send(data.c_str(), data.size());
+	return send(data.c_str(), data.size(), blocking);
 }
 
 size_t Serial::doSend(const char *data, size_t size)
@@ -614,13 +735,13 @@ size_t Serial::doSend(const char *data, size_t size)
 	return got;
 }
 
-size_t Serial::send(const char *data, size_t size)
+size_t Serial::send(const char *data, size_t size, bool blocking)
 {
 
 
 	if(device_is_file)
 	{
-		syst_wait_ms(1 + size / 50);
+		ms_sleep(1 + size / 50);
 		return size;
 	}
 	else if(!IsOpen())
@@ -634,14 +755,18 @@ size_t Serial::send(const char *data, size_t size)
 
 #ifdef WIN32
 	DWORD dwToWrite = (DWORD)size;
-	while(got < size)
+	int max_tries = 100;
+	while(got < size && max_tries-->0)
 	{
-		DWORD dwWritten = 0;
-		//cout << "Sending " << dwToWrite - got << " bytes " << endl;
-		WriteFile(fd, data + got, dwToWrite - got, &dwWritten, NULL);
-		got += dwWritten;
-		if (dwWritten == 0) Sleep(10);
-		//cout << "Sent " << got <<"/" << size <<  endl;
+		int sent = doSend(data, size);
+		if (sent < 0)
+			return sent;
+		else if (sent == 0)
+			Sleep(10);
+		else
+			got += sent;
+		if (!blocking)
+			break;
 	}
 	FlushFileBuffers(fd);
 #else

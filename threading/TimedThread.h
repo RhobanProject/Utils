@@ -138,6 +138,9 @@ public:
 	 */
 	void stop(bool wait_dead = false);
 
+	/* waits for the thread to be finished */
+	void wait_dead(){ Thread::wait_dead(); };
+
 	/*
 	 * the effective calling freauency of the timed thread
 	 */
