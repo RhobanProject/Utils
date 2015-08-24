@@ -66,6 +66,14 @@ option (COMPILE_UTILS_TESTS
 option (ENABLE_YAML
     "Enable the YAML support" ON)
 
+option (ENABLE_JSON
+    "Enable the JSON support" ON)
+
+if(MSVC)
+option (ENABLE_XML
+    "Enable the XML support" ON)
+endif(MSVC)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    SET(SYSTEM_OS "MACOSX")
@@ -120,23 +128,30 @@ if (ENABLE_YAML)
     set (EXTRA_LIBS ${EXTRA_LIBS} yaml-cpp)
 endif ()
 
+if (DEFINED ENABLE_XML)
+    message("-- Adding XML support")
+    add_subdirectory ("${PROJECT_SOURCE_DIR}/xml/TinyXml")
+    include_directories ("${PROJECT_SOURCE_DIR}/xml/TinyXml")
+    set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml)
+endif ()
+
 message("-- Adding Eigen support")
 set (EIGEN_HEADERS "${PROJECT_SOURCE_DIR}/eigen-3.2" CACHE STRING "")
 include_directories ("${EIGEN_HEADERS}")
 
+if(ENABLE_JSON)
 message("-- Adding JSON support")
 add_subdirectory ("${PROJECT_SOURCE_DIR}/jsoncpp")
 set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
     CACHE STRING "")
 include_directories ("${JSON_HEADERS}")
 set (EXTRA_LIBS ${EXTRA_LIBS} json)
+endif()
 
 # Sources
 set(DIRECTORIES
     .
     args
-    configfile
-    json
     logging
     observer
     scoring
@@ -149,6 +164,14 @@ set(DIRECTORIES
     xml
     spline
     )
+
+if(ENABLE_JSON)
+set(DIRECTORIES
+    ${DIRECTORIES}
+	configfile
+	json
+)
+	endif()
 
 
 if (COMPILE_UTILS_TESTS)
@@ -212,8 +235,10 @@ if (COMPILE_UTILS_TESTS)
   target_link_libraries (splineTest RhobanUtils)
 endif (COMPILE_UTILS_TESTS)
 
+if(NOT MSVC)
 # Adding TinyXml
 set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
+endif()
 
 set (ALL_HEADERS)
 # ADD HEADERS FILES 

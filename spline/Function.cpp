@@ -1,7 +1,9 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstdio>
+#ifndef MSVC
 #include <json/json.h>
+#endif
 #include <logging/Logger.h>
 #include "Function.h"
 
@@ -30,6 +32,7 @@ static std::string file_get_contents(std::string path)
 
 std::map<std::string, Function> Function::fromFile(std::string filename)
 {
+#ifndef MSVC
     auto data = file_get_contents(filename);
     Json::Value json;
     Json::Reader reader;
@@ -56,6 +59,9 @@ std::map<std::string, Function> Function::fromFile(std::string filename)
     }
 
     return result;
+#else
+	throw std::exception("Unimplemenetd");
+#endif
 }
 
 double Function::getXMax()

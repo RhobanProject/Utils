@@ -15,6 +15,7 @@
 #include <vector>
 #include "util.h"
 #include <ctime>
+
 using namespace std;
 
 bool is_in_vector_string(vector<string> vector, string testval)
@@ -207,6 +208,7 @@ vector<string> getLines(const string &header)
 
 std::string camelize(std::string input)
 {
+#ifndef MSVC
     std::string output;
     bool caps = false;
 
@@ -224,4 +226,7 @@ std::string camelize(std::string input)
     }
 
     return output;
+#else
+	throw std::exception("Unimplemented");
+#endif
 }
