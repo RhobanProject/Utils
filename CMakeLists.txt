@@ -5,18 +5,6 @@ find_package (Threads)
 option(MSVC "MSVC: Build for Microsoft Visual Studio" OFF)
 
 if (MSVC)
-	option(MSVC_SHARED_RT "Used shared runtime libraries" OFF)
-
-	IF(NOT MSVC_SHARED_RT)
-	foreach(flag_var
-        CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-		if(${flag_var} MATCHES "/MD")
-      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-	endif(${flag_var} MATCHES "/MD")
-	endforeach(flag_var)
-	ENDIF(NOT MSVC_SHARED_RT)
-
 	add_definitions(-D_USE_MATH_DEFINES)
 	add_definitions(-DMSVC)
 	add_definitions(-D_WINSOCKAPI_)
