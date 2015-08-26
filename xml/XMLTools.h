@@ -22,7 +22,7 @@
 #include "linear_algebra.h"
 #endif
 
-#include <tinyxml.h>
+#include <xml/TinyXml/tinyxml.h>
 
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_
@@ -46,6 +46,12 @@ using namespace std;
 	result << "<" << # truc << ">"; \
 	for(int i = 0 ; i < truc.size(); i++) \
 		result << "<v>" << truc[i] << "</v>"; \
+	result << "</" << # truc << ">"; \
+}
+#define XML_WRITE_STRING_ARRAY(result, truc){ \
+	result << "<" << # truc << ">"; \
+	for(int i = 0 ; i < truc.size(); i++) \
+		result << "<string>" << truc[i] << "</string>"; \
 	result << "</" << # truc << ">"; \
 }
 
