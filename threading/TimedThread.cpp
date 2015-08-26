@@ -153,8 +153,10 @@ void SlowTimedThread::execute()
 		step();
 
 		double t = last.getTime();
+        if (t < 1) {
+            t = 1;
+        }
 		measured_frequency = 0.9 * measured_frequency + 0.1 / min(1000.0, t);
-
 
 		last.reset();
 
@@ -179,6 +181,3 @@ void TimedThread::init_suspended(double hertz, bool animate)
 
     play_state = suspended;
 }
-
-
-
