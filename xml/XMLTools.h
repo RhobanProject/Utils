@@ -22,7 +22,7 @@
 #include "linear_algebra.h"
 #endif
 
-#include <xml/TinyXml/tinyxml.h>
+#include <tinyxml.h>
 
 #ifndef MOTORPRIMITIVEXML_H_
 #define MOTORPRIMITIVEXML_H_

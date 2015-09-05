@@ -37,7 +37,10 @@ option (UTILS_USES_ZMQ
     "Utils includes ZMQ?" ON)
 
 option (UTILS_USES_XML
-    "Utils includes TinyXML" ON)
+    "Utils includes XML features" ON)
+
+option (USE_SYSTEM_TINYXML
+    "Utils uses the system version of tinyXML" ON)
 
 option (COMPILE_UTILS_TESTS
     "Compile utils tests?" OFF)
@@ -224,12 +227,13 @@ if (COMPILE_UTILS_TESTS)
 endif (COMPILE_UTILS_TESTS)
 
 if(NOT MSVC)
-# Adding TinyXml
-if (NOT TARGET TinyXml)
-  add_subdirectory (xml/TinyXml)
-  set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
-endif()
-set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
+  if (USE_SYSTEM_TINYXML)
+    set (EXTRA_LIBS ${EXTRA_LIBS} tinyxml ${CMAKE_THREAD_LIBS_INIT})
+  else()
+    add_subdirectory (xml/TinyXml)
+    include_directories ("${PROJECT_SOURCE_DIR}/xml/TinyXml")
+    set (EXTRA_LIBS ${EXTRA_LIBS} TinyXml ${CMAKE_THREAD_LIBS_INIT})
+  endif()
 endif()
 
 set (ALL_HEADERS)
