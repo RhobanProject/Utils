@@ -15,7 +15,7 @@
 #include <string.h>
 
 #include <ticks.h>
-#include <sleep.h>
+#include <timing/sleep.h>
 
 
 #ifdef WIN32
