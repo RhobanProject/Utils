@@ -132,72 +132,87 @@ public:
     {									\
 l->lock(); \
 
-#define END_THREAD_SAFE					\
-  unlock();						\
-}							\
-     catch (const string & str)				\
-       {						\
-	 unlock();					\
-	 throw str;					\
-       }						\
-     catch(const std::runtime_error & e)        \
-       {						\
-	 unlock();					\
-	 throw e;	\
-       } \
-     catch(const std::exception & str)				\
-       {						\
-	 unlock();					\
-	 throw str;					\
-       }						\
-	catch (...)						\
-       {						\
-	 unlock();					\
-	 throw std::runtime_error("Unknown exception in thread");	\
-       }
+#define END_THREAD_SAFE                                       \
+  unlock();                                                   \
+}                                                             \
+  catch (const string & str)                                  \
+  {                                                           \
+    unlock();                                                 \
+    throw str;                                                \
+  }                                                           \
+  catch(const std::runtime_error & e)                         \
+  {                                                           \
+    unlock();                                                 \
+    throw e;                                                  \
+  }                                                           \
+  catch(const std::logic_error & e)                           \
+  {                                                           \
+    unlock();                                                 \
+    throw e;                                                  \
+  }                                                           \
+  catch(const std::exception & str)                           \
+  {                                                           \
+    unlock();                                                 \
+    throw str;                                                \
+  }                                                           \
+  catch (...)                                                 \
+  {                                                           \
+    unlock();                                                 \
+    throw std::runtime_error("Unknown exception in thread");  \
+  }
 
-#define END_SAFE(l)					\
-  l.unlock();						\
-}							\
-     catch(const std::runtime_error & str)				\
-       {						\
-	 l.unlock();					\
-	 throw str;					\
-       }						\
-     catch(const std::exception & str)				\
-       {						\
-	 l.unlock();					\
-	 throw str;					\
-       }						\
-       catch(const string & str)				\
-	 {						\
-	   l.unlock();					\
-	   throw str;					\
-	 }						\
-       catch(...)					\
-	 {						\
-	   l.unlock();					\
-	   throw std::runtime_error("Unknown exception in thread");	\
-	 }
+#define END_SAFE(l)                                           \
+    l.unlock();                                               \
+  }                                                           \
+  catch(const std::runtime_error & str)                       \
+  {                                                           \
+    l.unlock();                                               \
+    throw str;                                                \
+  }                                                           \
+  catch(const std::logic_error & str)                         \
+  {                                                           \
+    l.unlock();                                               \
+    throw str;                                                \
+  }                                                           \
+  catch(const std::exception & str)                           \
+  {                                                           \
+    l.unlock();                                               \
+    throw str;                                                \
+  }                                                           \
+  catch(const string & str)                                   \
+  {                                                           \
+    l.unlock();                                               \
+    throw str;                                                \
+  }                                                           \
+  catch(...)                                                  \
+  {                                                           \
+    l.unlock();                                               \
+    throw std::runtime_error("Unknown exception in thread");  \
+  }
 
-#define END_PSAFE(l)					\
-  l->unlock();						\
-}							\
-       catch (const std::runtime_error & str)				\
-	 {						\
-	   l->unlock();					\
-	   throw str;					\
-	 }						\
-	 catch (const exception & e)				\
-	   {						\
-	   l->unlock();					\
-	   throw e;					\
-	 }						\
-	 catch (...)					\
-	 {						\
-	   l->unlock();					\
-	   throw std::runtime_error("Unknown exception in thread");	\
-	 }
+#define END_PSAFE(l)                                          \
+    l->unlock();                                              \
+  }                                                           \
+  catch (const std::runtime_error & str)                      \
+  {                                                           \
+    l->unlock();                                              \
+    throw str;                                                \
+  }                                                           \
+  catch (const std::logic_error & str)                        \
+  {                                                           \
+    l->unlock();                                              \
+    throw str;                                                \
+  }                                                           \
+  catch (const exception & e)                                 \
+  {                                                           \
+    l->unlock();                                              \
+    throw e;                                                  \
+  }                                                           \
+  catch (...)                                                 \
+  {                                                           \
+    l->unlock();                                              \
+    throw std::runtime_error("Unknown exception in thread");  \
+  }
 
   //		  cout << "Unlocking "<<  #l << endl;
   
