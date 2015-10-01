@@ -62,6 +62,9 @@ option (UTILS_USES_CONFIG
 option (UTILS_USES_SOCKETS
     "UTils includes sockets and http" ON)
 
+option (UTILS_USES_VIEWER
+    "Utils includes viewer (based on SFML)" ON)
+
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
    SET(SYSTEM_OS "MACOSX")
@@ -100,6 +103,16 @@ if (RHOBANMATH)
     include_directories ("${RHOBAN_MATH_DIRECTORY}")
     set (EXTRA_LIBS ${EXTRA_LIBS} RhobanMath)
 endif (RHOBANMATH)
+
+if (UTILS_USES_VIEWER)
+    set(EXTRA_LIBS ${EXTRA_LIBS} 
+        sfml-graphics
+        sfml-window
+        sfml-system
+        GL
+        GLU
+    )
+endif (UTILS_USES_VIEWER)
 
 # Adding sockets for Win32
 if (WIN32)
@@ -160,6 +173,9 @@ if(UTILS_USES_SOCKETS)
 endif()
 if(UTILS_USES_CONFIG)
  set(DIRECTORIES ${DIRECTORIES}  args configfile)
+endif()
+if(UTILS_USES_VIEWER)
+ set(DIRECTORIES ${DIRECTORIES}  viewer)
 endif()
 
 
@@ -224,6 +240,8 @@ if (COMPILE_UTILS_TESTS)
   add_executable (timeStampTest test/TimeStampTest.cpp timing/TimeStamp.cpp tests/TestCase.cpp )
   add_executable (splineTest test/SplineTest.cpp)
   target_link_libraries (splineTest RhobanUtils)
+  add_executable (viewerTest test/ViewerTest.cpp)
+  target_link_libraries (viewerTest RhobanUtils)
 endif (COMPILE_UTILS_TESTS)
 
 if(NOT MSVC)
