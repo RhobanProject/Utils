@@ -56,21 +56,17 @@ namespace Rhoban {
         // If a key is pressed which is not binded, do nothing
         catch (const std::out_of_range& exc) {}
         break;
-      //Avoid sudden moves when mouse enters in the window
-      case Event::MouseEntered:{
-        sf::Vector2i mousePosition = sf::Mouse::getPosition();
-        _lastMousePosX = mousePosition.x;
-        _lastMousePosY = mousePosition.y;
-        break;
-      }
       case Event::MouseMoved:{
         double newX = event.mouseMove.x;
         double newY = event.mouseMove.y;
-        double mouseDeltaPosX = newX - _lastMousePosX;
-        double mouseDeltaPosY = newY - _lastMousePosY;
+        // This method allows to move the mouse without rotating point of view
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+          double mouseDeltaPosX = newX - _lastMousePosX;
+          double mouseDeltaPosY = newY - _lastMousePosY;
+          rotateCamera(-mouseDeltaPosY * camViewVel, mouseDeltaPosX * camViewVel);
+        }
         _lastMousePosX = newX;
         _lastMousePosY = newY;
-        rotateCamera(-mouseDeltaPosY * camViewVel, mouseDeltaPosX * camViewVel);
         break;
       }
       default:
