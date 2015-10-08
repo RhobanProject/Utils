@@ -9,7 +9,7 @@
 #include <functional>
 #include <map>
 
-#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <Eigen/Dense>
 
 namespace Rhoban {
@@ -46,7 +46,7 @@ namespace Rhoban {
       /**
        * SFML Windows instance
        */
-      sf::Window _window;
+      sf::RenderWindow _window;
 
       /**
        * Camera position and view direction
