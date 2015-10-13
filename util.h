@@ -25,6 +25,12 @@ typedef unsigned int uint;
 
 using namespace std;
 
+/**
+ * Return the content of the whole file 'effectively'
+ * cf: http://insanecoding.blogspot.jp/2011/11/how-to-read-in-file-in-c.html
+ */
+std::string slurpFile(const std::string& path);
+
 bool is_in_vector_string(vector<string> vector, string testval);
 
 template <typename T>
