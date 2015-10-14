@@ -33,7 +33,7 @@ std::string slurpFile(const std::string& path)
     in.close();
     return(contents);
   }
-  throw(errno);
+  throw std::runtime_error("Failed to open file '" + path + "'");
 }
 
 bool is_in_vector_string(vector<string> vector, string testval)
