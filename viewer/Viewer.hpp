@@ -73,6 +73,10 @@ namespace Rhoban {
       void leftMove();
       void rightMove();
 
+      sf::Font font;
+      sf::Text status;
+      bool statusEnabled;
+
     public:
       /**
        * Initialize SFML and OpenGL rendering
@@ -84,7 +88,7 @@ namespace Rhoban {
        * Poll event and update screen drawing
        * return false on exit asked
        */
-      bool update();
+      virtual bool update();
 
       /**
        * Draw a box with given size at
@@ -105,6 +109,9 @@ namespace Rhoban {
        */
       void drawCube(const Color& c = Color::gray,
                     bool wireFrame = true);
+
+      void displayStatus();
+      void updateStatus(const std::string& newStatus);
 
     private:
       /**

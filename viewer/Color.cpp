@@ -8,6 +8,11 @@ namespace Rhoban {
     const Color Color::blue(0,0,1);
     const Color Color::gray(0.3,0.6,0.6);
 
+    Color::Color()
+      : r(1.0), g(1.0), b(1.0)
+    {
+    }
+
     Color::Color(double r_, double g_, double b_)
       : r(r_), g(g_), b(b_)
     {

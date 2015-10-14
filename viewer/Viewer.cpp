@@ -14,7 +14,8 @@ namespace Rhoban {
       _window(sf::VideoMode(width, height), "OpenGL", 
               sf::Style::Default, sf::ContextSettings(32)),
       _camPos(0.0, 0.0, 0.0),
-      _camView(1.0, 0.0, 0.0)
+      _camView(1.0, 0.0, 0.0),
+      statusEnabled(true)
     {
       _window.setVerticalSyncEnabled(true);
       _camView.normalize();
@@ -39,6 +40,12 @@ namespace Rhoban {
       onKeyPress[Keyboard::Down ].push_back([this](){ this->backwardMove(); });
       onKeyPress[Keyboard::Left ].push_back([this](){ this->leftMove();     });
       onKeyPress[Keyboard::Right].push_back([this](){ this->rightMove();    });
+
+      // Default messages
+      font.loadFromFile("monkey.ttf");
+      status = sf::Text("Status", font);
+      status.setCharacterSize(30);
+      status.setColor(sf::Color::Red);
     }
 
     bool Viewer::treat(const Event& event)
@@ -129,6 +136,11 @@ namespace Rhoban {
 
       //Drawing
       drawGround(groundSize);
+
+      //Display status
+      if (statusEnabled) {
+        displayStatus();
+      }
     
       //Update drawing
       _window.display();
@@ -251,6 +263,19 @@ namespace Rhoban {
       if (isWireFrame) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       }
-    }        
+    }
+
+    void Viewer::displayStatus()
+    {
+      _window.pushGLStates();
+      _window.draw(status);
+      _window.popGLStates();
+    }
+
+    void Viewer::updateStatus(const std::string& s)
+    {
+      status.setString(s);
+    }
+
   }
 }
