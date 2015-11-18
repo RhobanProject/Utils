@@ -1,14 +1,15 @@
-#ifndef UTILS_TIMING_BENCHMARK_HPP
-#define UTILS_TIMING_BENCHMARK_HPP
+#pragma once
 
 #include <chrono>
 #include <map>
-#include <vector>
 #include <string>
 #include <stdexcept>
 #include <iostream>
 // TODO: create an example tests for this class
 
+/**
+ * Currently this 'Benchmark method' is not thread-safe.
+ */
 namespace Utils {
   namespace Timing {
 
@@ -20,19 +21,22 @@ namespace Utils {
 
       // typedefs
       typedef std::chrono::time_point<std::chrono::steady_clock> TimeStamp;
-      typedef std::pair<std::string, Benchmark *> namedBenchmark;
       /* Local variables */
       Benchmark * father;
       std::string name;
       TimeStamp openingTime;
       TimeStamp closingTime;
-      bool isTimerActive;
-      std::vector<namedBenchmark> children;
+      double elapsedTicks;
+      std::map<std::string, Benchmark *> children;
 
       static Benchmark * getCurrent();
 
       void print(std::ostream & out, int maxDepth = -1);
       void print(std::ostream & out, int depth, int width , int maxDepth = -1);
+
+      // Start a new timing session
+      void startSession();
+      void endSession();
 
       double getTime() const;
       double getSubTime() const;
@@ -57,5 +61,3 @@ namespace Utils {
     };
   }
 }
-
-#endif//UTILS_TIMING_BENCHMARK_HPP

@@ -31,6 +31,8 @@ using namespace std;
  */
 std::string slurpFile(const std::string& path);
 
+std::string to_string(double val, int precision);
+
 bool is_in_vector_string(vector<string> vector, string testval);
 
 template <typename T>

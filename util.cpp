@@ -17,6 +17,7 @@
 #include "util.h"
 #include <ctime>
 #include <cerrno>
+#include <iomanip>
 
 using namespace std;
 
@@ -34,6 +35,13 @@ std::string slurpFile(const std::string& path)
     return(contents);
   }
   throw std::runtime_error("Failed to open file '" + path + "'");
+}
+
+std::string to_string(double val, int precision)
+{
+  ostringstream oss;
+  oss << setprecision(precision) << val;
+  return oss.str();
 }
 
 bool is_in_vector_string(vector<string> vector, string testval)

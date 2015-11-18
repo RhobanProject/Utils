@@ -15,12 +15,9 @@ namespace Utils {
     Benchmark * Benchmark::current = NULL;
 
     Benchmark::Benchmark(Benchmark * f, const std::string & n)
-      : father(f), name(n)
+      : father(f), name(n), elapsedTicks(0)
     {
-#ifndef WIN32
-      openingTime = steady_clock::now();
-#endif
-      isTimerActive = false;
+      startSession();
     }
 
     Benchmark * Benchmark::getCurrent()
@@ -37,13 +34,37 @@ namespace Utils {
       }
     }
 
+    void Benchmark::startSession()
+    {
+#ifndef WIN32
+      openingTime = steady_clock::now();
+#endif
+    }
+
+    void Benchmark::endSession()
+    {
+#ifndef WIN32
+      closingTime = steady_clock::now();
+#endif
+      elapsedTicks += double((closingTime - openingTime).count());
+    }
+
+
     void Benchmark::open(const std::string& benchmarkName)
     {
-      Benchmark * newB = new Benchmark(current, benchmarkName);
-      if (current != NULL) {
-        current->children.push_back(namedBenchmark(benchmarkName, newB));
+      // If child is not existing yet:
+      Benchmark * childBenchmark = NULL;
+      if (current == NULL || current->children.count(benchmarkName) == 0) {
+        childBenchmark = new Benchmark(current, benchmarkName);
+        if (current != NULL) {
+          current->children[benchmarkName] = childBenchmark;
+        }
       }
-      current = newB;
+      else {
+        childBenchmark = current->children.at(benchmarkName);
+        childBenchmark->startSession();
+      }
+      current = childBenchmark;
     }
 
     double Benchmark::close(bool print, int detailLevel, std::ostream & out)
@@ -51,12 +72,12 @@ namespace Utils {
       if (current == NULL)
         throw std::runtime_error("No active benchmark to close");
       Benchmark * toClose = current;
-#ifndef WIN32
-      toClose->closingTime = steady_clock::now();
-#endif
+      toClose->endSession();
+
       current = toClose->father;
-      if (print)
+      if (print) {
         toClose->print(out, detailLevel);
+      }
       
       double elapsedTime = toClose->getTime();
       // Suppress Benchmark if the link is lost
@@ -67,7 +88,6 @@ namespace Utils {
 
     double Benchmark::getTime() const
     {
-      double elapsedTicks = double((closingTime - openingTime).count());
       double time = elapsedTicks * steady_clock::period::num / steady_clock::period::den;
       return time;
       

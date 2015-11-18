@@ -19,6 +19,12 @@ namespace Rhoban {
     {
       _window.setVerticalSyncEnabled(true);
       _camView.normalize();
+
+      double defaultGroundSize = 2;
+      for(int i : {0,1}){
+        groundLimits(i,0) = -defaultGroundSize;
+        groundLimits(i,1) =  defaultGroundSize;
+      }
     
       //Setup projection matrix
       glMatrixMode(GL_PROJECTION);
@@ -135,7 +141,7 @@ namespace Rhoban {
       updateCamera();
 
       //Drawing
-      drawGround(groundSize);
+      drawGround();
 
       //Display status
       if (statusEnabled) {
@@ -200,22 +206,29 @@ namespace Rhoban {
       glMultMatrixf(m);
     }
         
-    void Viewer::drawGround(double size)
+    void Viewer::drawGround()
     {
-      double groundStep = size / groundSquares;
+      double xSize = groundLimits(0,1) - groundLimits(0,0);
+      double ySize = groundLimits(1,1) - groundLimits(1,0);
+      double xGroundStep = xSize / groundSquares;
+      double yGroundStep = ySize / groundSquares;
       glLineWidth(groundThickness);
-      for (double x=-size;x<=size;x+=2.0*groundStep) {
+      for (double x = groundLimits(0,0);
+           x <= groundLimits(1,0);
+           x += xGroundStep) {
         glBegin(GL_LINES);
         glColor3f(1.0, 1.0, 1.0);
-        glVertex3f(x, -size, 0.0);
-        glVertex3f(x, size, 0.0);
+        glVertex3f(x, -ySize, 0.0);
+        glVertex3f(x,  ySize, 0.0);
         glEnd();
       }
-      for (double y=-size;y<=size;y+=2.0*groundStep) {
+      for (double y = groundLimits(0,0);
+           y <= groundLimits(1,0);
+           y += yGroundStep) {
         glBegin(GL_LINES);
         glColor3f(1.0, 1.0, 1.0);
-        glVertex3f(-size, y, 0.0);
-        glVertex3f(size, y, 0.0);
+        glVertex3f(-xSize, y, 0.0);
+        glVertex3f( xSize, y, 0.0);
         glEnd();
       }
     }

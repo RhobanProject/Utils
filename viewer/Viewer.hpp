@@ -30,7 +30,7 @@ namespace Rhoban {
       double camViewVel = 0.01;
 
       // Ground properties
-      double groundSize = 2.0;
+      Eigen::Matrix2d groundLimits;
       double groundThickness = 1.0;
       int groundSquares = 10;
 
@@ -126,10 +126,9 @@ namespace Rhoban {
       void applyRotation(const Eigen::Matrix3d& orientation);
 
       /**
-       * Draw ground centered on origin with
-       * given size
+       * Draw ground centered on origin
        */
-      void drawGround(double size);
+      void drawGround();
     };
   }
 }
