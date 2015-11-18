@@ -1,4 +1,4 @@
-if (ENABLE_YAML)
+if (UTILS_USES_YAML)
     set (SOURCES ConfigFile.cpp ConfigFileEntry.cpp)
 else ()
     set (SOURCES)
