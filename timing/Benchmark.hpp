@@ -58,6 +58,13 @@ namespace Utils {
        */
       static double close(bool print = false, int detailLevel = -1,
                           std::ostream & out = std::cout);
+
+      /**
+       * Throw an error if the name of the current benchmark does not match the
+       * provided name
+       */
+      static double close(const std::string & expectedName, bool print = false,
+                          int detailLevel = -1, std::ostream & out = std::cout);
     };
   }
 }

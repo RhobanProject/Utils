@@ -4,6 +4,7 @@
 #include <exception>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <tuple>
 
 using namespace std::chrono;
@@ -65,6 +66,24 @@ namespace Utils {
         childBenchmark->startSession();
       }
       current = childBenchmark;
+    }
+
+    double Benchmark::close(const std::string & expectedName, bool print,
+                            int detailLevel, std::ostream & out)
+    {
+      if (current == NULL)
+        throw std::runtime_error("No active benchmark to close");
+      Benchmark * toClose = current;
+
+      if (toClose->name != expectedName)
+      {
+        std::ostringstream oss;
+        oss << "Invalid close of Benchmark:" << std::endl
+            << "\tReceived: '" << toClose->name << "'" << std::endl
+            << "\tExpected: '" << expectedName  << "'";
+        throw std::runtime_error(oss.str());
+      }
+      return close(print, detailLevel, out);
     }
 
     double Benchmark::close(bool print, int detailLevel, std::ostream & out)
