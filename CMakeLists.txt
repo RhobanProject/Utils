@@ -62,8 +62,9 @@ option (UTILS_USES_CONFIG
 option (UTILS_USES_SOCKETS
     "UTils includes sockets and http" ON)
 
+# Disabling it by default to avoid screwing all the users
 option (UTILS_USES_VIEWER
-    "Utils includes viewer (based on SFML)" ON)
+    "Utils includes viewer (based on SFML)" OFF)
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # Mac OS X specific code
