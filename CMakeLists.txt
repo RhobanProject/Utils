@@ -241,8 +241,12 @@ if (COMPILE_UTILS_TESTS)
   add_executable (timeStampTest test/TimeStampTest.cpp timing/TimeStamp.cpp tests/TestCase.cpp )
   add_executable (splineTest test/SplineTest.cpp)
   target_link_libraries (splineTest RhobanUtils)
+  # viewerTest
   add_executable (viewerTest test/ViewerTest.cpp)
   target_link_libraries (viewerTest RhobanUtils)
+  # benchmarkTest
+  add_executable (benchmarkTest test/BenchmarkTest.cpp)
+  target_link_libraries (benchmarkTest RhobanUtils)
 endif (COMPILE_UTILS_TESTS)
 
 if(NOT MSVC)

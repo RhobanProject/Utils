@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -183,6 +184,59 @@ namespace Utils {
       for (int i = 0; i < depth; i++) out << '\t';
       out << std::setw(width) << getTime() * 1000 << " ms : "
           << name << std::endl;
+    }
+
+    double Benchmark::closeCSV(const std::string & path, int detailLevel)
+    {
+      std::ofstream out;
+      out.open(path);
+      double time = closeCSV(out, true, detailLevel);
+      out.close();
+      return time;
+    }
+    
+    double Benchmark::closeCSV(std::ostream & out, bool header, int detailLevel)
+    {
+        if (current == NULL)
+          throw std::runtime_error("No active benchmark to close");
+        Benchmark * toClose = current;
+        // Close the benchmark
+        toClose->endSession();
+        current = toClose->father;
+        // Print header if specified
+        if (header) printCSVHeader(out);
+        // Print benchmark 
+        toClose->printCSV(out, 0, detailLevel);
+    }
+    
+    void Benchmark::printCSVHeader(std::ostream & out)
+    {
+      out << "depth,name,father,time" << std::endl;
+    }
+    
+    void Benchmark::printCSV(std::ostream & out, int depth, int maxDepth)
+    {
+      // Getting father name
+      std::string fatherName("unknown");
+      if (father != NULL) fatherName = father->name;
+      // Priting current informations
+      out << depth      << ","
+          << name       << ","
+          << fatherName << ","
+          << getTime()  << std::endl;
+      
+      // Print childrens if allowed and found
+      if (children.size() > 0  && (maxDepth < 0 || depth < maxDepth)) {
+        for(auto& c : children) {
+          c.second->printCSV(out, depth + 1, maxDepth);
+        }
+        // Print the unknown part
+        double unknownTime = getTime() - getSubTime();
+        out << (depth + 1) << ","
+            << "unknown"   << ","
+            << name        << ","
+            << unknownTime << std::endl;
+      }
     }
   }
 }

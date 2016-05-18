@@ -34,6 +34,10 @@ namespace Utils {
       void print(std::ostream & out, int maxDepth = -1);
       void print(std::ostream & out, int depth, int width , int maxDepth = -1);
 
+      void printCSV(std::ostream & out, int depth, int maxDepth = -1);
+
+      static void printCSVHeader(std::ostream & out);
+
       // Start a new timing session
       void startSession();
       void endSession();
@@ -65,6 +69,18 @@ namespace Utils {
        */
       static double close(const std::string & expectedName, bool print = false,
                           int detailLevel = -1, std::ostream & out = std::cout);
+
+      /**
+       * Close the current benchmak and print its output to the file at the
+       * given path.
+       */
+      static double closeCSV(const std::string & path, int detailLevel = -1);
+      /**
+       * close the current benchmark and append its content to the provided
+       * output stream, csv header is printed or not according to the related
+       * parameter
+       */
+      static double closeCSV(std::ostream & out, bool header, int detailLevel = -1);
     };
   }
 }
