@@ -5,6 +5,8 @@ option (32BIT "Compilation 32 bit" OFF)
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "")
 endif ()
+set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -fPIC")
 
 IF(32BIT)
 	set (CMAKE_CXX_FLAGS "-m32" CACHE STRING "")
