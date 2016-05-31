@@ -1,4 +1,5 @@
 #include <SFML/OpenGL.hpp>
+#include <GL/glu.h>
 #include "Viewer.hpp"
 
 using sf::Event;

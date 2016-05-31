@@ -17,6 +17,8 @@ else (MSVC)
   ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set(CMAKE_CXX_FLAGS 
     "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -fPIC")
 
 endif (MSVC)
 
