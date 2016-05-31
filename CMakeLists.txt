@@ -34,7 +34,7 @@ if(ENABLE_JSON)
 endif()
 
 option (UTILS_USES_ZMQ
-    "Utils includes ZMQ?" ON)
+    "Utils includes ZMQ?" OFF)
 
 option (UTILS_USES_XML
     "Utils includes XML features" ON)
