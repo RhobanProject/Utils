@@ -65,9 +65,12 @@ namespace Utils {
 
       /**
        * Throw an error if the name of the current benchmark does not match the
-       * provided name
+       * provided name.
+       * /!\ char * is used instead of string here. Otherwise, if we call close("any string")
+       * the compiler choses the close(bool) overload instead of this one. Great job
+       * c++
        */
-      static double close(const std::string & expectedName, bool print = false,
+      static double close(const char * expectedName, bool print = false,
                           int detailLevel = -1, std::ostream & out = std::cout);
 
       /**

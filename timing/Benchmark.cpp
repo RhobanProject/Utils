@@ -69,7 +69,7 @@ namespace Utils {
       current = childBenchmark;
     }
 
-    double Benchmark::close(const std::string & expectedName, bool print,
+    double Benchmark::close(const char * expectedName, bool print,
                             int detailLevel, std::ostream & out)
     {
       if (current == NULL)
