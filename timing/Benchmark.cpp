@@ -98,7 +98,7 @@ namespace Utils {
       if (print) {
         toClose->print(out, detailLevel);
       }
-      
+
       double elapsedTime = toClose->getTime();
       // Suppress Benchmark if the link is lost
       if (current == NULL)
@@ -110,7 +110,7 @@ namespace Utils {
     {
       double time = elapsedTicks * steady_clock::period::num / steady_clock::period::den;
       return time;
-      
+
     }
 
     double Benchmark::getSubTime() const
@@ -194,7 +194,7 @@ namespace Utils {
       out.close();
       return time;
     }
-    
+
     double Benchmark::closeCSV(std::ostream & out, bool header, int detailLevel)
     {
         if (current == NULL)
@@ -205,17 +205,18 @@ namespace Utils {
         current = toClose->father;
         // Print header if specified
         if (header) printCSVHeader(out);
-        // Print benchmark 
+        // Print benchmark
         toClose->printCSV(out, 0, detailLevel);
+        return toClose->getTime(); //Is it ok?
     }
-    
-    void Benchmark::printCSVHeader(std::ostream & out)
-    {
+
+  void Benchmark::printCSVHeader(std::ostream & out)
+  {
       out << "depth,name,father,time" << std::endl;
-    }
-    
-    void Benchmark::printCSV(std::ostream & out, int depth, int maxDepth)
-    {
+  }
+
+  void Benchmark::printCSV(std::ostream & out, int depth, int maxDepth)
+  {
       // Getting father name
       std::string fatherName("unknown");
       if (father != NULL) fatherName = father->name;
@@ -224,19 +225,19 @@ namespace Utils {
           << name       << ","
           << fatherName << ","
           << getTime()  << std::endl;
-      
+
       // Print childrens if allowed and found
       if (children.size() > 0  && (maxDepth < 0 || depth < maxDepth)) {
-        for(auto& c : children) {
-          c.second->printCSV(out, depth + 1, maxDepth);
-        }
-        // Print the unknown part
-        double unknownTime = getTime() - getSubTime();
-        out << (depth + 1) << ","
-            << "unknown"   << ","
-            << name        << ","
-            << unknownTime << std::endl;
+          for(auto& c : children) {
+              c.second->printCSV(out, depth + 1, maxDepth);
+          }
+          // Print the unknown part
+          double unknownTime = getTime() - getSubTime();
+          out << (depth + 1) << ","
+              << "unknown"   << ","
+              << name        << ","
+              << unknownTime << std::endl;
       }
-    }
+  }
   }
 }

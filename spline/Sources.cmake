@@ -1,5 +1,5 @@
 
-set (SOURCES 
+set (SOURCES
     PolySpline.cpp
     Function.cpp
     )
