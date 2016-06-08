@@ -182,42 +182,8 @@ if (COMPILE_UTILS_TESTS)
   include_directories ("test")
 endif (COMPILE_UTILS_TESTS)
 
-if (UTILS_USES_ZMQ)
-	message("-- Adding ZMQ support")
-
 	set(DIRECTORIES ${DIRECTORIES} zmq)
-
-    add_definitions (-DHAVE_ZMQ)
-	set (ZMQ_VERSION "3.0" CACHE STRING  "ZMQ Version")
-
-	if(${ZMQ_VERSION} MATCHES "2.2")
-		message("Using ZMQ version 2.2")
-		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq2.2/include"
-			CACHE STRING "ZMQ headers directory")
-		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq2.2")
-    elseif(${ZMQ_VERSION} MATCHES "3.2")
-		message("Using ZMQ version 3.2")
-		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq3.2/include"
-			CACHE STRING "ZMQ headers directory")
-		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq3.2")
-	else()
-		message("Using ZMQ version ${ZMQ_VERSION}")
-		set(ZMQ_HEADERS "${PROJECT_SOURCE_DIR}/zmq/include"
-			CACHE STRING "ZMQ headers directory")
-		add_subdirectory("${PROJECT_SOURCE_DIR}/zmq")
-		message("Adding graph directory")
-		set(DIRECTORIES ${DIRECTORIES} graph)
-		set(DIRECTORIES ${DIRECTORIES} zmq)
-	endif()
-
-
-    include_directories ("${ZMQ_HEADERS}")
-    set (EXTRA_LIBS ${EXTRA_LIBS} ZeroMQ)
-
-    if(UNIX AND NOT APPLE)
-        set (EXTRA_LIBS ${EXTRA_LIBS} rt)
-    endif(UNIX AND NOT APPLE)
-endif (UTILS_USES_ZMQ)
+	add_definitions (-DHAVE_ZMQ)
 
 set (SOURCES)
 set (ALL_SOURCES)
