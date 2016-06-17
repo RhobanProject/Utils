@@ -2,15 +2,7 @@
 #include "ZMQContext.h"
 #include <threading/Thread.h>
 
-#ifdef WIN32
-#include <zmq/include/zmq.h>
-#else
-#ifdef MACOSX
-#include <zmq/include/zmq.h>
-#else
 #include <zmq.h>
-#endif
-#endif
 
 using namespace std;
 

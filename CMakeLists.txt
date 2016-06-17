@@ -31,6 +31,7 @@ if (MSVC)
 else (MSVC) 
   IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
      set(CMAKE_CXX_FLAGS " -Wall -g -Wno-overloaded-virtual")
+        add_definitions(-DMACOSX)
   ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")  
   ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -150,7 +151,7 @@ if(ENABLE_JSON)
 	set (JSON_HEADERS "${PROJECT_SOURCE_DIR}/jsoncpp/include"
 	    CACHE STRING "")
 	include_directories ("${JSON_HEADERS}")
-	set (EXTRA_LIBS ${EXTRA_LIBS} json)
+    set (EXTRA_LIBS ${EXTRA_LIBS} json)
 endif()
 
 # Sources

@@ -4,9 +4,9 @@
 // Include a bunch of headers that we will need in the examples
 
 #ifndef WIN32
-#include <zmq/include/zmq.h>
+#include <zmq.h>
 #else
-#include <zmq\include\zmq.h>
+#include <zmq.h>
 #endif
 
 #include <stdint.h>

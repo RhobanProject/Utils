@@ -57,14 +57,16 @@ string ZMQClient::process(const string &request)
 
   zmq_msg_init_size(&message, request.size());
   memcpy(zmq_msg_data(&message), request.c_str(), request.size());
-  int sent = zmq_msg_send(&message, client, 0);
+  //int sent =
+    zmq_msg_send(&message, client, 0);
 //  if (sent == -1)
 //	  throw runtime_error("Unable to send message to the server");
   int size = zmq_msg_recv(&message, client, 0);
     if (size == -1)
         throw runtime_error("Unable to get reponse from the server");
     
-    string response((char *)zmq_msg_data(&message), size);
+    char * buf = (char *)zmq_msg_data(&message);
+    string response(buf, size);
     zmq_msg_close(&message);
     return response;
 }

@@ -121,11 +121,20 @@ namespace Rhoban
                     }
 
 #ifndef MSVC
-                    if (bind(socketDescriptor, (SOCKADDR*) &sinserv, sizeof(sinserv)))
+#ifdef MACOSX
+                    //int	bind(int, const struct sockaddr *, socklen_t) __DARWIN_ALIAS(bind);
+                    if (bind((int) socketDescriptor, (const sockaddr*) &sinserv, (socklen_t) sizeof(sinserv)) < 0)
                     {
                         perror("bind()");
                         throw string("Failed to bind socket");
                     }
+#else
+                    if (bind(socketDescriptor, (SOCKADDR*) &sinserv, sizeof(sinserv)) < 0)
+                    {
+                        perror("bind()");
+                        throw string("Failed to bind socket");
+                    }
+#endif
 #else
 					bind(socketDescriptor, (SOCKADDR*)&sinserv, sizeof(sinserv));
 #endif

@@ -24,13 +24,7 @@ using namespace Rhoban;
 Thread::Thread()
 {
     thread_state = Unborn;
-#ifndef WIN32
-    _Thread = 0;
-#else
-#ifndef MSVC
-    _Thread.p =0;
-#endif
-#endif
+    _Thread = NULL;
 }
 
 Thread::~Thread()
@@ -63,22 +57,18 @@ Thread::~Thread()
 
 void Thread::detach()
 {
-#ifndef MSVC
-    pthread_detach(_Thread);
-#endif
+    if(_Thread)
+        _Thread->detach();
 }
 
 int Thread::start(void * arg)
 {
     thread_state = Starting;
-    _Arg = arg; 
+    _Arg = arg;
+    
 #ifndef MSVC
-    int code = pthread_create(&_Thread, NULL, Thread::EntryPoint, this);
-
-    if (code != 0) {
-        perror("pthread");
-    }
-    return code;
+    _Thread = new thread(Thread::EntryPoint, this);
+    return 0;
 #else
 	DWORD id;
 	_Thread = CreateThread( 
@@ -170,8 +160,7 @@ void Thread::kill(void)
         if(_Thread.p)
 #endif
         {
-            pthread_cancel(_Thread);
-            pthread_join(_Thread, NULL);
+            _Thread->join();
 #ifndef WIN32
             _Thread=0;
 #else
@@ -204,10 +193,7 @@ int Thread::currentThreadId(void)
 
 void Thread::run(void)
 {
-    stringstream ss;
-    ss << currentThreadId();
-    thread_name = ss.str();
-
+    thread_name = to_string(currentThreadId());
     myId = currentThreadId();
 
     try {
@@ -240,6 +226,7 @@ void Thread::run(void)
  void * Thread::EntryPoint(void* pthis)
 {
     Thread *pt = (Thread*)pthis;
+    /*
     int s = pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
     if (s != 0) {
@@ -255,7 +242,7 @@ void Thread::run(void)
         cerr << err;
         throw err;
     }
-
+*/
  #else
  DWORD Thread::EntryPoint(LPVOID pthis)
 	 {
@@ -313,7 +300,9 @@ void Thread::unlock()
 void Thread::wait(void)
 {
 #ifndef MSVC
-    pthread_join (_Thread, NULL);
+    if(_Thread)
+        _Thread->join();
+    _Thread = NULL;
 #else
 	wait_dead();
 #endif
