@@ -108,22 +108,19 @@ IF(DEFINED WIN32)
 ENDIF(DEFINED WIN32)
 
 # Options
-option (RHOBANMATH
-    "Enables RhobanMath support" ON)
+option(RHOBANMATH "Enables RhobanMath support" OFF)
 
 set (RHOBAN_UTILS_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
 if (NOT RHOBANMATH)
     add_definitions(-DNO_RHOBANMATH)
-endif (NOT RHOBANMATH)
-
-if (RHOBANMATH)
+else ()
     set(RHOBAN_MATH_DIRECTORY "${BASE}/Math"
         CACHE STRING "RhobanMath directory")
 
     include_directories ("${RHOBAN_MATH_DIRECTORY}")
     set (EXTRA_LIBS ${EXTRA_LIBS} RhobanMath)
-endif (RHOBANMATH)
+endif ()
 
 # Adding sockets for Win32
 if (WIN32)

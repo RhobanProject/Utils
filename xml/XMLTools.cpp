@@ -164,12 +164,11 @@ string XMLTools::serialize_double_array(vector<double> data)
     return result.str();
 }
 
-#ifndef NO_RHOBANMATH
-Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
+vector<double> XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
     if(!node) throw string("XMLTools extractdoublearray null node");
     TiXmlNode* the_values = node->FirstChild( array_id );
     if(the_values){
-        vector<scalar> tmp;
+        vector<double> tmp;
         for ( TiXmlNode* child = the_values->FirstChild(); child != 0; child = child->NextSibling())
         {
             if(!child)
@@ -182,14 +181,13 @@ Matrix XMLTools::extract_double_array(TiXmlNode* node, const char * array_id) {
             }
             else tmp.push_back(atof(child->FirstChild()->Value()));
         }
-        return Matrix(tmp);
+        return tmp;
     }
     else
     {
         xml_parse_error(string("Xml parsing: Could not find (double array) node with label  ") +array_id + " in node " + string(node->Value()));
     }
 }
-#endif
 
 vector<string> XMLTools::get_string_array(TiXmlNode* node, const char * array_id)
 {

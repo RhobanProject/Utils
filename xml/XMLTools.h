@@ -15,11 +15,8 @@
  */
 
 #include <fstream>
+#include <sstream>
 #include <vector>
-
-#ifndef NO_RHOBANMATH
-#include "linear_algebra.h"
-#endif
 
 #include "TinyXml/tinystr.h"
 #include "TinyXml/tinyxml.h"
@@ -106,9 +103,7 @@ namespace XMLTools
 
     float * get_float_array_with_3_element(TiXmlNode * node, const char * id);
 
-#ifndef NO_RHOBANMATH
-    Matrix extract_double_array(TiXmlNode* node, const char * array_id);
-#endif
+    vector<double> extract_double_array(TiXmlNode* node, const char * array_id);
 
     string serialize_double_array(vector<double> data);
 
