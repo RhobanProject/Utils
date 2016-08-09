@@ -122,10 +122,6 @@ void SlowTimedThread::stop(bool wait)
 	}
 }
 
-
-
-
-
 double SlowTimedThread::elapsed_time_since_start()
 {
 	return start.getTime();
@@ -138,37 +134,26 @@ void SlowTimedThread::execute()
 
 	while(thread_state != Dying && thread_state != Dead)
 	{
-	//	if(timer.get_frequency() < 0.00001)
-		//	measured_frequency = 0;
-
 		while(max_frequency < 0.00001)
 		{
 			measured_frequency = 0;
 			syst_wait_ms(1000);
 		}
 
-		//timer.wait_next_tick();
 		before.reset();
 
 		step();
 
-		double t = last.getTime();
-		measured_frequency = 0.9 * measured_frequency + 0.1 / min(1000.0, t);
-
-
-		last.reset();
 
 		double t2 = before.getTimeUsec();
 		int to_wait = max(1.0, 1000000.0 / max_frequency - t2);
 
-		//cout << "Max freq " << max_frequency << " step_ms " << step_ms << " waiting " << to_wait << endl;
-
 		syst_wait_us(to_wait);
 
-		//cout << /*TM_CAUTION_MSG*/ "Waiting nexttick in Timedthread " << this->ThreadId() << endl;
-		//cout << /*TM_CAUTION_MSG*/ "Done Stepping Timedthread " << this->ThreadId() << endl;
+		double t = last.getTime();
+		measured_frequency = 0.9 * measured_frequency + 0.1 / min(1000.0, t);
+		last.reset();
 	}
-	//not yet thread_state = Dead;
 }
 
 void TimedThread::init_suspended(double hertz)
