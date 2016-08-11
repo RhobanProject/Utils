@@ -24,10 +24,7 @@
 
 #include <stdexcept>
 
-#ifndef WIN32
-#include <pthread.h>
-#include <stdexcept>
-#endif
+#include <thread>
 
 #include "Mutex.h"
 #include "Condition.h"
@@ -281,7 +278,7 @@ protected:
   void wait_for_resume(bool lock = false);
 
 #ifndef MSVC
-  pthread_t _Thread; ///< thread handle
+    std::thread * _Thread; ///< thread handle
 #else
   HANDLE _Thread;
 #endif

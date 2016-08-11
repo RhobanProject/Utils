@@ -284,7 +284,7 @@ int Serial::connect2()
 	connect();
 #else
 	struct termios tio;
-	int flags;
+	//int flags;
 	memset(&tio, 0, sizeof(tio));
 
 	if ((fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK |O_NOCTTY)) == -1){
@@ -326,6 +326,7 @@ int Serial::connect2()
 	case 38400: baudrate_code = B38400; break;
 	case 57600: baudrate_code = B57600; break;
 	case 115200: baudrate_code = B115200; break;
+#ifndef MACOSX
 	case 230400: baudrate_code = B230400; break;
 	case 460800: baudrate_code = B460800; break;
 	case 500000: baudrate_code = B500000; break;
@@ -339,6 +340,7 @@ int Serial::connect2()
 	case 3000000: baudrate_code = B3000000; break;
 	case 3500000: baudrate_code = B3500000; break;
 	case 4000000: baudrate_code = B4000000; break;
+#endif
 	default:
 	  throw runtime_error("Serial::setSpeed: unknown baudrate");
 	}

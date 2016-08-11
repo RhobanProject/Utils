@@ -18,6 +18,8 @@ string JsonServer::process(const char *str)
 
 string JsonServer::process(const string &str)
 {
+   // return "";
+    
     Json::Reader reader;
     Json::Value request;
 
@@ -28,6 +30,7 @@ string JsonServer::process(const string &str)
         return writer.write(response);
     }
 
+//    return str;
     return "[0,\"Unable to parse the request\"]";
 }
 

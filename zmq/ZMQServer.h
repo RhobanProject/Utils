@@ -43,18 +43,21 @@ public:
 
 	void execute()
 	{
-		zmq_msg_t message;
-		zmq_msg_init(&message);
 
 		while (processor.isRunning()) {
+            zmq_msg_t message;
+            zmq_msg_init(&message);
 			int size = zmq_msg_recv(&message, server, 0);
 			if (size != -1)
 			{
-				auto name = std::string((char *)zmq_msg_data(&message), size);
+                char * data = (char *)zmq_msg_data(&message);
+                if(data) {
+				auto name = std::string(data, size);
 				std::string response = processor.process(name);
 				zmq_msg_init_size(&message, response.size());
 				memcpy(zmq_msg_data(&message), response.c_str(), response.size());
 				zmq_msg_send(&message, server, 0);
+                }
 			}
 		}
 	}

@@ -78,7 +78,7 @@ public:
 	*  method will be called at the given frequency
 	*
 	*/
-	void init(double hertz);
+	virtual void init(double hertz);
 
 	/*
 	Sae as init but the thread is suspended on startup, use Playable::pplay() to start it */
@@ -104,6 +104,7 @@ protected:
 	void lock(){ mutex.lock(); }
 	void unlock() { mutex.unlock(); }
 
+    virtual void init(double hertz, bool animated_by_tick_machine) { return init(hertz); };
 };
 
 class SlowTimedThread : protected Thread
